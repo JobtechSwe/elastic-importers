@@ -127,7 +127,7 @@ def start():
     #print(concept_id_counter)
     pickle_values(all_values)
     json_converter.concept_to_taxonomy(all_values)
-    json_converter.taxonomy_to_concept(all_values)
+    json_converter.save_taxonomy_to_concept_as_json(all_values)
 
 
 if __name__ == '__main__':

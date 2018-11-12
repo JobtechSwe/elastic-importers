@@ -15,6 +15,10 @@ def concept_to_taxonomy(values):
         json.dump(json_dict, fout, sort_keys=True,  indent=4, separators=(',', ': '))
 
 
+def save_taxonomy_to_concept_as_json(values):
+    result = taxonomy_to_concept(values)
+    dump_json("taxonomy_to_concept.json", result)
+
 def taxonomy_to_concept(values):
     py_dict = {}
     for value in values:
@@ -26,8 +30,12 @@ def taxonomy_to_concept(values):
         py_dict[value["type"]][value["legacy_id"]]["type"] = value["type"]
     #print(len(values))
     #print(len(py_dict))
-    with open(resources_folder + "taxonomy_to_concept.json", "w") as fout:
-        json.dump(py_dict, fout , sort_keys=True, indent=4, separators=(',', ': '))
+    return py_dict
+
+
+def dump_json(file_name, data):
+    with open(resources_folder + file_name , "w") as fout:
+        json.dump(data, fout , sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def unpickle_json(file_name):
