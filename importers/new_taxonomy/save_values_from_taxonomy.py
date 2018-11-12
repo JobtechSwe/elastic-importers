@@ -109,7 +109,7 @@ def add_concept_id(value_category):
 
 
 def get_uuids():
-    with open("uuid.txt", "r") as fin:
+    with open(settings.resources_folder + "uuid.txt", "r") as fin:
         data = fin.read()
         data = data.replace('"', '')
         uuid_list = data.split("\n")
@@ -117,8 +117,7 @@ def get_uuids():
 
 
 def pickle_values(all_values):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "/values.pickle", "wb") as fout:
+    with open(settings.resources_folder + "values.pickle", "wb") as fout:
         pickle.dump(all_values, fout)
 
 
