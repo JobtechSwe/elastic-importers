@@ -30,8 +30,7 @@ def check_if_taxonomyversion_already_exists():
 
 
 def unpickle_values():
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path+"/values.pickle", "rb") as fin:
+    with open(settings.resources_folder + "values.pickle", "rb") as fin:
         data = pickle.load(fin)
         return data
 
