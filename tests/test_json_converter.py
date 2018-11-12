@@ -5,11 +5,11 @@ import pytest
 
 def createTestDataElement(legacy_id, type, label, concept_id, legacy_num_id):
     od = OrderedDict()
-    od['legacy_id'] = legacy_id
+    od['legacy_ams_taxonomy_id'] = legacy_id
     od['type'] = type
     od['label'] = label
     od['concept_id'] = concept_id
-    od['legacy_num_id'] = legacy_num_id
+    od['legacy_ams_taxonomy_num_id'] = legacy_num_id
     return od
 
 testData = []
