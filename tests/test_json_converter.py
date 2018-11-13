@@ -28,9 +28,10 @@ json_dict = {'jobterm':
                       {'conceptId': '5bcde2bb-9c6b-4ad0-8e1f-aa086598b663',
                        'legacyAmsTaxonomyId': '5372',
                        'preferredTerm': '2:e Fartygsingenjör/2:e Maskinist',
-                       'type': 'jobterm'}
+                       'type': 'jobterm'},
                   }
              }
+
 
 test_data = [create_test_data_element('5370',
                                       'jobterm',
@@ -46,10 +47,12 @@ test_data = [create_test_data_element('5370',
                                       'jobterm',
                                       '2:e Styrman',
                                       '5bcde2bb-5854-4ced-bf3e-7fccef284357',
-                                      '3151')]
+                                      '3151'),
+             ]
 
 
 @pytest.mark.unit
 def test_taxonomy_to_concept():
     result = importers.new_taxonomy.json_converter.taxonomy_to_concept(test_data)
     assert {result[k] == v for k, v in json_dict.items()}
+    assert len(result) == len(json_dict)

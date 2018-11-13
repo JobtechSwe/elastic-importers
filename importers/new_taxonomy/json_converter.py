@@ -1,8 +1,8 @@
 import json
 import os
-from uu import encode
 from importers.new_taxonomy.settings import resources_folder
 from collections import defaultdict
+
 
 def concept_to_taxonomy(values):
     json_dict = {}
@@ -11,8 +11,6 @@ def concept_to_taxonomy(values):
         json_dict[value["concept_id"]]["legacyAmsTaxonomyId"] = value["legacy_ams_taxonomy_id"]
         json_dict[value["concept_id"]]["type"] = value["type"]
         json_dict[value["concept_id"]]["label"] = value["label"]
-    #print(len(values))
-    #print(len(json_dict))
     with open(resources_folder + "concept_to_taxonomy.json", "w") as fout:
         json.dump(json_dict, fout, sort_keys=True,  indent=4, separators=(',', ': '))
 
@@ -20,6 +18,7 @@ def concept_to_taxonomy(values):
 def save_taxonomy_to_concept_as_json(values):
     result = taxonomy_to_concept(values)
     dump_json("taxonomy_to_concept.json", result)
+
 
 def taxonomy_to_concept(values):
     py_dict = defaultdict(dict)
@@ -33,8 +32,8 @@ def taxonomy_to_concept(values):
 
 
 def dump_json(file_name, data):
-    with open(resources_folder + file_name , "w") as fout:
-        json.dump(data, fout , ensure_ascii=False ,sort_keys=True, indent=4, separators=(',', ': '))
+    with open(resources_folder + file_name, "w") as fout:
+        json.dump(data, fout, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def unpickle_json(file_name):
