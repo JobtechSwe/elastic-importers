@@ -11,9 +11,11 @@ def concept_to_taxonomy(values):
         json_dict[value["concept_id"]]["legacyAmsTaxonomyId"] = value["legacy_ams_taxonomy_id"]
         json_dict[value["concept_id"]]["type"] = value["type"]
         json_dict[value["concept_id"]]["label"] = value["label"]
-    with open(resources_folder + "concept_to_taxonomy.json", "w") as fout:
-        json.dump(json_dict, fout, sort_keys=True,  indent=4, separators=(',', ': '))
+    return json_dict
 
+def save_concept_to_taxonomy_as_json(values):
+    result = concept_to_taxonomy(values)
+    dump_json("concept_to_taxonomy.json", result)
 
 def save_taxonomy_to_concept_as_json(values):
     result = taxonomy_to_concept(values)
@@ -36,7 +38,7 @@ def dump_json(file_name, data):
         json.dump(data, fout, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-def unpickle_json(file_name):
+def open_json(file_name):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     with open(dir_path + "/" + file_name, "r") as fin:
         data = json.load(fin)
