@@ -1,8 +1,8 @@
 import json
 import os
 from uu import encode
-
 from importers.new_taxonomy.settings import resources_folder
+from collections import defaultdict
 
 def concept_to_taxonomy(values):
     json_dict = {}
@@ -22,16 +22,13 @@ def save_taxonomy_to_concept_as_json(values):
     dump_json("taxonomy_to_concept.json", result)
 
 def taxonomy_to_concept(values):
-    py_dict = {}
+    py_dict = defaultdict(dict)
     for value in values:
-        py_dict[value["type"]] = {}
         py_dict[value["type"]][value["legacy_ams_taxonomy_id"]] = {}
         py_dict[value["type"]][value["legacy_ams_taxonomy_id"]]["conceptId"] = value["concept_id"]
         py_dict[value["type"]][value["legacy_ams_taxonomy_id"]]["legacyAmsTaxonomyId"] = value["legacy_ams_taxonomy_id"]
         py_dict[value["type"]][value["legacy_ams_taxonomy_id"]]["preferredTerm"] = value["label"]
         py_dict[value["type"]][value["legacy_ams_taxonomy_id"]]["type"] = value["type"]
-    #print(len(values))
-    #print(len(py_dict))
     return py_dict
 
 
