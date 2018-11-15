@@ -21,7 +21,7 @@ platsannons_mappings = {
                     }
                 },
                 "keywords": {
-                    "type": "objet",
+                    "type": "object",
                     "properties": {
                         "occupation": {
                             "type": "text",
