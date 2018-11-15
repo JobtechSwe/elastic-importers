@@ -21,11 +21,34 @@ platsannons_mappings = {
                     }
                 },
                 "keywords": {
-                    "type": "text",
-                    "fields": {
-                        "raw": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                    "type": "objet",
+                    "properties": {
+                        "occupation": {
+                            "type": "text",
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
+                        "skill": {
+                            "type": "text",
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
+                        "location": {
+                            "type": "text",
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         }
                     }
                 },

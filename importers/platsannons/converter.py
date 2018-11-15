@@ -253,25 +253,42 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
 
 
 def _add_keywords(annons):
-    keywords = set()
-    for key in [
-        'yrkesroll.term',
-        'yrkesgrupp.term',
-        'yrkesomrade.term',
-        'krav.kompetenser.term',
-        'krav.sprak.term',
-        'meriterande.kompetenser.term',
-        'meriterande.sprak.term',
-        'arbetsplatsadress.postort',
-        'arbetsplatsadress.kommun',
-        'arbetsplatsadress.lansnamn',
-        'arbetsplatsadress.land',
-    ]:
-        values = _get_nested_value(key, annons)
-        for value in values:
-            for kw in _extract_taxonomy_label(value):
-                keywords.add(kw)
-    annons['keywords'] = list(keywords)
+    annons['keywords'] = dict()
+    for key_dict in [
+        {
+            'occupation':
+                [
+                    'yrkesroll.term',
+                    'yrkesgrupp.term',
+                    'yrkesomrade.term',
+                ]
+        },
+        {
+            'skill':
+                [
+                    'krav.kompetenser.term',
+                    'krav.sprak.term',
+                    'meriterande.kompetenser.term',
+                    'meriterande.sprak.term',
+                ]
+        },
+        {
+            'location':
+                [
+                    'arbetsplatsadress.postort',
+                    'arbetsplatsadress.kommun',
+                    'arbetsplatsadress.lansnamn',
+                    'arbetsplatsadress.land',
+                ]
+        }]:
+        field = list(key_dict.keys())[0]
+        keywords = set()
+        for key in list(key_dict.values())[0]:
+            values = _get_nested_value(key, annons)
+            for value in values:
+                for kw in _extract_taxonomy_label(value):
+                    keywords.add(kw)
+        annons['keywords'][field] = list(keywords)
     return annons
 
 
