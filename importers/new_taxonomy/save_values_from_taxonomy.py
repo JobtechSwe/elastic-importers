@@ -4,13 +4,12 @@ from importers.new_taxonomy import settings, taxonomy_service, converter
 from pkg_resources import resource_string
 import pickle
 from importers.new_taxonomy import json_converter
-import os
 
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
 log = logging.getLogger(__name__)
-concept_id_counter = 0  # 100000001
+concept_id_counter = 0
 
 
 def fetch_full_taxonomy():
@@ -123,10 +122,8 @@ def pickle_values(all_values):
 
 def start():
     all_values = fetch_full_taxonomy()
-    #print(len(all_values))
-    #print(concept_id_counter)
     pickle_values(all_values)
-    json_converter.concept_to_taxonomy(all_values)
+    json_converter.save_concept_to_taxonomy_as_json(all_values)
     json_converter.save_taxonomy_to_concept_as_json(all_values)
 
 
