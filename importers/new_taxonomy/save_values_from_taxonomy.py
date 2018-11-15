@@ -108,7 +108,7 @@ def add_concept_id(value_category):
 
 
 def get_uuids():
-    with open(settings.resources_folder + "uuid.txt", "r") as fin:
+    with open(settings.resources_folder + "ids.txt", "r") as fin:
         data = fin.read()
         data = data.replace('"', '')
         uuid_list = data.split("\n")
