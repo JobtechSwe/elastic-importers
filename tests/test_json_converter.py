@@ -1,5 +1,5 @@
 import importers.new_taxonomy.json_converter as json_converter
-import pytest
+import pytest, sys
 
 
 test_data_for_map_functions = [{'legacy_ams_taxonomy_id':'5370',
@@ -22,6 +22,7 @@ test_data_for_map_functions = [{'legacy_ams_taxonomy_id':'5370',
 
 @pytest.mark.unit
 def test_taxonomy_to_concept():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
     expected_dict = {'jobterm':
                          {'3151':
                               {'conceptId': '5bcde2bb-ff9b-4a8b-9a09-cf3c67b9a05e',
@@ -44,7 +45,9 @@ def test_taxonomy_to_concept():
     assert {result[k] == v for k, v in expected_dict.items()}
     assert len(result) == len(expected_dict)
 
+@pytest.mark.unit
 def test_concept_to_taxonomy():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
     expected_dict = {'5bcde2bb-ff9b-4a8b-9a09-cf3c67b9a05e':
                          {'label': '1:e Fartygsingenjör/1:e Maskinist',
                           'legacyAmsTaxonomyId': '5370',
