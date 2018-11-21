@@ -14,7 +14,7 @@ setup(
     entry_points={
         'console_scripts': [
             'import-platsannonser = importers.platsannons.main:start',
-            'import-taxonomy = importers.taxonomy.main:start',
+            'import-taxonomy = importers.new_taxonomy.main:start',
             'import-auranest = importers.auranest.main:start',
             'import-new-taxonomy = importers.new_taxonomy.main:start'
         ],
