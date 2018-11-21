@@ -1,5 +1,5 @@
 import json
-from importers.new_taxonomy.settings import resources_folder
+from importers.taxonomy.settings import resources_folder
 from collections import defaultdict
 
 

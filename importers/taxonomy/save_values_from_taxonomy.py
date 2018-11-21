@@ -1,9 +1,9 @@
 import logging
 import json
-from importers.new_taxonomy import settings, taxonomy_service, converter
+from importers.taxonomy import settings, taxonomy_service, converter
 from pkg_resources import resource_string
 import pickle
-from importers.new_taxonomy import json_converter
+from importers.taxonomy import json_converter
 
 
 logging.basicConfig()
