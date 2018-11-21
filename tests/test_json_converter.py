@@ -1,4 +1,4 @@
-import importers.new_taxonomy.json_converter as json_converter
+import importers.taxonomy.json_converter as json_converter
 import pytest, sys
 
 
