@@ -10,7 +10,7 @@ setup(
         'valuestore', 'psycopg2-binary', 'elasticsearch', 'zeep',
         'python-dateutil', 'flashtext'
     ],
-    package_data={'': ['**/platser.json']},
+    package_data={'': ['**/resources/*']},
     entry_points={
         'console_scripts': [
             'import-platsannonser = importers.platsannons.main:start',
