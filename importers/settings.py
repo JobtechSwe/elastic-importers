@@ -6,7 +6,8 @@ ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
 
 # For platsannonser
-ES_ANNONS_INDEX = os.getenv('ES_ANNONS_INDEX', os.getenv('ES_ANNONS', 'platsannons'))
+ES_ANNONS_INDEX = os.getenv('ES_ANNONS_INDEX',
+                            os.getenv('ES_ANNONS', 'platsannons-write'))
 platsannons_mappings = {
     "mappings": {
         "document": {
@@ -106,7 +107,8 @@ PG_PASSWORD = os.getenv("PG_PASSWORD")
 PG_BATCH_SIZE = os.getenv("PG_BATCH_SIZE", 1000)
 
 # For kandidat import
-ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX', os.getenv('ES_KANDIDAT', 'kandidater'))
+ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
+                              os.getenv('ES_KANDIDAT', 'kandidater'))
 ORACLE_USER = os.getenv('ORACLE_USER')
 ORACLE_PASSWORD = os.getenv('ORACLE_PASSWORD')
 ORACLE_PORT = os.getenv('ORACLE_PORT', '1521')
@@ -114,8 +116,10 @@ ORACLE_HOST = os.getenv('ORACLE_HOST')
 ORACLE_SERVICE = os.getenv('ORACLE_SERVICE')
 
 # For auranest import
-ES_AURANEST_INDEX = os.getenv('ES_AURANEST_INDEX', os.getenv('ES_AURANEST', 'auranest'))
-ES_ONTOLOGY_INDEX = os.getenv('ES_ONTOLOGY_INDEX', os.getenv('ES_ONTOLOGY', 'ontology'))
+ES_AURANEST_INDEX = os.getenv('ES_AURANEST_INDEX',
+                              os.getenv('ES_AURANEST', 'auranest-write'))
+ES_ONTOLOGY_INDEX = os.getenv('ES_ONTOLOGY_INDEX',
+                              os.getenv('ES_ONTOLOGY', 'ontology'))
 
 auranest_mappings = {
     "settings": {
@@ -195,4 +199,3 @@ auranest_mappings = {
         }
     }
 }
-
