@@ -37,7 +37,7 @@ def create_valuestore_jobs(taxonomy_jobterms, taxonomy_jobgroups,
                      ('type', tax_type['yrkesroll']),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['LocaleCode'])),
+                     ('legacy_ams_taxonomy_num_id', int(field['OccupationNameID'])),
                      ('parent', jobgroups[field['LocaleCode']])])
         for field in taxonomy_jobterms
     }
