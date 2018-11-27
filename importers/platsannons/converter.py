@@ -72,26 +72,21 @@ def convert_message(message_envelope):
         annons['egen_bil'] = message.get('tillgangTillEgenBil', False)
         if message.get('korkort', []):
             annons['korkort_kravs'] = True
-            taxkorkort = []
-            for kkort in message.get('korkort'):
-                taxkorkort.append({
-                    "kod": kkort['varde'],
-                    "term": taxonomy.get_term('korkort', kkort['varde'])
-                })
-            annons['korkort'] = taxkorkort
+            annons['korkort'] = parse_driving_licence(message)
         else:
             annons['korkort_kravs'] = False
         if 'yrkesroll' in message:
-            yrkesroll = taxonomy.get_entity('yrkesroll',
+            # jafhk fixa parsning för dessa med get_concept_by_legacy_id
+            yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll',
                                             message.get('yrkesroll', {}).get('varde'))
             if yrkesroll and 'parent' in yrkesroll:
                 yrkesgrupp = yrkesroll.pop('parent')
                 yrkesomrade = yrkesgrupp.pop('parent')
-                annons['yrkesroll'] = {'kod': yrkesroll['id'],
+                annons['yrkesroll'] = {'kod': yrkesroll['concept_id'],
                                        'term': yrkesroll['label']}
-                annons['yrkesgrupp'] = {'kod': yrkesgrupp['id'],
+                annons['yrkesgrupp'] = {'kod': yrkesgrupp['concept_id'],
                                         'term': yrkesgrupp['label']}
-                annons['yrkesomrade'] = {'kod': yrkesomrade['id'],
+                annons['yrkesomrade'] = {'kod': yrkesomrade['concept_id'],
                                          'term': yrkesomrade['label']}
             elif not yrkesroll:
                 log.warning('Taxonomy value not found for "yrkesroll" (%s)'
@@ -136,83 +131,52 @@ def convert_message(message_envelope):
         }
         annons['krav'] = {
             'kompetenser': [
-                {'kod': kompetens.get('varde'),
-                 'term': taxonomy.get_term('kompetens', kompetens.get('varde')),
-                 'vikt': kompetens.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'), kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) > 3
             ],
             'sprak': [
-                {'kod': sprak.get('varde'),
-                 'term': taxonomy.get_term('sprak', sprak.get('varde')),
-                 'vikt': sprak.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'), sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) > 3
             ],
             'utbildningsniva': [
-                {'kod': utbn.get('varde'),
-                 'term': taxonomy.get_term('utbildningsniva', utbn.get('varde')),
-                 'vikt': utbn.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('utbildningsniva', utbn.get('varde'), utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn.get('vikt', 0) > 3
-
             ],
             'utbildningsinriktning': [
-                {'kod': utbi.get('varde'),
-                 'term': taxonomy.get_term('utbildningsinriktning', utbi.get('varde')),
-                 'vikt': utbi.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('utbildningsinriktning', utbi.get('varde'), utbi.get('vikt'))
                 for utbi in
-                [message.get('utbildningsinriktning', {})] if utbi.get('vikt', 0) > 3
+                [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) > 3
             ],
             'yrkeserfarenheter': [
-                {'kod': yrkerf.get('varde'),
-                 'term': taxonomy.get_term('yrkesroll', yrkerf.get('varde')),
-                 'vikt': yrkerf.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('yrkesroll', yrkerf.get('varde'), yrkerf.get('vikt')) # varför yrkesroll?? och inte yrkeerfarenhet?
                 for yrkerf in
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) > 3
             ]
         }
         annons['meriterande'] = {
             'kompetenser': [
-                {'kod': kompetens.get('varde'),
-                 'term': taxonomy.get_term('kompetens', kompetens.get('varde')),
-                 'vikt': kompetens.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'), kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) < 4
             ],
             'sprak': [
-                {'kod': sprak.get('varde'),
-                 'term': taxonomy.get_term('sprak', sprak.get('varde')),
-                 'vikt': sprak.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'), sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) < 4
             ],
             'utbildningsniva': [
-                {'kod': utbn.get('varde'),
-                 'term': taxonomy.get_term('utbildningsniva', utbn('varde')),
-                 'vikt': utbn('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('utbildningsniva', utbn.get('varde'), utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn and utbn.get('vikt', 0) < 4
             ],
             'utbildningsinriktning': [
-                {'kod': utbi.get('varde'),
-                 'term': taxonomy.get_term('utbildningsinriktning', utbi.get('varde')),
-                 'vikt': utbi.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('utbildningsinriktning', utbi.get('varde'), utbi.get('vikt'))
                 for utbi in
-                [message.get('utbildningsinriktning', {})] if utbi.get('vikt', 0) < 4
+                [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) < 4 # hantera null värden
             ],
             'yrkeserfarenheter': [
-                {'kod': yrkerf.get('varde'),
-                 'term': taxonomy.get_term('yrkesroll', yrkerf.get('varde')),
-                 'vikt': yrkerf.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('yrkeserfarenheter', yrkerf.get('varde'), yrkerf.get('vikt'))
                 for yrkerf in
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) < 4
             ]
@@ -245,11 +209,33 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
     message_value = message_dict.get(message_key, {}).get('varde') \
         if message_dict else None
     if message_value:
+        concept = taxonomy.get_concept_by_legacy_id(annons_key, message_value)
         return {
-            'kod': message_value,
-            'term': taxonomy.get_term(annons_key, message_value)
+            "kod": concept['concept_id'],
+            "term": concept['label']
         }
     return None
+
+
+def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
+    concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
+    #TODO handle null values better
+    return {'kod': concept.get('legacy_id', {}),
+            'term': concept.get('label', {}),
+            'vikt': weight
+            }
+
+
+
+def parse_driving_licence(message):
+    taxkorkortList = []
+    for kkort in message.get('korkort'):
+        taxkortkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
+        taxkorkortList.append({
+            "kod": taxkortkort['concept_id'],
+            "term": taxkortkort['label']
+        })
+    return taxkorkortList
 
 
 def _add_keywords(annons):
@@ -266,6 +252,7 @@ def _add_keywords(annons):
         {
             'skill':
                 [
+
                     'krav.kompetenser.term',
                     'krav.sprak.term',
                     'meriterande.kompetenser.term',
