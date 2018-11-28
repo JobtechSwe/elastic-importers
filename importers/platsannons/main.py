@@ -4,12 +4,13 @@ from datetime import datetime
 from importers.repository import elastic, postgresql
 from importers.platsannons import converter
 from importers import settings
+from importers import common
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
 
 log = logging.getLogger(__name__)
-
+IMPORTER_NAME = 'af-platsannons'
 
 def start():
     start_time = time.time()
@@ -29,10 +30,13 @@ def start():
         (last_identifiers, last_timestamp, platsannonser) = \
             postgresql.read_from_pg_since(last_identifiers,
                                           last_timestamp, 'platsannonser', converter)
-        doc_counter += len(platsannonser)
+        current_doc_count = len(platsannonser)
+        doc_counter += current_doc_count
+
         if platsannonser:
-            log.info("Indexed %d docs so far." % doc_counter)
+            log.debug("Indexed %d docs so far." % doc_counter)
             elastic.bulk_index(platsannonser, settings.ES_ANNONS_INDEX)
+            common.log_import_metrics(log, IMPORTER_NAME, current_doc_count)
         else:
             break
 
