@@ -6,8 +6,11 @@ ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
 
 # For platsannonser
-ES_ANNONS_INDEX = os.getenv('ES_ANNONS_INDEX',
-                            os.getenv('ES_ANNONS', 'platsannons-write'))
+WRITE_INDEX_SUFFIX = '-write'
+ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX',
+                             os.getenv('ES_ANNONS', 'platsannons'))
+ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
+
 platsannons_mappings = {
     "mappings": {
         "document": {
@@ -116,8 +119,9 @@ ORACLE_HOST = os.getenv('ORACLE_HOST')
 ORACLE_SERVICE = os.getenv('ORACLE_SERVICE')
 
 # For auranest import
-ES_AURANEST_INDEX = os.getenv('ES_AURANEST_INDEX',
-                              os.getenv('ES_AURANEST', 'auranest-write'))
+ES_AURANEST_PREFIX = os.getenv('ES_AURANEST_INDEX',
+                               os.getenv('ES_AURANEST', 'auranest'))
+ES_AURANEST_INDEX = "%s%s" % (ES_AURANEST_PREFIX, WRITE_INDEX_SUFFIX)
 ES_ONTOLOGY_INDEX = os.getenv('ES_ONTOLOGY_INDEX',
                               os.getenv('ES_ONTOLOGY', 'ontology'))
 

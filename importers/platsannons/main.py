@@ -12,18 +12,20 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 IMPORTER_NAME = 'af-platsannons'
 
-def start():
+
+def start(args):
     start_time = time.time()
-    if not elastic.index_exists(settings.ES_ANNONS_INDEX):
-        log.info("Creating index %s" % settings.ES_ANNONS_INDEX)
-        elastic.create_index(settings.ES_ANNONS_INDEX, settings.platsannons_mappings)
-    last_timestamp = elastic.get_last_timestamp(settings.ES_ANNONS_INDEX)
+    es_index = args[1] if len(args) > 1 else settings.ES_ANNONS_INDEX
+    if not elastic.index_exists(es_index):
+        log.info("Creating index %s" % es_index)
+        elastic.create_index(es_index, settings.platsannons_mappings)
+    last_timestamp = elastic.get_last_timestamp(es_index)
     log.info("Last timestamp: %d (%s)" % (last_timestamp,
                                           datetime.fromtimestamp(
                                               (last_timestamp+1)/1000)
                                           ))
     last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
-                                                      settings.ES_ANNONS_INDEX)
+                                                      es_index)
     doc_counter = 0
 
     while True:
@@ -34,8 +36,8 @@ def start():
         doc_counter += current_doc_count
 
         if platsannonser:
-            log.debug("Indexed %d docs so far." % doc_counter)
-            elastic.bulk_index(platsannonser, settings.ES_ANNONS_INDEX)
+            log.info("Indexed %d docs so far." % doc_counter)
+            elastic.bulk_index(platsannonser, es_index)
             common.log_import_metrics(log, IMPORTER_NAME, current_doc_count)
         else:
             break
@@ -46,4 +48,5 @@ def start():
 
 
 if __name__ == '__main__':
-    start()
+    import sys
+    start(sys.argv)
