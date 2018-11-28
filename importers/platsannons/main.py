@@ -13,7 +13,9 @@ log = logging.getLogger(__name__)
 IMPORTER_NAME = 'af-platsannons'
 
 
-def start(args):
+def start():
+    import sys
+    args = sys.argv
     start_time = time.time()
     es_index = args[1] if len(args) > 1 else settings.ES_ANNONS_INDEX
     if not elastic.index_exists(es_index):
@@ -48,5 +50,4 @@ def start(args):
 
 
 if __name__ == '__main__':
-    import sys
-    start(sys.argv)
+    start()
