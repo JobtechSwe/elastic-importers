@@ -78,16 +78,19 @@ def convert_message(message_envelope):
         if 'yrkesroll' in message:
             # jafhk fixa parsning för dessa med get_concept_by_legacy_id
             yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll',
-                                            message.get('yrkesroll', {}).get('varde'))
+                                                          message.get('yrkesroll', {}).get('varde'))
             if yrkesroll and 'parent' in yrkesroll:
                 yrkesgrupp = yrkesroll.pop('parent')
                 yrkesomrade = yrkesgrupp.pop('parent')
                 annons['yrkesroll'] = {'kod': yrkesroll['concept_id'],
-                                       'term': yrkesroll['label']}
+                                       'term': yrkesroll['label'],
+                                       'taxonomi-kod': yrkesroll['legacy_ams_taxonomy_id']}
                 annons['yrkesgrupp'] = {'kod': yrkesgrupp['concept_id'],
-                                        'term': yrkesgrupp['label']}
+                                        'term': yrkesgrupp['label'],
+                                        'taxonomi-kod': yrkesgrupp['legacy_ams_taxonomy_id']}
                 annons['yrkesomrade'] = {'kod': yrkesomrade['concept_id'],
-                                         'term': yrkesomrade['label']}
+                                         'term': yrkesomrade['label'],
+                                         'taxonomi-kod': yrkesomrade['legacy_ams_taxonomy_id']}
             elif not yrkesroll:
                 log.warning('Taxonomy value not found for "yrkesroll" (%s)'
                             % message['yrkesroll'])
@@ -150,7 +153,7 @@ def convert_message(message_envelope):
                 [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) > 3
             ],
             'yrkeserfarenheter': [
-                get_concept_as_annons_value_with_weight('yrkesroll', yrkerf.get('varde'), yrkerf.get('vikt')) # varför yrkesroll?? och inte yrkeerfarenhet?
+                get_concept_as_annons_value_with_weight('yrkesroll', yrkerf.get('varde'), yrkerf.get('vikt'))
                 for yrkerf in
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) > 3
             ]
@@ -212,18 +215,28 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
         concept = taxonomy.get_concept_by_legacy_id(annons_key, message_value)
         return {
             "kod": concept['concept_id'],
-            "term": concept['label']
+            "term": concept['label'],
+            "taxonomi-kod": concept['legacy_ams_taxonomy_id']
         }
     return None
 
 
 def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
     concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
-    #TODO handle null values better
-    return {'kod': concept.get('legacy_id', {}),
-            'term': concept.get('label', {}),
-            'vikt': weight
-            }
+    weighted_concept = {
+        'kod': None,
+        'term': None,
+        'vikt': None,
+        'taxonomi-kod': None
+    }
+    try:
+        weighted_concept['kod'] = concept.get('concept_id', None)
+        weighted_concept['term'] = concept.get('label', None)
+        weighted_concept['vikt'] = weight
+        weighted_concept['taxonomi-kod'] = concept.get('legacy_ams_taxonomy_id', None)
+    except AttributeError:
+        log.warning('Taxonomy value not found for {0} {1}'.format(taxtype, legacy_id))
+    return weighted_concept
 
 
 
@@ -264,10 +277,11 @@ def _add_keywords(annons):
                 [
                     'arbetsplatsadress.postort',
                     'arbetsplatsadress.kommun',
-                    'arbetsplatsadress.lansnamn',
+                    'arbetsplatsadress.lan',
                     'arbetsplatsadress.land',
                 ]
-        }]:
+        }
+    ]:
         field = list(key_dict.keys())[0]
         keywords = set()
         for key in list(key_dict.values())[0]:
@@ -293,15 +307,18 @@ def _get_nested_value(path, data):
             break
         if isinstance(element, dict):
             data = element
-
     return values
 
 
 def _extract_taxonomy_label(label):
     if not label:
         return []
-    label = label.replace('m.fl.', '').strip()
-    if '-' in label:
-        return [word.lower() for word in re.split(r'/', label)]
-    else:
-        return [word.lower().strip() for word in re.split(r'/|, | och ', label)]
+    try:
+        label = label.replace('m.fl.', '').strip()
+        if '-' in label:
+            return [word.lower() for word in re.split(r'/', label)]
+        else:
+            return [word.lower().strip() for word in re.split(r'/|, | och ', label)]
+    except AttributeError:
+        print('extract fail (%s)' % label)
+    return []
