@@ -16,13 +16,13 @@ setup(
             'import-platsannonser = importers.platsannons.main:start',
             'import-taxonomy = importers.taxonomy.main:start',
             'import-auranest = importers.auranest.main:start',
-            'set-platsannons-read-alias = '
+            'set-read-alias-platsannons = '
             'importers.indexmaint.main:set_platsannons_read_alias',
-            'set-platsannons-write-alias = '
+            'set-write-alias-platsannons = '
             'importers.indexmaint.main:set_platsannons_write_alias',
-            'set-auranest-read-alias = '
+            'set-read-alias-auranest = '
             'importers.indexmaint.main:set_auranest_read_alias',
-            'set-auranest-write-alias = '
+            'set-write-alias-auranest = '
             'importers.indexmaint.main:set_auranest_write_alias',
         ],
     },
