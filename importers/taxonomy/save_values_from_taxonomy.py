@@ -39,10 +39,22 @@ def fetch_full_taxonomy():
         taxonomy_drivinglicence = add_concept_id(taxonomy_drivinglicence)  # adding concept_id
         taxonomy_wagetype = taxonomy_service.get_all_wage_type()
         taxonomy_wagetype = add_concept_id(taxonomy_wagetype)  # adding concept_id
-        taxonomy_education_level = taxonomy_service.get_all_education_levels()
-        taxonomy_education_level = add_concept_id(taxonomy_education_level)  # adding concept_id
-        taxonomy_education_field = taxonomy_service.get_all_education_fields()
-        taxonomy_education_field = add_concept_id(taxonomy_education_field)  # adding concept_id
+
+
+        taxonomy_education_fields_SUN1 = taxonomy_service.get_all_education_fields_SUN1()
+        taxonomy_education_fields_SUN1 = add_concept_id(taxonomy_education_fields_SUN1)
+        taxonomy_education_fields_SUN2 = taxonomy_service.get_all_education_fields_SUN2()
+        taxonomy_education_fields_SUN2 = add_concept_id(taxonomy_education_fields_SUN2)
+        taxonomy_education_fields_SUN3 = taxonomy_service.get_all_education_fields_SUN3()
+        taxonomy_education_fields_SUN3 = add_concept_id(taxonomy_education_fields_SUN3)
+
+        taxonomy_education_levels_SUN1 = taxonomy_service.get_all_education_levels_SUN1()
+        taxonomy_education_levels_SUN1 = add_concept_id(taxonomy_education_levels_SUN1)
+        taxonomy_education_levels_SUN2 = taxonomy_service.get_all_education_levels_SUN2()
+        taxonomy_education_levels_SUN2 = add_concept_id(taxonomy_education_levels_SUN2)
+        taxonomy_education_levels_SUN3 = taxonomy_service.get_all_education_levels_SUN3()
+        taxonomy_education_levels_SUN3 = add_concept_id(taxonomy_education_levels_SUN3)
+
         taxonomy_duration = taxonomy_service.get_all_duration()
         taxonomy_duration = add_concept_id(taxonomy_duration)  # adding concept_id
         taxonomy_occupation_experience = taxonomy_service.get_all_occupation_experience()
@@ -73,8 +85,18 @@ def fetch_full_taxonomy():
     valuestore_employmenttypes = converter.create_valuestore_employment_types(taxonomy_employmenttypes)
     valuestore_drivinglicences = converter.create_valuestore_driving_licence(taxonomy_drivinglicence)
     valuestore_wagetype = converter.create_valuestore_wagetype(taxonomy_wagetype)
-    valuestore_education_level = converter.create_valuestore_education_level(taxonomy_education_level)
-    valuestore_education_field = converter.create_valuestore_education_field(taxonomy_education_field)
+#    valuestore_education_level = converter.create_valuestore_education_level(taxonomy_education_level)
+    (valuestore_education_fields_SUN1,
+     valuestore_education_fields_SUN2,
+     valuestore_education_fields_SUN3) = converter.create_valuestore_education_fields(taxonomy_education_fields_SUN1,
+                                                                                    taxonomy_education_fields_SUN2,
+                                                                                    taxonomy_education_fields_SUN3)
+
+    (valuestore_education_levels_SUN1,
+     valuestore_education_levels_SUN2,
+     valuestore_education_levels_SUN3) = converter.create_valuestore_education_levels(taxonomy_education_levels_SUN1,
+                                                                                     taxonomy_education_levels_SUN2,
+                                                                                     taxonomy_education_levels_SUN3)
     valuestore_duration = converter.create_valuestore_duration(taxonomy_duration)
     valuestore_occupation_experience = converter.create_valuestore_occupation_experience(taxonomy_occupation_experience)
     return (
@@ -91,8 +113,13 @@ def fetch_full_taxonomy():
         + list(valuestore_employmenttypes.values())
         + list(valuestore_drivinglicences.values())
         + list(valuestore_wagetype.values())
-        + list(valuestore_education_level.values())
-        + list(valuestore_education_field.values())
+#        + list(valuestore_education_level.values())
+        + list(valuestore_education_fields_SUN1.values())
+        + list(valuestore_education_fields_SUN2.values())
+        + list(valuestore_education_fields_SUN3.values())
+        + list(valuestore_education_levels_SUN1.values())
+        + list(valuestore_education_levels_SUN2.values())
+        + list(valuestore_education_levels_SUN3.values())
         + list(valuestore_duration.values())
         + list(valuestore_occupation_experience.values())
     )

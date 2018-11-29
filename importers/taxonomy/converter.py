@@ -172,31 +172,78 @@ def create_valuestore_wagetype(taxonomy_wagetype):
     return wage_type
 
 
-def create_valuestore_education_level(taxonomy_education_level):
-    education_level = {
-        field['EducationLevelID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationLevelID'])),
-                     ('type', tax_type['utbildningsniva']),
+def create_valuestore_education_fields(taxonomy_education_field_SUN1, taxonomy_education_field_SUN2, taxonomy_education_field_SUN3):
+    education_field_SUN1 = {
+        field['SUNField1ID']:
+        OrderedDict([('legacy_ams_taxonomy_id', str(field['SUNField1Code'])),
+                     ('type', 'education_field_SUN1'),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['EducationLevelID']))])
-        for field in taxonomy_education_level
+                     ('legacy_ams_taxonomy_num_id', int(field['SUNField1Code']))])
+        for field in taxonomy_education_field_SUN1
     }
-    return education_level
+
+    education_field_SUN2 = {
+        field['SUNField2ID']: OrderedDict(
+            [('legacy_ams_taxonomy_id', str(field['SUNField2Code'])),
+             ('type',  'education_field_SUN2'),
+             ('label', field['Term']),
+             ('concept_id', str(field['uuid_id'])),
+             ('legacy_ams_taxonomy_num_id', int(field['SUNField2Code'])),
+             ('parent', education_field_SUN1[field['SUNField1ID']])])
+        for field in taxonomy_education_field_SUN2
+    }
+
+    education_field_SUN3 = {
+        field['SUNField3ID']: OrderedDict(
+            [('legacy_ams_taxonomy_id', str(field['SUNField3Code'])),
+             ('type',  'education_field_SUN3'),
+             ('label', field['Term']),
+             ('concept_id', str(field['uuid_id'])),
+             ('legacy_ams_taxonomy_num_id', int(field['SUNField3ID'])),
+             ('parent', education_field_SUN2[field['SUNField2ID']])])
+        for field in taxonomy_education_field_SUN3
+    }
+
+    return (education_field_SUN1, education_field_SUN2, education_field_SUN3)
+
+def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_education_levels_SUN2, taxonomy_education_levels_SUN3):
+
+    education_levels_SUN1 = {
+        field['SUNLevel1ID']:
+            OrderedDict([('legacy_ams_taxonomy_id', str(field['SUNLevel1Code'])),
+                         ('type', 'education_level_SUN1'),
+                         ('label', field['Term']),
+                         ('concept_id', str(field['uuid_id'])),
+                         ('legacy_ams_taxonomy_num_id', int(field['SUNLevel1Code']))])
+        for field in taxonomy_education_levels_SUN1
+    }
+
+    education_levels_SUN2 = {
+        field['SUNLevel2ID']: OrderedDict(
+            [('legacy_ams_taxonomy_id', str(field['SUNLevel2Code'])),
+             ('type',  'education_field_SUN2'),
+             ('label', field['Term']),
+             ('concept_id', str(field['uuid_id'])),
+             ('legacy_ams_taxonomy_num_id', int(field['SUNLevel2Code'])),
+             ('parent', education_levels_SUN1[field['SUNLevel1ID']])])
+        for field in taxonomy_education_levels_SUN2
+    }
+
+    education_levels_SUN3 = {
+        field['SUNLevel3ID']: OrderedDict(
+            [('legacy_ams_taxonomy_id', str(field['SUNLevel3Code'])),
+             ('type',  'education_field_SUN3'),
+             ('label', field['Term']),
+             ('concept_id', str(field['uuid_id'])),
+             ('legacy_ams_taxonomy_num_id', int(field['SUNLevel3Code'])),
+             ('parent', education_levels_SUN2[field['SUNLevel2ID']])])
+        for field in taxonomy_education_levels_SUN3
+    }
+
+    return (education_levels_SUN1, education_levels_SUN2, education_levels_SUN3)
 
 
-def create_valuestore_education_field(taxonomy_education_field):
-    education_field = {
-        field['EducationFieldID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationFieldID'])),
-                     ('type', tax_type['utbildningsinriktning']),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('description', field['Description']),
-                     ('legacy_ams_taxonomy_num_id', int(field['EducationFieldID']))])
-        for field in taxonomy_education_field
-    }
-    return education_field
 
 
 def create_valuestore_duration(taxonomy_duration):
