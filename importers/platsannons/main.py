@@ -1,3 +1,4 @@
+import sys
 import logging
 import time
 from datetime import datetime
@@ -14,13 +15,9 @@ IMPORTER_NAME = 'af-platsannons'
 
 
 def start():
-    import sys
-    args = sys.argv
     start_time = time.time()
-    es_index = args[1] if len(args) > 1 else settings.ES_ANNONS_INDEX
-    if not elastic.index_exists(es_index):
-        log.info("Creating index %s" % es_index)
-        elastic.create_index(es_index, settings.platsannons_mappings)
+    es_index = elastic.setup_indices(sys.argv, settings.ES_ANNONS_PREFIX,
+                                     settings.platsannons_mappings)
     last_timestamp = elastic.get_last_timestamp(es_index)
     log.info("Last timestamp: %d (%s)" % (last_timestamp,
                                           datetime.fromtimestamp(

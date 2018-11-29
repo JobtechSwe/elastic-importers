@@ -1,3 +1,4 @@
+import sys
 import time
 import logging
 from importers.repository import elastic, postgresql
@@ -12,15 +13,16 @@ log = logging.getLogger(__name__)
 
 IMPORTER_NAME = 'auranest'
 
+
 def start():
     log.info("Starting auranest import")
     start_time = time.time()
-    if not elastic.index_exists(settings.ES_AURANEST_INDEX):
-        elastic.create_index(settings.ES_AURANEST_INDEX, settings.auranest_mappings)
-    last_timestamp = elastic.get_last_timestamp(settings.ES_AURANEST_INDEX)
+    es_index = elastic.setup_indices(sys.argv, settings.ES_AURANEST_PREFIX,
+                                     settings.auranest_mappings)
+    last_timestamp = elastic.get_last_timestamp(es_index)
     log.debug("Last timestamp: %d" % last_timestamp)
     last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
-                                                      settings.ES_AURANEST_INDEX)
+                                                      es_index)
     doc_counter = 0
 
     while True:
@@ -34,7 +36,7 @@ def start():
         if annonser:
             enhanced = enricher.enrich(annonser)
             log.debug("Indexed %d docs so far." % doc_counter)
-            elastic.bulk_index(enhanced, settings.ES_AURANEST_INDEX)
+            elastic.bulk_index(enhanced, es_index)
             common.log_import_metrics(log, IMPORTER_NAME, current_doc_count)
         else:
             break

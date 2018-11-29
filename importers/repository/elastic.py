@@ -107,6 +107,25 @@ def put_alias(indexlist, aliasname):
     return es.indices.put_alias(index=indexlist, name=aliasname)
 
 
+def setup_indices(args, default_index, mappings):
+    es_alias = None
+    if len(args) > 1:
+        es_index = args[1]
+    else:
+        es_index = default_index
+        es_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
+    if not index_exists(es_index):
+        log.info("Creating index %s" % es_index)
+        create_index(es_index, mappings)
+    if es_alias and not alias_exists(es_alias):
+        log.info("Setting up alias %s for index %s" % (es_alias, es_index))
+        put_alias([es_index], es_alias)
+
+        return es_alias
+
+    return es_index
+
+
 def create_index(indexname, extra_mappings=None):
     basic_body = {
         "mappings": {
