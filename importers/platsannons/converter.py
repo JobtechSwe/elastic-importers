@@ -143,12 +143,12 @@ def convert_message(message_envelope):
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) > 3
             ],
             'utbildningsniva': [
-                get_concept_as_annons_value_with_weight('utbildningsniva', utbn.get('varde'), utbn.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationlevel', utbn.get('varde'), utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn.get('vikt', 0) > 3
             ],
             'utbildningsinriktning': [
-                get_concept_as_annons_value_with_weight('utbildningsinriktning', utbi.get('varde'), utbi.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationfield', utbi.get('varde'), utbi.get('vikt'))
                 for utbi in
                 [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) > 3
             ],
@@ -169,12 +169,12 @@ def convert_message(message_envelope):
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) < 4
             ],
             'utbildningsniva': [
-                get_concept_as_annons_value_with_weight('utbildningsniva', utbn.get('varde'), utbn.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationlevel', utbn.get('varde'), utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn and utbn.get('vikt', 0) < 4
             ],
             'utbildningsinriktning': [
-                get_concept_as_annons_value_with_weight('utbildningsinriktning', utbi.get('varde'), utbi.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationfield', utbi.get('varde'), utbi.get('vikt'))
                 for utbi in
                 [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) < 4 # hantera null värden
             ],
