@@ -68,6 +68,15 @@ def get_all_driving_licences():
     result = service.GetAllDrivingLicences(settings.LANGUAGE_CODE_SE)
     return serialize_object(result)
 
+def get_all_deprecated_education_fields():
+    result = service.GetAllEducationFields(settings.LANGUAGE_CODE_SE)
+    return serialize_object(result)
+
+
+def get_all_deprecated_education_levels():
+    result = service.GetAllEducationLevels(settings.LANGUAGE_CODE_SE)
+    return serialize_object(result)
+
 
 def get_all_education_fields_SUN1():
     result = service.GetAllSUNField1(settings.LANGUAGE_CODE_SE)

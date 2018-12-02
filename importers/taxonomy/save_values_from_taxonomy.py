@@ -40,6 +40,11 @@ def fetch_full_taxonomy():
         taxonomy_wagetype = taxonomy_service.get_all_wage_type()
         taxonomy_wagetype = add_concept_id(taxonomy_wagetype)  # adding concept_id
 
+        taxonomy_deprecated_education_levels = taxonomy_service.get_all_deprecated_education_levels()
+        taxonomy_deprecated_education_levels = add_concept_id(taxonomy_deprecated_education_levels)
+        taxonomy_deprecated_education_fields = taxonomy_service.get_all_deprecated_education_fields()
+        taxonomy_deprecated_education_fields = add_concept_id(taxonomy_deprecated_education_fields)
+
 
         taxonomy_education_fields_SUN1 = taxonomy_service.get_all_education_fields_SUN1()
         taxonomy_education_fields_SUN1 = add_concept_id(taxonomy_education_fields_SUN1)
@@ -97,6 +102,10 @@ def fetch_full_taxonomy():
      valuestore_education_levels_SUN3) = converter.create_valuestore_education_levels(taxonomy_education_levels_SUN1,
                                                                                      taxonomy_education_levels_SUN2,
                                                                                      taxonomy_education_levels_SUN3)
+
+    valuestore_deprecated_education_levels = converter.create_valuestore_deprecated_education_level(taxonomy_deprecated_education_levels)
+    valuestore_deprecated_education_fields = converter.create_valuestore_deprecated_education_field(taxonomy_deprecated_education_fields)
+
     valuestore_duration = converter.create_valuestore_duration(taxonomy_duration)
     valuestore_occupation_experience = converter.create_valuestore_occupation_experience(taxonomy_occupation_experience)
     return (
@@ -113,7 +122,8 @@ def fetch_full_taxonomy():
         + list(valuestore_employmenttypes.values())
         + list(valuestore_drivinglicences.values())
         + list(valuestore_wagetype.values())
-#        + list(valuestore_education_level.values())
+        + list(valuestore_deprecated_education_levels.values())
+        + list(valuestore_deprecated_education_fields.values())
         + list(valuestore_education_fields_SUN1.values())
         + list(valuestore_education_fields_SUN2.values())
         + list(valuestore_education_fields_SUN3.values())

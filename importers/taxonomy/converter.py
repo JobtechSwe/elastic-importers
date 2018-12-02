@@ -1,6 +1,6 @@
 import logging
 from collections import OrderedDict
-from valuestore.taxonomy import tax_type
+from valuestore.taxonomy import tax_type, DEPRECATED_EDUCATION_FIELD, DEPRECATED_EDUCATION_LEVEL
 
 
 logging.basicConfig()
@@ -244,6 +244,31 @@ def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_
     return (education_levels_SUN1, education_levels_SUN2, education_levels_SUN3)
 
 
+def create_valuestore_deprecated_education_level(taxonomy_education_level):
+    education_level = {
+        field['EducationLevelID']:
+            OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationLevelID'])),
+                         ('type', DEPRECATED_EDUCATION_LEVEL),
+                         ('label', field['Term']),
+                         ('concept_id', str(field['uuid_id'])),
+                         ('legacy_ams_taxonomy_num_id', int(field['EducationLevelID']))])
+        for field in taxonomy_education_level
+    }
+    return education_level
+
+
+def create_valuestore_deprecated_education_field(taxonomy_education_field):
+    education_field = {
+        field['EducationFieldID']:
+            OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationFieldID'])),
+                         ('type', DEPRECATED_EDUCATION_FIELD),
+                         ('label', field['Term']),
+                         ('concept_id', str(field['uuid_id'])),
+                         ('description', field['Description']),
+                         ('legacy_ams_taxonomy_num_id', int(field['EducationFieldID']))])
+        for field in taxonomy_education_field
+    }
+    return education_field
 
 
 def create_valuestore_duration(taxonomy_duration):
