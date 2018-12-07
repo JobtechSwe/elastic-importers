@@ -1,6 +1,6 @@
 import logging
 from collections import OrderedDict
-from valuestore.taxonomy import tax_type, DEPRECATED_EDUCATION_FIELD, DEPRECATED_EDUCATION_LEVEL
+from valuestore.taxonomy import tax_type, DEPRECATED_EDUCATION_FIELD, DEPRECATED_EDUCATION_LEVEL, JobtechTaxonomy as jt
 
 
 logging.basicConfig()
@@ -13,7 +13,7 @@ def create_valuestore_jobs(taxonomy_jobterms, taxonomy_jobgroups,
     jobfields = {
         field['LocaleFieldID']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['LocaleFieldID'])),
-             ('type', tax_type['yrkesomrade']),
+             ('type', jt.OCCUPATION_FIELD),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('description', field['Description']),
@@ -23,7 +23,7 @@ def create_valuestore_jobs(taxonomy_jobterms, taxonomy_jobgroups,
     jobgroups = {
         field['LocaleCode']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['LocaleCode'])),
-             ('type', tax_type['yrkesgrupp']),
+             ('type', jt.OCCUPATION_GROUP),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('description', field['Description']),
@@ -34,7 +34,7 @@ def create_valuestore_jobs(taxonomy_jobterms, taxonomy_jobgroups,
     jobterms = {
         field['OccupationNameID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['OccupationNameID'])),
-                     ('type', tax_type['yrkesroll']),
+                     ('type', jt.OCCUPATION_NAME),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('legacy_ams_taxonomy_num_id', int(field['OccupationNameID'])),
@@ -49,7 +49,7 @@ def create_valuestore_geo(file_places, taxonomy_municipalities, taxonomy_regions
     countries = {
         field['CountryID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['CountryID'])),
-                     ('type', tax_type['land']),
+                     ('type', jt.COUNTRY),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('legacy_ams_taxonomy_num_id', int(field['CountryID'])),
@@ -59,7 +59,7 @@ def create_valuestore_geo(file_places, taxonomy_municipalities, taxonomy_regions
     regions = {
         field['NationalNUTSLevel3Code']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['NationalNUTSLevel3Code'])),
-             ('type', tax_type['lan']),
+             ('type', jt.COUNTY),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('legacy_ams_taxonomy_num_id', int(field['NationalNUTSLevel3Code']))])
@@ -68,7 +68,7 @@ def create_valuestore_geo(file_places, taxonomy_municipalities, taxonomy_regions
     municipalities = {
         field['NationalNUTSLAU2Code']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['NationalNUTSLAU2Code'])),
-             ('type', tax_type['kommun']),
+             ('type', jt.MUNICIPALITY),
              ('concept_id', str(field['uuid_id'])),
              ('label', field['Term']),
              ('parent', regions[field['NationalNUTSLevel3Code']]),
@@ -98,7 +98,7 @@ def create_valuestore_skills(taxonomy_skills):
     skills = {
         field['SkillID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['SkillID'])),
-                     ('type', tax_type['kompetens']),
+                     ('type', jt.SKILL),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('description', field['Term'])])
@@ -111,7 +111,7 @@ def create_valuestore_work_time_extent(taxonomy_work_time_extent):
     wte = {
         field['WorkTimeExtentID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['WorkTimeExtentID'])),
-                     ('type', tax_type['arbetstidsomfattning']),
+                     ('type', jt.WORKTIME_EXTENT),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id']))])
         for field in taxonomy_work_time_extent
@@ -123,7 +123,7 @@ def create_valuestore_languages(taxonomy_languages):
     languages = {
         field['LanguageID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['LanguageID'])),
-                     ('type', tax_type['sprak']),
+                     ('type', jt.LANGUAGE),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('legacy_ams_taxonomy_num_id', int(field['LanguageID']))])
@@ -136,7 +136,7 @@ def create_valuestore_employment_types(taxonomy_employmenttypes):
     employment_types = {
         field['EmploymentTypeID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['EmploymentTypeID'])),
-                     ('type', tax_type['anstallningstyp']),
+                     ('type', jt.EMPLOYMENT_TYPE),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('legacy_ams_taxonomy_num_id', int(field['EmploymentTypeID']))])
@@ -149,7 +149,7 @@ def create_valuestore_driving_licence(taxonomy_drivinglicence):
     driving_licence = {
         field['DrivingLicenceID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['DrivingLicenceID'])),
-                     ('type', tax_type['korkort']),
+                     ('type', jt.DRIVING_LICENCE),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('description', field['Description']),
@@ -163,7 +163,7 @@ def create_valuestore_wagetype(taxonomy_wagetype):
     wage_type = {
         field['WageTypeID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['WageTypeID'])),
-                     ('type', tax_type['lonetyp']),
+                     ('type', jt.WAGE_TYPE),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('legacy_ams_taxonomy_num_id', int(field['WageTypeID']))])
@@ -176,7 +176,7 @@ def create_valuestore_education_fields(taxonomy_education_field_SUN1, taxonomy_e
     education_field_SUN1 = {
         field['SUNField1ID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['SUNField1Code'])),
-                     ('type', 'education_field_SUN1'),
+                     ('type', jt.SUN_EDUCATION_FIELD_1),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('legacy_ams_taxonomy_num_id', int(field['SUNField1Code']))])
@@ -186,7 +186,7 @@ def create_valuestore_education_fields(taxonomy_education_field_SUN1, taxonomy_e
     education_field_SUN2 = {
         field['SUNField2ID']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['SUNField2Code'])),
-             ('type',  'education_field_SUN2'),
+             ('type',  jt.SUN_EDUCATION_FIELD_2),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('legacy_ams_taxonomy_num_id', int(field['SUNField2Code'])),
@@ -197,7 +197,7 @@ def create_valuestore_education_fields(taxonomy_education_field_SUN1, taxonomy_e
     education_field_SUN3 = {
         field['SUNField3ID']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['SUNField3Code'])),
-             ('type',  'education_field_SUN3'),
+             ('type',  jt.SUN_EDUCATION_FIELD_3),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('legacy_ams_taxonomy_num_id', int(field['SUNField3ID'])),
@@ -212,7 +212,7 @@ def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_
     education_levels_SUN1 = {
         field['SUNLevel1ID']:
             OrderedDict([('legacy_ams_taxonomy_id', str(field['SUNLevel1Code'])),
-                         ('type', 'education_level_SUN1'),
+                         ('type', jt.SUN_EDUCATION_LEVEL_1),
                          ('label', field['Term']),
                          ('concept_id', str(field['uuid_id'])),
                          ('legacy_ams_taxonomy_num_id', int(field['SUNLevel1Code']))])
@@ -222,7 +222,7 @@ def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_
     education_levels_SUN2 = {
         field['SUNLevel2ID']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['SUNLevel2Code'])),
-             ('type',  'education_field_SUN2'),
+             ('type',  jt.SUN_EDUCATION_LEVEL_2),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('legacy_ams_taxonomy_num_id', int(field['SUNLevel2Code'])),
@@ -233,7 +233,7 @@ def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_
     education_levels_SUN3 = {
         field['SUNLevel3ID']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['SUNLevel3Code'])),
-             ('type',  'education_field_SUN3'),
+             ('type',  jt.SUN_EDUCATION_LEVEL_3),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('legacy_ams_taxonomy_num_id', int(field['SUNLevel3Code'])),
@@ -248,7 +248,7 @@ def create_valuestore_deprecated_education_level(taxonomy_education_level):
     education_level = {
         field['EducationLevelID']:
             OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationLevelID'])),
-                         ('type', DEPRECATED_EDUCATION_LEVEL),
+                         ('type', jt.DEPRECATED_EDUCATION_LEVEL),
                          ('label', field['Term']),
                          ('concept_id', str(field['uuid_id'])),
                          ('legacy_ams_taxonomy_num_id', int(field['EducationLevelID']))])
@@ -261,7 +261,7 @@ def create_valuestore_deprecated_education_field(taxonomy_education_field):
     education_field = {
         field['EducationFieldID']:
             OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationFieldID'])),
-                         ('type', DEPRECATED_EDUCATION_FIELD),
+                         ('type', jt.DEPRECATED_EDUCATION_FIELD),
                          ('label', field['Term']),
                          ('concept_id', str(field['uuid_id'])),
                          ('description', field['Description']),
@@ -275,7 +275,7 @@ def create_valuestore_duration(taxonomy_duration):
     duration = {
         field['EmploymentDurationID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['EmploymentDurationID'])),
-                     ('type', tax_type['varaktighet']),
+                     ('type', jt.EMPLOYMENT_DURATION),
                      ('label', field['Term']),
                      ('concept_id', str(field['uuid_id'])),
                      ('EURESCode', field['EURESCode']),
@@ -289,7 +289,7 @@ def create_valuestore_occupation_experience(taxonomy_occupation_experience):
     occupation_experience = {
         field['OccupationExperienceYearID']:
         OrderedDict([('legacy_ams_taxonomy_id', str(field['OccupationExperienceYearID'])),
-                     ('type', tax_type['erfarenhetsniva']),
+                     ('type', jt.OCCUPATION_EXPERIENCE_YEARS),
                      ('label', field['ExperienceYearCandidate']),
                      ('concept_id', str(field['uuid_id'])),
                      ('legacy_ams_taxonomy_num_id', int(field['OccupationExperienceYearID']))])
