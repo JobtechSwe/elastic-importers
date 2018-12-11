@@ -24,7 +24,7 @@ RUN python3 setup.py install
 RUN python3 -m pytest -svv -m unit tests/
 
 # show commit info
-RUN git log -1
+# RUN git log -1
 
 WORKDIR /
 RUN rm -fr /app
