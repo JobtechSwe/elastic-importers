@@ -81,7 +81,7 @@ platsannons_mappings = {
                             "type": "text"
                         },
                         "landskod": {
-                            "type": "text",
+                            "type": "keyword",
                             "null_value": "199"  # Assume Sweden when not specified
                         },
                         "coordinates": {

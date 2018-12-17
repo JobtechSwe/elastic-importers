@@ -44,8 +44,8 @@ def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
     # timestamp from row[0] and row[1] unless the id is the one of the
     # same as last time method was called
     documents = [dict(converter.convert_message(row[2]) if converter else dict(row[2]),
-                      **{'id': row[0].strip(), 'timestamp': row[1]})
-                 for row in rows if row[0].strip() not in last_ids]
+                      **{'id': row[0], 'timestamp': row[1]})
+                 for row in rows if row[0] not in last_ids]
     # Return a tuple containing a list of last ids, last timestamp and
     # list of dictionaries (annonser to save)
     return [row[0] for row in rows], rows[-1][1] if rows else 0, documents
