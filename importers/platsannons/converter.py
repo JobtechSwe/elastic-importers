@@ -78,10 +78,11 @@ def convert_message(message_envelope):
         if 'yrkesroll' in message:
             # jafhk fixa parsning för dessa med get_concept_by_legacy_id
             yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll',
-                                                          message.get('yrkesroll', {}).get('varde'))
+                                                          message.get('yrkesroll',
+                                                                      {}).get('varde'))
             if yrkesroll and 'parent' in yrkesroll:
-                yrkesgrupp = yrkesroll.pop('parent')
-                yrkesomrade = yrkesgrupp.pop('parent')
+                yrkesgrupp = yrkesroll.get('parent')
+                yrkesomrade = yrkesgrupp.get('parent')
                 annons['yrkesroll'] = {'kod': yrkesroll['concept_id'],
                                        'term': yrkesroll['label'],
                                        'taxonomi-kod': yrkesroll['legacy_ams_taxonomy_id']}
@@ -92,11 +93,11 @@ def convert_message(message_envelope):
                                          'term': yrkesomrade['label'],
                                          'taxonomi-kod': yrkesomrade['legacy_ams_taxonomy_id']}
             elif not yrkesroll:
-                log.warning('Taxonomy value not found for "yrkesroll" (%s)'
+                log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
                             % message['yrkesroll'])
             else:  # yrkesroll is not None and 'parent' not in yrkesroll
-                log.warning('Taxonomy value not found for "yrkesroll" (%s)'
-                            % message['yrkesroll'])
+                log.warning('Parent not found for yrkesroll %s (%s)'
+                            % (message['yrkesroll'], yrkesroll))
         arbplatsmessage = message.get('arbetsplatsadress', {})
         kommun = None
         lansnamn = None
@@ -235,7 +236,7 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
         weighted_concept['vikt'] = weight
         weighted_concept['taxonomi-kod'] = concept.get('legacy_ams_taxonomy_id', None)
     except AttributeError:
-        log.warning('Taxonomy value not found for {0} {1}'.format(taxtype, legacy_id))
+        log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
     return weighted_concept
 
 
