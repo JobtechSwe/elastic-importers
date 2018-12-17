@@ -80,6 +80,10 @@ platsannons_mappings = {
                         "kommunkod": {
                             "type": "text"
                         },
+                        "landskod": {
+                            "type": "text",
+                            "null_value": "199"  # Assume Sweden when not specified
+                        },
                         "coordinates": {
                             "type": "geo_point",
                             "ignore_malformed": True
