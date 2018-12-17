@@ -36,7 +36,11 @@ def start():
 
         if platsannonser:
             log.info("Indexed %d docs so far." % doc_counter)
-            elastic.bulk_index(platsannonser, es_index)
+            try:
+                elastic.bulk_index(platsannonser, es_index)
+            except Exception as e:
+                log.error("Import failed", e)
+                sys.exit(1)
             common.log_import_metrics(log, IMPORTER_NAME, current_doc_count)
         else:
             break
