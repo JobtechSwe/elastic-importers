@@ -46,6 +46,7 @@ TBD
 Importerar platsannonser från databas till Elasticsearch. 
 
 Om det konfigurerade indexet inte existerar skapas det, och ett "skriv-alias" sätts upp mot det indexet med suffix "-write" (e.g. platsannons-write). 
+På samma sätt är ```sokannonser-api``` konfigurerat för att läsa från ett "läs-alias" med suffix "-read".
 
 #### Användning
 Kommandot ```import-platsannonser``` startar en import av platsannonser till förkonfigurerat skriv-alias.
