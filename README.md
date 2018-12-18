@@ -43,9 +43,22 @@ TBD
 TBD
 
 ### import-platsannonser
-TBD
+Importerar platsannonser från databas till Elasticsearch. 
+
+Om det konfigurerade indexet inte existerar skapas det, och ett "skriv-alias" sätts upp mot det indexet med suffix "-write" (e.g. platsannons-write). 
+
 #### Användning
-TBD
+Kommandot ```import-platsannonser``` startar en import av platsannonser till förkonfigurerat skriv-alias.
+
+#### Omindexering
+Vid förändringar i mappningar eller datastruktur behöver man läsa om hela indexet. Med fördel gör man då ett nytt index som man läser in allt data till utan att ställa som skriv-aliaset. 
+Om man anger ett indexnamn som argument till ```import-platsannonser``` så skapas det indexet (om det inte redan finns), men inget nytt skriv-alias skapas.
+På så sätt kan man skriva datat till ett nytt index och när det är klart kan man peka om skriv- och läs-aliasen till det nya indexet utan nedtid.
+
+    $ import-platsannonser nytt-platsannons-index
+    ... vänta tills datat lästs in ...
+    $ set-write-alias-platsannons nytt-platsannons-index
+    $ set-read-alias-platsannons nytt-platsannons-index
 
 ### import-auranest
 TBD
