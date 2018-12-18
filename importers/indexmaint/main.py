@@ -46,6 +46,7 @@ def set_auranest_write_alias():
 
 
 def change_alias(idxname, aliasname):
+    print(f"Setting alias {aliasname} to point to {idxname}")
     try:
         if elastic.alias_exists(aliasname):
             oldindices = list(elastic.get_alias(aliasname).keys())
