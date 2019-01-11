@@ -10,17 +10,18 @@ node('jobtech-appdev'){
   //def chechoutDir = "/tmp/workspace/importers-pipeline"
 
   // Set the tag for the development image: version + build number
-  def devTag  = "${version}-${BUILD_NUMBER}"
+  def jenkinsTag  = "${version}-${BUILD_NUMBER}"
   
-  def branchName = env.BRANCH_NAME;
+
 
   // Checkout Source Code
   stage('Checkout Source') {
-  echo "Branch is: ${env.BRANCH_NAME}"
+  echo "Branch is: ${env.GIT_BRANCH}"
     checkout scm
-    echo "Branch Name: ${branchName}"
+    echo "Branch Name: ${env.GIT_BRANCH}"
   }
-
+  def commitHash = env.GIT_COMMIT;
+  def devTag = "${jenkinsTag}-${commitHash}"
   // Call SonarQube for Code Analysis
   stage('Code Analysis') {
     echo "Running Code Analysis"
@@ -39,9 +40,6 @@ node('jobtech-appdev'){
 
     // Start Binary Build in OpenShift using the file we just published
     sh "oc start-build elastic-importers -n sokannonser-develop --follow"
-
-    // Tag the image using the devTag
-    sh "oc tag jt-dev/sokapi:latest jt-dev/sokapi:${devTag} -n jt-dev"
   }
 
   // Deploy the built image to the Development Environment.
