@@ -16,12 +16,12 @@ node('jobtech-appdev'){
 
   // Checkout Source Code
   stage('Checkout Source') {
-  echo "Branch is: ${env.GIT_BRANCH}"
-    checkout scm
-    echo "Branch Name: ${env.GIT_BRANCH}"
+    def scmVars = checkout scm
+    echo "Branch is: ${scmVars.GIT_BRANCH}"
+    echo "Commit Hash is: ${scmVars.GIT_COMMIT}"
   }
-  def commitHash = env.GIT_COMMIT;
-  def devTag = "${jenkinsTag}-${commitHash}"
+  //def commitHash = scmVars.GIT_COMMIT;
+  def devTag = "${jenkinsTag} //-${commitHash}"
   // Call SonarQube for Code Analysis
   stage('Code Analysis') {
     echo "Running Code Analysis"
