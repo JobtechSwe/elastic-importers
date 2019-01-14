@@ -12,16 +12,17 @@ node('jobtech-appdev'){
   // Set the tag for the development image: version + build number
   def jenkinsTag  = "${version}-${BUILD_NUMBER}"
   
-
+  def commitHash = ''
 
   // Checkout Source Code
   stage('Checkout Source') {
     def scmVars = checkout scm
     echo "Branch: ${scmVars.GIT_BRANCH}"
     echo "Commit Hash: ${scmVars.GIT_COMMIT}"
+    commitHash = "${scmVars.GIT_COMMIT}"
   }
-  def commitHash = scmVars.GIT_COMMIT;
-  def devTag = "${jenkinsTag}-${commitHash}"
+  echo "Commithash: ${commitHash}"
+  def devTag = "${jenkinsTag}"
   // Call SonarQube for Code Analysis
   stage('Code Analysis') {
     echo "Running Code Analysis"
