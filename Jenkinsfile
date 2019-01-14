@@ -17,11 +17,11 @@ node('jobtech-appdev'){
   // Checkout Source Code
   stage('Checkout Source') {
     def scmVars = checkout scm
-    echo "Branch is: ${scmVars.GIT_BRANCH}"
-    echo "Commit Hash is: ${scmVars.GIT_COMMIT}"
+    echo "Branch: ${scmVars.GIT_BRANCH}"
+    echo "Commit Hash: ${scmVars.GIT_COMMIT}"
   }
-  //def commitHash = scmVars.GIT_COMMIT;
-  def devTag = "${jenkinsTag} //-${commitHash}"
+  def commitHash = scmVars.GIT_COMMIT;
+  def devTag = "${jenkinsTag}-${commitHash}"
   // Call SonarQube for Code Analysis
   stage('Code Analysis') {
     echo "Running Code Analysis"
@@ -48,5 +48,8 @@ node('jobtech-appdev'){
 
     echo "DEV TAGGING"
     sh "oc tag sokannonser-develop/elastic-importers:latest sokannonser-develop/elastic-importers:${devTag} -n sokannonser-develop"
+
+    echo "UPDATING CRONJOB IMAGE"
+    // sh "oc patch cronjobs/import-taxonomy --type=json -p='[{"op":"replace", "path": "/spec/jobTemplate/spec/template/spec/containers/0/image", "value":"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:1-1"}]'"
   }
 }
