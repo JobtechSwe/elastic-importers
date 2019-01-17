@@ -24,7 +24,7 @@ TAXONOMY_INDEX_CONFIGURATION = {
                         }
                     }
                 },
-                "id": {
+                "concept_id": {
                     "type": "keyword"
                 },
                 "label": {
@@ -37,20 +37,11 @@ TAXONOMY_INDEX_CONFIGURATION = {
                         }
                     }
                 },
-                "parent_id": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
                 "type": {
                     "type": "keyword"
                 },
-                "num_id": {
-                    "type": "long"
+                "legacy_ams_taxonomy_id": {
+                    "type": "keyword"
                 }
             }
         }
@@ -83,3 +74,5 @@ TAXONOMY_INDEX_CONFIGURATION = {
         }
     }
 }
+
+resources_folder = os.path.dirname(os.path.realpath(__file__)) + "/resources/"

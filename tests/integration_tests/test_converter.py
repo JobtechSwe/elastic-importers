@@ -4,27 +4,31 @@ from importers.repository import taxonomy
 
 log = logging.getLogger(__name__)
 
+
 @pytest.mark.integration
 @pytest.mark.parametrize("annons_key", ['anstallningstyp', '', None, 'sprak'])
-@pytest.mark.parametrize("message_key", ['anstallningTyp','mkey', '', None, 'sprak'] )
-@pytest.mark.parametrize("message_dict", [{"anstallningTyp": {"varde": "1"}}, {"anstallningTyp": {"varde": "2"}}
-                                          ,{'': {'varde': 'v2'}}, {'mkey': {'EJvarde': 'v1'}} ,{} ,None, {"sprak": {"varde": "424"}} ] )
+@pytest.mark.parametrize("message_key", ['anstallningTyp', 'mkey', '', None, 'sprak'])
+@pytest.mark.parametrize("message_dict", [{"anstallningTyp": {"varde": "1"}}, {"anstallningTyp": {"varde": "2"}},
+                                          {'': {'varde': 'v2'}}, {'mkey': {'EJvarde': 'v1'}}, {}, None, {"sprak": {"varde": "424"}}])
 def test_expand_taxonomy_value(annons_key, message_key, message_dict):
     print('============================', sys._getframe().f_code.co_name, '============================ ')
-    d =  converter._expand_taxonomy_value(annons_key, message_key, message_dict)
+    d = converter._expand_taxonomy_value(annons_key, message_key, message_dict)
     print(d)
-    if not message_dict: #message_dict is empty
+    if not message_dict:
+        # message_dict is empty
         assert d is None
         return
     message_value = message_dict.get(message_key, {}).get('varde')
-    if message_value :
+    if message_value:
         assert d['kod'] == message_value
         assert d['term'] == taxonomy.get_term(annons_key, message_value)
     else:
         assert d is None
 
+
 @pytest.mark.integration
-def test_convert_message(msg): # see msg fixture in conftest.py
+def test_convert_message(msg):
+    # see msg fixture in conftest.py
     print('============================', sys._getframe().f_code.co_name, '============================ ')
     print(msg)
     annons = converter.convert_message(msg)
@@ -44,7 +48,7 @@ def test_convert_message(msg): # see msg fixture in conftest.py
             'annonstext': message.get('annonstext'),
         }
         assert annons['arbetsplats_id'] == message.get('arbetsplatsId')
-        assert annons['anstallningstyp'] == converter._expand_taxonomy_value('anstallningstyp','anstallningTyp', message)
+        assert annons['anstallningstyp'] == converter._expand_taxonomy_value('anstallningstyp', 'anstallningTyp', message)
         assert annons['lonetyp'] == converter._expand_taxonomy_value('lonetyp', 'lonTyp', message)
         assert annons['varaktighet'] == converter._expand_taxonomy_value('varaktighet', 'varaktighetTyp', message)
         assert annons['arbetstidstyp'] == converter._expand_taxonomy_value('arbetstidstyp', 'arbetstidTyp', message)
@@ -72,7 +76,7 @@ def test_convert_message(msg): # see msg fixture in conftest.py
         }
         assert annons['erfarenhet_kravs'] is not message.get('ingenErfarenhetKravs', False)
         assert annons['egen_bil'] == message.get('tillgangTillEgenBil', False)
-        if message.get('korkort') :
+        if message.get('korkort'):
             assert annons['korkort_kravs'] is True
         else:
             assert annons['korkort_kravs'] is False
@@ -81,9 +85,9 @@ def test_convert_message(msg): # see msg fixture in conftest.py
             if yrkesroll and 'parent' in yrkesroll:
                 yrkesgrupp = yrkesroll.pop('parent')
                 yrkesomrade = yrkesgrupp.pop('parent')
-                assert annons['yrkesroll'] ==  {'kod': yrkesroll['id'],  'term': yrkesroll['label']}
+                assert annons['yrkesroll'] == {'kod': yrkesroll['id'], 'term': yrkesroll['label']}
                 assert annons['yrkesgrupp'] == {'kod': yrkesgrupp['id'], 'term': yrkesgrupp['label']}
-                assert annons['yrkesomrade'] =={'kod': yrkesomrade['id'],'term': yrkesomrade['label']}
+                assert annons['yrkesomrade'] == {'kod': yrkesomrade['id'], 'term': yrkesomrade['label']}
 
         if message.get('arbetsplatsadress'):
             arbplatsmessage = message.get('arbetsplatsadress')
@@ -167,7 +171,7 @@ def test_convert_message(msg): # see msg fixture in conftest.py
                  'vikt': utbn('vikt')
                  }
                 for utbn in
-                [message.get('utbildningsniva', {})] if utbn and utbn.get('vikt', 0) < 4 #TODO ask Markus about "and"
+                [message.get('utbildningsniva', {})] if utbn and utbn.get('vikt', 0) < 4  # TODO ask Markus about "and"
             ],
             'utbildningsinriktning': [
                 {'kod': utbi.get('varde'),
@@ -205,13 +209,3 @@ def test_convert_message(msg): # see msg fixture in conftest.py
     else:
         print("Message is already in correct format")
         assert msg == annons
-
-@pytest.mark.unit
-@pytest.mark.parametrize("parsing_date", ['180924-00:00', '20180924T', 'mon sep 24', '00:00:00' ])
-@pytest.mark.parametrize("not_parsing_date", ['20180101f', '2099-13-32', '18-09-24:01:01', '', None, []])
-def test_isodate(parsing_date, not_parsing_date):
-    if not not_parsing_date:
-        assert converter._isodate(not_parsing_date) is None
-        return
-    assert converter._isodate(not_parsing_date) is None
-    assert converter._isodate(parsing_date) is not None

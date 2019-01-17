@@ -1,16 +1,15 @@
 import logging
 import json
-from importers.new_taxonomy import settings, taxonomy_service, converter
+from importers.taxonomy import settings, taxonomy_service, converter
 from pkg_resources import resource_string
 import pickle
-from importers.new_taxonomy import json_converter
-import os
+from importers.taxonomy import json_converter
 
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
 log = logging.getLogger(__name__)
-concept_id_counter = 0  # 100000001
+concept_id_counter = 0
 
 
 def fetch_full_taxonomy():
@@ -40,10 +39,27 @@ def fetch_full_taxonomy():
         taxonomy_drivinglicence = add_concept_id(taxonomy_drivinglicence)  # adding concept_id
         taxonomy_wagetype = taxonomy_service.get_all_wage_type()
         taxonomy_wagetype = add_concept_id(taxonomy_wagetype)  # adding concept_id
-        taxonomy_education_level = taxonomy_service.get_all_education_levels()
-        taxonomy_education_level = add_concept_id(taxonomy_education_level)  # adding concept_id
-        taxonomy_education_field = taxonomy_service.get_all_education_fields()
-        taxonomy_education_field = add_concept_id(taxonomy_education_field)  # adding concept_id
+
+        taxonomy_deprecated_education_levels = taxonomy_service.get_all_deprecated_education_levels()
+        taxonomy_deprecated_education_levels = add_concept_id(taxonomy_deprecated_education_levels)
+        taxonomy_deprecated_education_fields = taxonomy_service.get_all_deprecated_education_fields()
+        taxonomy_deprecated_education_fields = add_concept_id(taxonomy_deprecated_education_fields)
+
+
+        taxonomy_education_fields_SUN1 = taxonomy_service.get_all_education_fields_SUN1()
+        taxonomy_education_fields_SUN1 = add_concept_id(taxonomy_education_fields_SUN1)
+        taxonomy_education_fields_SUN2 = taxonomy_service.get_all_education_fields_SUN2()
+        taxonomy_education_fields_SUN2 = add_concept_id(taxonomy_education_fields_SUN2)
+        taxonomy_education_fields_SUN3 = taxonomy_service.get_all_education_fields_SUN3()
+        taxonomy_education_fields_SUN3 = add_concept_id(taxonomy_education_fields_SUN3)
+
+        taxonomy_education_levels_SUN1 = taxonomy_service.get_all_education_levels_SUN1()
+        taxonomy_education_levels_SUN1 = add_concept_id(taxonomy_education_levels_SUN1)
+        taxonomy_education_levels_SUN2 = taxonomy_service.get_all_education_levels_SUN2()
+        taxonomy_education_levels_SUN2 = add_concept_id(taxonomy_education_levels_SUN2)
+        taxonomy_education_levels_SUN3 = taxonomy_service.get_all_education_levels_SUN3()
+        taxonomy_education_levels_SUN3 = add_concept_id(taxonomy_education_levels_SUN3)
+
         taxonomy_duration = taxonomy_service.get_all_duration()
         taxonomy_duration = add_concept_id(taxonomy_duration)  # adding concept_id
         taxonomy_occupation_experience = taxonomy_service.get_all_occupation_experience()
@@ -74,8 +90,22 @@ def fetch_full_taxonomy():
     valuestore_employmenttypes = converter.create_valuestore_employment_types(taxonomy_employmenttypes)
     valuestore_drivinglicences = converter.create_valuestore_driving_licence(taxonomy_drivinglicence)
     valuestore_wagetype = converter.create_valuestore_wagetype(taxonomy_wagetype)
-    valuestore_education_level = converter.create_valuestore_education_level(taxonomy_education_level)
-    valuestore_education_field = converter.create_valuestore_education_field(taxonomy_education_field)
+#    valuestore_education_level = converter.create_valuestore_education_level(taxonomy_education_level)
+    (valuestore_education_fields_SUN1,
+     valuestore_education_fields_SUN2,
+     valuestore_education_fields_SUN3) = converter.create_valuestore_education_fields(taxonomy_education_fields_SUN1,
+                                                                                    taxonomy_education_fields_SUN2,
+                                                                                    taxonomy_education_fields_SUN3)
+
+    (valuestore_education_levels_SUN1,
+     valuestore_education_levels_SUN2,
+     valuestore_education_levels_SUN3) = converter.create_valuestore_education_levels(taxonomy_education_levels_SUN1,
+                                                                                     taxonomy_education_levels_SUN2,
+                                                                                     taxonomy_education_levels_SUN3)
+
+    valuestore_deprecated_education_levels = converter.create_valuestore_deprecated_education_level(taxonomy_deprecated_education_levels)
+    valuestore_deprecated_education_fields = converter.create_valuestore_deprecated_education_field(taxonomy_deprecated_education_fields)
+
     valuestore_duration = converter.create_valuestore_duration(taxonomy_duration)
     valuestore_occupation_experience = converter.create_valuestore_occupation_experience(taxonomy_occupation_experience)
     return (
@@ -92,8 +122,14 @@ def fetch_full_taxonomy():
         + list(valuestore_employmenttypes.values())
         + list(valuestore_drivinglicences.values())
         + list(valuestore_wagetype.values())
-        + list(valuestore_education_level.values())
-        + list(valuestore_education_field.values())
+        + list(valuestore_deprecated_education_levels.values())
+        + list(valuestore_deprecated_education_fields.values())
+        + list(valuestore_education_fields_SUN1.values())
+        + list(valuestore_education_fields_SUN2.values())
+        + list(valuestore_education_fields_SUN3.values())
+        + list(valuestore_education_levels_SUN1.values())
+        + list(valuestore_education_levels_SUN2.values())
+        + list(valuestore_education_levels_SUN3.values())
         + list(valuestore_duration.values())
         + list(valuestore_occupation_experience.values())
     )
@@ -109,7 +145,7 @@ def add_concept_id(value_category):
 
 
 def get_uuids():
-    with open("uuid.txt", "r") as fin:
+    with open(settings.resources_folder + "ids.txt", "r") as fin:
         data = fin.read()
         data = data.replace('"', '')
         uuid_list = data.split("\n")
@@ -117,18 +153,15 @@ def get_uuids():
 
 
 def pickle_values(all_values):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "/values.pickle", "wb") as fout:
+    with open(settings.resources_folder + "values.pickle", "wb") as fout:
         pickle.dump(all_values, fout)
 
 
 def start():
     all_values = fetch_full_taxonomy()
-    #print(len(all_values))
-    #print(concept_id_counter)
     pickle_values(all_values)
-    json_converter.concept_to_taxonomy(all_values)
-    json_converter.taxonomy_to_concept(all_values)
+    json_converter.save_concept_to_taxonomy_as_json(all_values)
+    json_converter.save_taxonomy_to_concept_as_json(all_values)
 
 
 if __name__ == '__main__':

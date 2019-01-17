@@ -72,33 +72,32 @@ def convert_message(message_envelope):
         annons['egen_bil'] = message.get('tillgangTillEgenBil', False)
         if message.get('korkort', []):
             annons['korkort_kravs'] = True
-            taxkorkort = []
-            for kkort in message.get('korkort'):
-                taxkorkort.append({
-                    "kod": kkort['varde'],
-                    "term": taxonomy.get_term('korkort', kkort['varde'])
-                })
-            annons['korkort'] = taxkorkort
+            annons['korkort'] = parse_driving_licence(message)
         else:
             annons['korkort_kravs'] = False
         if 'yrkesroll' in message:
-            yrkesroll = taxonomy.get_entity('yrkesroll',
-                                            message.get('yrkesroll', {}).get('varde'))
+            # jafhk fixa parsning för dessa med get_concept_by_legacy_id
+            yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll',
+                                                          message.get('yrkesroll',
+                                                                      {}).get('varde'))
             if yrkesroll and 'parent' in yrkesroll:
-                yrkesgrupp = yrkesroll.pop('parent')
-                yrkesomrade = yrkesgrupp.pop('parent')
-                annons['yrkesroll'] = {'kod': yrkesroll['id'],
-                                       'term': yrkesroll['label']}
-                annons['yrkesgrupp'] = {'kod': yrkesgrupp['id'],
-                                        'term': yrkesgrupp['label']}
-                annons['yrkesomrade'] = {'kod': yrkesomrade['id'],
-                                         'term': yrkesomrade['label']}
+                yrkesgrupp = yrkesroll.get('parent')
+                yrkesomrade = yrkesgrupp.get('parent')
+                annons['yrkesroll'] = {'kod': yrkesroll['concept_id'],
+                                       'term': yrkesroll['label'],
+                                       'taxonomi-kod': yrkesroll['legacy_ams_taxonomy_id']}
+                annons['yrkesgrupp'] = {'kod': yrkesgrupp['concept_id'],
+                                        'term': yrkesgrupp['label'],
+                                        'taxonomi-kod': yrkesgrupp['legacy_ams_taxonomy_id']}
+                annons['yrkesomrade'] = {'kod': yrkesomrade['concept_id'],
+                                         'term': yrkesomrade['label'],
+                                         'taxonomi-kod': yrkesomrade['legacy_ams_taxonomy_id']}
             elif not yrkesroll:
-                log.warning('Taxonomy value not found for "yrkesroll" (%s)'
+                log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
                             % message['yrkesroll'])
             else:  # yrkesroll is not None and 'parent' not in yrkesroll
-                log.warning('Taxonomy value not found for "yrkesroll" (%s)'
-                            % message['yrkesroll'])
+                log.warning('Parent not found for yrkesroll %s (%s)'
+                            % (message['yrkesroll'], yrkesroll))
         arbplatsmessage = message.get('arbetsplatsadress', {})
         kommun = None
         lansnamn = None
@@ -136,83 +135,52 @@ def convert_message(message_envelope):
         }
         annons['krav'] = {
             'kompetenser': [
-                {'kod': kompetens.get('varde'),
-                 'term': taxonomy.get_term('kompetens', kompetens.get('varde')),
-                 'vikt': kompetens.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'), kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) > 3
             ],
             'sprak': [
-                {'kod': sprak.get('varde'),
-                 'term': taxonomy.get_term('sprak', sprak.get('varde')),
-                 'vikt': sprak.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'), sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) > 3
             ],
             'utbildningsniva': [
-                {'kod': utbn.get('varde'),
-                 'term': taxonomy.get_term('utbildningsniva', utbn.get('varde')),
-                 'vikt': utbn.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('deprecated_educationlevel', utbn.get('varde'), utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn.get('vikt', 0) > 3
-
             ],
             'utbildningsinriktning': [
-                {'kod': utbi.get('varde'),
-                 'term': taxonomy.get_term('utbildningsinriktning', utbi.get('varde')),
-                 'vikt': utbi.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('deprecated_educationfield', utbi.get('varde'), utbi.get('vikt'))
                 for utbi in
-                [message.get('utbildningsinriktning', {})] if utbi.get('vikt', 0) > 3
+                [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) > 3
             ],
             'yrkeserfarenheter': [
-                {'kod': yrkerf.get('varde'),
-                 'term': taxonomy.get_term('yrkesroll', yrkerf.get('varde')),
-                 'vikt': yrkerf.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('yrkesroll', yrkerf.get('varde'), yrkerf.get('vikt'))
                 for yrkerf in
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) > 3
             ]
         }
         annons['meriterande'] = {
             'kompetenser': [
-                {'kod': kompetens.get('varde'),
-                 'term': taxonomy.get_term('kompetens', kompetens.get('varde')),
-                 'vikt': kompetens.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'), kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) < 4
             ],
             'sprak': [
-                {'kod': sprak.get('varde'),
-                 'term': taxonomy.get_term('sprak', sprak.get('varde')),
-                 'vikt': sprak.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'), sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) < 4
             ],
             'utbildningsniva': [
-                {'kod': utbn.get('varde'),
-                 'term': taxonomy.get_term('utbildningsniva', utbn('varde')),
-                 'vikt': utbn('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('deprecated_educationlevel', utbn.get('varde'), utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn and utbn.get('vikt', 0) < 4
             ],
             'utbildningsinriktning': [
-                {'kod': utbi.get('varde'),
-                 'term': taxonomy.get_term('utbildningsinriktning', utbi.get('varde')),
-                 'vikt': utbi.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('deprecated_educationfield', utbi.get('varde'), utbi.get('vikt'))
                 for utbi in
-                [message.get('utbildningsinriktning', {})] if utbi.get('vikt', 0) < 4
+                [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) < 4 # hantera null värden
             ],
             'yrkeserfarenheter': [
-                {'kod': yrkerf.get('varde'),
-                 'term': taxonomy.get_term('yrkesroll', yrkerf.get('varde')),
-                 'vikt': yrkerf.get('vikt')
-                 }
+                get_concept_as_annons_value_with_weight('yrkeserfarenheter', yrkerf.get('varde'), yrkerf.get('vikt'))
                 for yrkerf in
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) < 4
             ]
@@ -245,33 +213,84 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
     message_value = message_dict.get(message_key, {}).get('varde') \
         if message_dict else None
     if message_value:
+        concept = taxonomy.get_concept_by_legacy_id(annons_key, message_value)
         return {
-            'kod': message_value,
-            'term': taxonomy.get_term(annons_key, message_value)
+            "kod": concept['concept_id'],
+            "term": concept['label'],
+            "taxonomi-kod": concept['legacy_ams_taxonomy_id']
         }
     return None
 
 
+def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
+    concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
+    weighted_concept = {
+        'kod': None,
+        'term': None,
+        'vikt': None,
+        'taxonomi-kod': None
+    }
+    try:
+        weighted_concept['kod'] = concept.get('concept_id', None)
+        weighted_concept['term'] = concept.get('label', None)
+        weighted_concept['vikt'] = weight
+        weighted_concept['taxonomi-kod'] = concept.get('legacy_ams_taxonomy_id', None)
+    except AttributeError:
+        log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
+    return weighted_concept
+
+
+
+def parse_driving_licence(message):
+    taxkorkortList = []
+    for kkort in message.get('korkort'):
+        taxkortkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
+        taxkorkortList.append({
+            "kod": taxkortkort['concept_id'],
+            "term": taxkortkort['label']
+        })
+    return taxkorkortList
+
+
 def _add_keywords(annons):
-    keywords = set()
-    for key in [
-        'yrkesroll.term',
-        'yrkesgrupp.term',
-        'yrkesomrade.term',
-        'krav.kompetenser.term',
-        'krav.sprak.term',
-        'meriterande.kompetenser.term',
-        'meriterande.sprak.term',
-        'arbetsplatsadress.postort',
-        'arbetsplatsadress.kommun',
-        'arbetsplatsadress.lansnamn',
-        'arbetsplatsadress.land',
+    annons['keywords'] = dict()
+    for key_dict in [
+        {
+            'occupation':
+                [
+                    'yrkesroll.term',
+                    'yrkesgrupp.term',
+                    'yrkesomrade.term',
+                ]
+        },
+        {
+            'skill':
+                [
+
+                    'krav.kompetenser.term',
+                    'krav.sprak.term',
+                    'meriterande.kompetenser.term',
+                    'meriterande.sprak.term',
+                ]
+        },
+        {
+            'location':
+                [
+                    'arbetsplatsadress.postort',
+                    'arbetsplatsadress.kommun',
+                    'arbetsplatsadress.lan',
+                    'arbetsplatsadress.land',
+                ]
+        }
     ]:
-        values = _get_nested_value(key, annons)
-        for value in values:
-            for kw in _extract_taxonomy_label(value):
-                keywords.add(kw)
-    annons['keywords'] = list(keywords)
+        field = list(key_dict.keys())[0]
+        keywords = set()
+        for key in list(key_dict.values())[0]:
+            values = _get_nested_value(key, annons)
+            for value in values:
+                for kw in _extract_taxonomy_label(value):
+                    keywords.add(kw)
+        annons['keywords'][field] = list(keywords)
     return annons
 
 
@@ -289,15 +308,18 @@ def _get_nested_value(path, data):
             break
         if isinstance(element, dict):
             data = element
-
     return values
 
 
 def _extract_taxonomy_label(label):
     if not label:
         return []
-    label = label.replace('m.fl.', '').strip()
-    if '-' in label:
-        return [word.lower() for word in re.split(r'/', label)]
-    else:
-        return [word.lower().strip() for word in re.split(r'/|, | och ', label)]
+    try:
+        label = label.replace('m.fl.', '').strip()
+        if '-' in label:
+            return [word.lower() for word in re.split(r'/', label)]
+        else:
+            return [word.lower().strip() for word in re.split(r'/|, | och ', label)]
+    except AttributeError:
+        print('extract fail (%s)' % label)
+    return []

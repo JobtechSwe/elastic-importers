@@ -18,7 +18,7 @@ RUN apt-key fingerprint 0EBFCD88 | grep "E2D8 8D81 803C 0EBF CD88" || exit 1
 COPY . /app
 
 WORKDIR /app
-RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install -r requirements-dev.txt
 RUN python3 setup.py install
 # runs unit tests with @pytest.mark.unit annotation only
 RUN python3 -m pytest -svv -m unit tests/

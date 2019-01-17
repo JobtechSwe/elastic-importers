@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# IntelliJ idea folder
+.idea/
+.iml
+
+todo: maybe add files below to github eventually?
+# mapping between legacy_ams_ID and concept_ID
+concept_to_taxonomy.json
+taxonomy_to_concept.json
