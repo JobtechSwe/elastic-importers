@@ -17,12 +17,17 @@ IMPORTER_NAME = 'auranest'
 def start():
     log.info("Starting auranest import")
     start_time = time.time()
-    es_index = elastic.setup_indices(sys.argv, settings.ES_AURANEST_PREFIX,
-                                     settings.auranest_mappings)
-    last_timestamp = elastic.get_last_timestamp(es_index)
-    log.debug("Last timestamp: %d" % last_timestamp)
-    last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
-                                                      es_index)
+    try:
+        es_index = elastic.setup_indices(sys.argv, settings.ES_AURANEST_PREFIX,
+                                         settings.auranest_mappings)
+        last_timestamp = elastic.get_last_timestamp(es_index)
+        log.debug("Last timestamp: %d" % last_timestamp)
+        last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
+                                                          es_index)
+    except Exception as e:
+        log.error("Failed to setup elastic: %s" % str(e))
+        sys.exit(1)
+
     doc_counter = 0
 
     while True:
