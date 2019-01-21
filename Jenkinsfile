@@ -36,19 +36,19 @@ node('jobtech-appdev'){
   }
 
   // Build the OpenShift Image in OpenShift, tag and pus to nexus.
-  stage('Build and Tag OpenShift Image') {
+  stage('Build OpenShift Image') {
     echo "Building OpenShift container image elastic-importers:${devTag}"
 
     // Start Binary Build in OpenShift using the file we just published
     sh "oc start-build elastic-importers -n ${openshiftProject} --follow"
-  }
+
+    echo "DEV TAGGING"
+    sh "oc tag ${openshiftProject}/elastic-importers:latest ${openshiftProject}/elastic-importers:${devTag} -n ${openshiftProject}"
+}
 
   // Deploy the built image to the Development Environment.
   stage('Deploy to Dev Env') {
     echo "Deploying container image to Development Env Project"
-
-    echo "DEV TAGGING"
-    sh "oc tag ${openshiftProject}/elastic-importers:latest ${openshiftProject}/elastic-importers:${devTag} -n ${openshiftProject}"
 
     echo "UPDATING CRONJOB IMAGE"
     sh "oc patch cronjobs/import-taxonomy --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
