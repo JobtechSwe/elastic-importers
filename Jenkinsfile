@@ -48,9 +48,13 @@ node('jobtech-appdev'){
     echo "Deploying container image to Development Env Project"
 
     echo "DEV TAGGING"
-    sh "oc tag sokannonser-develop/elastic-importers:latest sokannonser-develop/elastic-importers:${devTag} -n ${openshiftProject}"
+    sh "oc tag ${openshiftProject}/elastic-importers:latest ${openshiftProject}/elastic-importers:${devTag} -n ${openshiftProject}"
 
     echo "UPDATING CRONJOB IMAGE"
     sh "oc patch cronjobs/import-taxonomy --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
+
+    sh "oc patch cronjobs/import-platsannonser --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
+
+    sh "oc patch cronjobs/import-jobtechjobs --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
   }
 }
