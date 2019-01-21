@@ -3,7 +3,7 @@ import certifi
 import time
 from ssl import create_default_context
 from elasticsearch.helpers import bulk, scan
-from elasticsearch import Elasticsearch, ElasticsearchException
+from elasticsearch import Elasticsearch
 from importers import settings
 
 
@@ -24,7 +24,8 @@ def _bulk_generator(documents, indexname, idkey, doctype='document'):
             doc_id = document["concept_id"]
         else:
             doc_id = '-'.join([document[key]
-                               for key in idkey]) if isinstance(idkey, list) else document[idkey]
+                               for key in idkey]) \
+                if isinstance(idkey, list) else document[idkey]
 
         yield {
             '_index': indexname,
@@ -50,10 +51,7 @@ def load_terms(termtype):
 
 
 def bulk_index(documents, indexname, idkey='id'):
-    try:
-        bulk(es, _bulk_generator(documents, indexname, idkey))
-    except ElasticsearchException as e:
-        log.error("Indexing failed: %s" % str(e))
+    bulk(es, _bulk_generator(documents, indexname, idkey))
 
 
 def get_last_timestamp(indexname):
@@ -88,14 +86,20 @@ def get_ids_with_timestamp(ts, indexname):
 
 def index_exists(indexname):
     es_available = False
+    fail_count = 0
     while not es_available:
         try:
             result = es.indices.exists(index=[indexname])
             es_available = True
             return result
         except Exception as e:
+            if fail_count > 1:
+                # Elastic has its own failure management, so > 1 is enough.
+                log.error("Elastic not available. Stop trying.")
+                raise e
             log.warning("Elasticsearch currently not available. Waiting ...")
             log.debug("Connection failed: %s" % str(e))
+            fail_count += 1
             time.sleep(1)
 
 

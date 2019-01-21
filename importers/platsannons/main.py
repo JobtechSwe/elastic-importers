@@ -16,15 +16,20 @@ IMPORTER_NAME = 'af-platsannons'
 
 def start():
     start_time = time.time()
-    es_index = elastic.setup_indices(sys.argv, settings.ES_ANNONS_PREFIX,
-                                     settings.platsannons_mappings)
-    last_timestamp = elastic.get_last_timestamp(es_index)
-    log.info("Last timestamp: %d (%s)" % (last_timestamp,
-                                          datetime.fromtimestamp(
-                                              (last_timestamp+1)/1000)
-                                          ))
-    last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
-                                                      es_index)
+    try:
+        es_index = elastic.setup_indices(sys.argv, settings.ES_ANNONS_PREFIX,
+                                         settings.platsannons_mappings)
+        last_timestamp = elastic.get_last_timestamp(es_index)
+        log.info("Last timestamp: %d (%s)" % (last_timestamp,
+                                              datetime.fromtimestamp(
+                                                  (last_timestamp+1)/1000)
+                                              ))
+        last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
+                                                          es_index)
+    except Exception as e:
+        log.error("Elastic operations failed: %s" % str(e))
+        sys.exit(1)
+
     doc_counter = 0
 
     while True:
