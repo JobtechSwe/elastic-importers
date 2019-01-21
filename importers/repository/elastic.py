@@ -3,7 +3,7 @@ import certifi
 import time
 from ssl import create_default_context
 from elasticsearch.helpers import bulk, scan
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, ElasticsearchException
 from importers import settings
 
 
@@ -23,7 +23,8 @@ def _bulk_generator(documents, indexname, idkey, doctype='document'):
         if "concept_id" in document:
             doc_id = document["concept_id"]
         else:
-            doc_id = '-'.join([document[key] for key in idkey]) if isinstance(idkey, list) else document[idkey]
+            doc_id = '-'.join([document[key]
+                               for key in idkey]) if isinstance(idkey, list) else document[idkey]
 
         yield {
             '_index': indexname,
@@ -49,7 +50,10 @@ def load_terms(termtype):
 
 
 def bulk_index(documents, indexname, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey))
+    try:
+        bulk(es, _bulk_generator(documents, indexname, idkey))
+    except ElasticsearchException as e:
+        log.error("Indexing failed: %s" % str(e))
 
 
 def get_last_timestamp(indexname):
