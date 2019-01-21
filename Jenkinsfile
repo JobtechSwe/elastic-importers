@@ -40,7 +40,7 @@ node('jobtech-appdev'){
     echo "Building OpenShift container image elastic-importers:${devTag}"
 
     // Start Binary Build in OpenShift using the file we just published
-    sh "oc start-build elastic-importers -n sokannonser-develop --follow"
+    sh "oc start-build elastic-importers -n ${openshiftProject} --follow"
   }
 
   // Deploy the built image to the Development Environment.
@@ -48,9 +48,9 @@ node('jobtech-appdev'){
     echo "Deploying container image to Development Env Project"
 
     echo "DEV TAGGING"
-    sh "oc tag sokannonser-develop/elastic-importers:latest sokannonser-develop/elastic-importers:${devTag} -n sokannonser-develop"
+    sh "oc tag sokannonser-develop/elastic-importers:latest sokannonser-develop/elastic-importers:${devTag} -n ${openshiftProject}"
 
     echo "UPDATING CRONJOB IMAGE"
-    sh "oc patch cronjobs/import-taxonomy --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]'"
+    sh "oc patch cronjobs/import-taxonomy --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
   }
 }
