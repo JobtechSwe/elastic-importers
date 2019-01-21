@@ -51,6 +51,6 @@ node('jobtech-appdev'){
     sh "oc tag sokannonser-develop/elastic-importers:latest sokannonser-develop/elastic-importers:${devTag} -n sokannonser-develop"
 
     echo "UPDATING CRONJOB IMAGE"
-    // sh "oc patch cronjobs/import-taxonomy --type=json -p='[{"op":"replace", "path": "/spec/jobTemplate/spec/template/spec/containers/0/image", "value":"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:1-1"}]'"
+    sh "oc patch cronjobs/import-taxonomy --type=json -p='[{"op":"replace", "path": "/spec/jobTemplate/spec/template/spec/containers/0/image", "value":"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}"}]'"
   }
 }
