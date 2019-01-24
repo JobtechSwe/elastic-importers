@@ -1,7 +1,6 @@
-# from psycopg2cffi import compat
-# compat.register()
 import logging
 import sys
+import time
 import psycopg2
 from importers import settings
 
@@ -36,9 +35,11 @@ def query(sql, args):
 
 def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
     cur = pg_conn.cursor()
+    ts_today = int(round(time.time() * 1000))  # Get current timestamp
     cur.execute("SELECT id, timestamp, doc FROM " + tablename +
-                " WHERE timestamp >= %s ORDER BY timestamp ASC LIMIT %s",
-                [timestamp, settings.PG_BATCH_SIZE])
+                " WHERE timestamp >= %s AND (expires IS NULL OR expires > %s)"
+                " ORDER BY timestamp ASC LIMIT %s",
+                [timestamp, ts_today, settings.PG_BATCH_SIZE])
     rows = cur.fetchall()
     # Create a list of dictionaries from row[2] adding to it the id and
     # timestamp from row[0] and row[1] unless the id is the one of the
