@@ -32,8 +32,8 @@ def start():
 
     while True:
         (last_identifiers, last_timestamp, annonser) = \
-            postgresql.read_from_pg_since(last_identifiers,
-                                          last_timestamp, 'auranest')
+            postgresql.read_from_pg_since(last_identifiers, last_timestamp,
+                                          settings.PG_AURANEST_TABLE)
         current_doc_count = len(annonser)
         doc_counter += current_doc_count
         log.debug("Read %d ads" % doc_counter)

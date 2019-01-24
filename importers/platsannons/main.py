@@ -34,8 +34,8 @@ def start():
 
     while True:
         (last_identifiers, last_timestamp, platsannonser) = \
-            postgresql.read_from_pg_since(last_identifiers,
-                                          last_timestamp, 'platsannonser', converter)
+            postgresql.read_from_pg_since(last_identifiers, last_timestamp,
+                                          settings.PG_PLATSANNONS_TABLE, converter)
         current_doc_count = len(platsannonser)
         doc_counter += current_doc_count
 

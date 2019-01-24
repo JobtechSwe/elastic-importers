@@ -112,6 +112,8 @@ PG_DBNAME = os.getenv("PG_DBNAME")
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
 PG_BATCH_SIZE = os.getenv("PG_BATCH_SIZE", 1000)
+PG_PLATSANNONS_TABLE = os.getenv("PG_PLATSANNONS_TABLE", "platsannonser")
+PG_AURANEST_TABLE = os.getenv("PG_AURANEST_TABLE", "auranest")
 
 # For kandidat import
 ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
