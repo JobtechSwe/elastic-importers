@@ -151,6 +151,7 @@ PG_PASSWORD = os.getenv("PG_PASSWORD")
 PG_BATCH_SIZE = os.getenv("PG_BATCH_SIZE", 1000)
 PG_PLATSANNONS_TABLE = os.getenv("PG_PLATSANNONS_TABLE", "platsannonser")
 PG_AURANEST_TABLE = os.getenv("PG_AURANEST_TABLE", "auranest")
+PG_SSLMODE = os.getenv("PG_SSLMODE", 'require')
 
 # For berikning (platsannonser och auranest)
 URL_ENRICH_TEXTDOCS_BINARY_SERVICE=os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE', 'http://localhost:6357/enrichtextdocumentsbinary')
