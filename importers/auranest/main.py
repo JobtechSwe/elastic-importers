@@ -5,6 +5,7 @@ from importers.repository import elastic, postgresql
 from importers.auranest import enricher
 from importers import settings
 from importers import common
+# from importers.auranest import enricher_mt_rest_multiple
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -39,12 +40,17 @@ def start():
         log.debug("Read %d ads" % doc_counter)
 
         if annonser:
-            enhanced = enricher.enrich(annonser)
-            log.debug("Indexed %d docs so far." % doc_counter)
-            elastic.bulk_index(enhanced, es_index)
+            # enriched_annonser = enricher_mt_rest_multiple.enrich(annonser, parallelism=8)
+            enriched_annonser = enricher.enrich(annonser)
+            elastic.bulk_index(enriched_annonser, es_index)
+            log.info("Indexed %d docs so far." % doc_counter)
             common.log_import_metrics(log, IMPORTER_NAME, current_doc_count)
+            # if doc_counter >= 9900:
+            #     break
         else:
             break
+
+
 
     elapsed_time = time.time() - start_time
 

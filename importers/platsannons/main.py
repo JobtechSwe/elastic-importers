@@ -6,6 +6,7 @@ from importers.repository import elastic, postgresql
 from importers.platsannons import converter
 from importers import settings
 from importers import common
+# from importers.platsannons import enricher_mt_rest_multiple
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -39,16 +40,24 @@ def start():
         current_doc_count = len(platsannonser)
         doc_counter += current_doc_count
 
+
+
         if platsannonser:
-            log.info("Indexed %d docs so far." % doc_counter)
             try:
+                # enriched_platsannonser = enricher_mt_rest_multiple.enrich(platsannonser, parallelism=8)
+                # elastic.bulk_index(enriched_platsannonser, es_index)
                 elastic.bulk_index(platsannonser, es_index)
+                log.info("Indexed %d docs so far." % doc_counter)
             except Exception as e:
                 log.error("Import failed", e)
                 sys.exit(1)
             common.log_import_metrics(log, IMPORTER_NAME, current_doc_count)
+            # if doc_counter >= 9900:
+            #     break
         else:
             break
+
+
 
     elapsed_time = time.time() - start_time
 
