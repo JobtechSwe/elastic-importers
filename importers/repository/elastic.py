@@ -116,20 +116,24 @@ def put_alias(indexlist, aliasname):
 
 
 def setup_indices(args, default_index, mappings):
-    es_alias = None
+    write_alias = None
     if len(args) > 1:
         es_index = args[1]
     else:
         es_index = default_index
-        es_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
+        write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
+        read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
     if not index_exists(es_index):
         log.info("Creating index %s" % es_index)
         create_index(es_index, mappings)
-    if es_alias and not alias_exists(es_alias):
-        log.info("Setting up alias %s for index %s" % (es_alias, es_index))
-        put_alias([es_index], es_alias)
+    if write_alias and not alias_exists(write_alias):
+        log.info("Setting up alias %s for index %s" % (write_alias, es_index))
+        put_alias([es_index], write_alias)
+    if read_alias and not alias_exists(read_alias):
+        log.info("Setting up alias %s for index %s" % (read_alias, es_index))
+        put_alias([es_index], read_alias)
 
-        return es_alias
+        return write_alias
 
     return es_index
 
