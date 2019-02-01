@@ -51,7 +51,7 @@ def load_terms(termtype):
 
 
 def bulk_index(documents, indexname, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey))
+    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30)
 
 
 def get_last_timestamp(indexname):
