@@ -1,60 +1,49 @@
-#!groovy
-
-// Run this pipeline on the custom Jenkins Slave ('jobtech-appdev')
-// Jenkins Slaves have JDK and Maven already installed
-// 'jobtech-appdev' has skopeo installed as well.
-node('jobtech-appdev'){
-
-  // The following variables need to be defined at the top level and not inside the scope of a stage - otherwise they would not be accessible from other stages.
-  def version    = "1"
-  //def chechoutDir = "/tmp/workspace/importers-pipeline"
-
-  // Set the tag for the development image: version + build number
-  def jenkinsTag  = "${version}-${BUILD_NUMBER}"
-  
-  def commitHash = ''
-
-  // Checkout Source Code
-  stage('Checkout Source') {
-    def scmVars = checkout scm
-    echo "Branch: ${scmVars.GIT_BRANCH}"
-    echo "Commit Hash: ${scmVars.GIT_COMMIT}"
-    commitHash = "${scmVars.GIT_COMMIT}"
-  }
-  echo "Commithash: ${commitHash}"
-  def devTag = "${jenkinsTag}"
-  // Call SonarQube for Code Analysis
-  stage('Code Analysis') {
-    echo "Running Code Analysis"
-    // requires SonarQube Scanner 2.8+
-    def scannerHome = tool 'Jobtech_Sokapi_SonarScanner';
-    echo "Scanner Home: ${scannerHome}"
-    ////sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=jobtech_sokapi -Dsonar.sources=. -Dsonar.host.url=http://sonarqube-jt-sonarqube.dev.services.jtech.se -Dsonar.login=${sonarqube_token}"
-    withSonarQubeEnv('Jobtech_SonarQube_Server') {
-      sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sokapi_sonar -Dsonar.sources=."
+pipeline {
+    agent any
+    environment {
+        scannerHome = tool 'Jobtech_Sokapi_SonarScanner'
+        version = "1"
+        buildTag = "${version}.${BUILD_NUMBER}"
+        buildName= "elastic-importers"
     }
-  }
-
-  // Build the OpenShift Image in OpenShift, tag and pus to nexus.
-  stage('Build OpenShift Image') {
-    echo "Building OpenShift container image elastic-importers:${devTag}"
-
-    // Start Binary Build in OpenShift using the file we just published
-    sh "oc start-build elastic-importers -n ${openshiftProject} --follow"
-
-    echo "DEV TAGGING"
-    sh "oc tag ${openshiftProject}/elastic-importers:latest ${openshiftProject}/elastic-importers:${devTag} -n ${openshiftProject}"
-}
-
-  // Deploy the built image to the Development Environment.
-  stage('Deploy to Dev Env') {
-    echo "Deploying container image to Development Env Project"
-
-    echo "UPDATING CRONJOB IMAGE"
-    sh "oc patch cronjobs/import-taxonomy --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
-
-    sh "oc patch cronjobs/import-platsannonser --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
-
-    sh "oc patch cronjobs/import-jobtechjobs --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/sokannonser-develop/elastic-importers:${devTag}\"}]' -n ${openshiftProject}"
-  }
+    stages{
+        stage('Checkout code'){
+            steps{
+                checkout scm: [
+                    $class: 'GitSCM'
+                ]               
+            }
+        }
+        stage('Code analysis'){
+            steps {
+                withSonarQubeEnv('Jobtech_SonarQube_Server'){
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${buildName} -Dsonar.sources=."
+                }
+            }
+        }
+        stage('Build and Tag Openshift Image'){
+            steps{
+                openshiftBuild(namespace:'${openshiftProject}', bldCfg: '${buildName}', showBuildLogs: 'true')
+                openshiftTag(namespace:'${openshiftProject}', srcStream: '${buildName}', srcTag: 'latest', destStream: '${buildName}', destTag:'${buildTag}')
+            }
+        }
+        stage('Change Cronjob Images'){
+            steps{
+                sh "oc patch cronjobs/import-taxonomy --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/${openshiftProject}/${buildName}:${buildTag}\"}]' -n ${openshiftProject}"
+                sh "oc patch cronjobs/import-platsannonser --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/${openshiftProject}/${buildName}:${buildTag}\"}]' -n ${openshiftProject}"
+                sh "oc patch cronjobs/import-jobtechjobs --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/${openshiftProject}/${buildName}:${buildTag}\"}]' -n ${openshiftProject}"
+            }
+        }
+    }
+    post {
+        success {
+            slackSend color: 'good', message: "${GIT_URL}, Branch: ${GIT_BRANCH}, Commit: ${GIT_COMMIT} successfully built to project ${openshiftProject} build: ${buildTag}."
+        }
+        failure {
+            slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} failed to build to ${openshiftProject} build ${buildTag}."
+        }
+        unstable {
+            slackSend color: 'bad', message: "${GIT_URL} ${GIT_BRANCH} ${GIT_COMMIT} unstable build for ${openshiftProject} build ${buildTag}."
+        }
+    }
 }
