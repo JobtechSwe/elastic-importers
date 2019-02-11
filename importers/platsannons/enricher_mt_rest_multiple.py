@@ -26,7 +26,9 @@ def enrich(annonser, parallelism=1):
     # 2019-01-09 11:19:52+0100|INFO|importers.platsannons.main|MESSAGE: Indexed 999 docs in: 23.753832817077637 seconds.
     # 2019-01-23 10:41:51+0100|INFO|importers.platsannons.main|MESSAGE: Indexed 10000 docs in: 62.099438190460205 seconds.
 
-    log.info("Running enrich with " + str(parallelism) + " processes")
+    log.info('Running enrich with %s processes' % str(parallelism))
+    log.info('Enriching documents calling: %s' % settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE)
+
     global counter
     counter = Value('i', 0)
 
@@ -49,7 +51,7 @@ def enrich(annonser, parallelism=1):
 
     nr_of_items_per_batch = len(annonser) // parallelism
     nr_of_items_per_batch = int(math.ceil(nr_of_items_per_batch / 1000.0)) * 1000
-    nr_of_items_per_batch = min(nr_of_items_per_batch, 100)
+    nr_of_items_per_batch = min(nr_of_items_per_batch, len(annonser), 100)
     log.info('nr_of_items_per_batch: %s' % nr_of_items_per_batch)
 
 
@@ -65,7 +67,7 @@ def enrich(annonser, parallelism=1):
 
 
     enrich_results_data = execute_calls(batch_indatas, parallelism)
-    log.info('len(enrich_results_data): %s' % len(enrich_results_data))
+    log.info('Enriched %s/%s documents' % (len(enrich_results_data), len(annonser)))
 
 
     for annons in annonser:
@@ -97,6 +99,7 @@ def get_enrich_result(batch_indata, timeout):
     # log.info('get_enrich_result - Sending %s ads (documents_input) for enrichment' % (len(batch_indata['documents_input'])))
     # log.debug('Enriching Id: %s' % (input_doc_params[NarvalEnricher.PARAM_DOC_ID]))
     r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE, headers=headers, json = batch_indata, timeout=timeout)
+    r.raise_for_status()
     return r.json()
 
 
@@ -117,10 +120,12 @@ def execute_calls(batch_indatas, parallelism):
                     # += operation is not atomic, so we need to get a lock:
                     with counter.get_lock():
                         counter.value += 1
+                        if counter.value % 100 == 0:
+                            log.info("enrichtextdocumentsbinary - Processed %s docs" % (str(counter.value)))
             except Exception as exc:
-                log.error('Call generated an exception: %s' % (str(exc)))
-            if counter.value % 100 == 0:
-                log.info("enrich_docs - Processed %s docs" % (str(counter.value)))
+                log.error('Enrichment call generated an exception: %s' % (str(exc)))
+                raise exc
+
 
     return enriched_output
 

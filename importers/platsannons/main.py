@@ -6,7 +6,7 @@ from importers.repository import elastic, postgresql
 from importers.platsannons import converter
 from importers import settings
 from importers import common
-# from importers.platsannons import enricher_mt_rest_multiple
+from importers.platsannons import enricher_mt_rest_multiple
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -16,6 +16,8 @@ IMPORTER_NAME = 'af-platsannons'
 
 
 def start():
+    log.info('Starting importer %s with PG_BATCH_SIZE: %s' % (IMPORTER_NAME, settings.PG_BATCH_SIZE))
+
     start_time = time.time()
     try:
         es_index = elastic.setup_indices(sys.argv, settings.ES_ANNONS_PREFIX,
@@ -31,6 +33,7 @@ def start():
         log.error("Elastic operations failed: %s" % str(e))
         sys.exit(1)
 
+
     doc_counter = 0
 
     while True:
@@ -44,9 +47,8 @@ def start():
 
         if platsannonser:
             try:
-                # enriched_platsannonser = enricher_mt_rest_multiple.enrich(platsannonser, parallelism=8)
-                # elastic.bulk_index(enriched_platsannonser, es_index)
-                elastic.bulk_index(platsannonser, es_index)
+                enriched_platsannonser = enricher_mt_rest_multiple.enrich(platsannonser, parallelism=settings.ENRICHER_PROCESSES)
+                elastic.bulk_index(enriched_platsannonser, es_index)
                 log.info("Indexed %d docs so far." % doc_counter)
             except Exception as e:
                 log.error("Import failed", e)

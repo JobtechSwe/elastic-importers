@@ -35,21 +35,6 @@ def _bulk_generator(documents, indexname, idkey, doctype='document'):
         }
 
 
-def load_terms(termtype):
-    dsl = {
-        "query": {
-            "bool": {
-                "must": [
-                    {"term": {"type.keyword": termtype.upper()}}
-                ]
-            }
-        }
-    }
-    results = scan(es, query=dsl, index=settings.ES_ONTOLOGY_INDEX, doc_type='default')
-    terms = [result['_source'] for result in results]
-    return terms
-
-
 def bulk_index(documents, indexname, idkey='id'):
     bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30)
 
@@ -117,6 +102,7 @@ def put_alias(indexlist, aliasname):
 
 def setup_indices(args, default_index, mappings):
     write_alias = None
+    read_alias = None
     if len(args) > 1:
         es_index = args[1]
     else:

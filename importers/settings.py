@@ -18,6 +18,8 @@ ENRICHER_PARAM_DOC_ID = 'doc_id'
 ENRICHER_PARAM_DOC_HEADLINE = 'doc_headline'
 ENRICHER_PARAM_DOC_TEXT = 'doc_text'
 
+ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
+
 platsannons_mappings = {
     "mappings": {
         "document": {
@@ -173,8 +175,6 @@ ORACLE_SERVICE = os.getenv('ORACLE_SERVICE')
 ES_AURANEST_PREFIX = os.getenv('ES_AURANEST_INDEX',
                                os.getenv('ES_AURANEST', 'auranest'))
 ES_AURANEST_INDEX = "%s%s" % (ES_AURANEST_PREFIX, WRITE_INDEX_SUFFIX)
-ES_ONTOLOGY_INDEX = os.getenv('ES_ONTOLOGY_INDEX',
-                              os.getenv('ES_ONTOLOGY', 'ontology'))
 
 auranest_mappings = {
     "settings": {
