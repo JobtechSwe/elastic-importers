@@ -52,8 +52,9 @@ def enrich(annonser, parallelism=1):
     nr_of_items_per_batch = len(annonser) // parallelism
     nr_of_items_per_batch = int(math.ceil(nr_of_items_per_batch / 1000.0)) * 1000
     nr_of_items_per_batch = min(nr_of_items_per_batch, len(annonser), 100)
+    if nr_of_items_per_batch == 0:
+        nr_of_items_per_batch = len(annonser)
     log.info('nr_of_items_per_batch: %s' % nr_of_items_per_batch)
-
 
     annons_batches = grouper(nr_of_items_per_batch, annonser_input_data)
 
@@ -116,7 +117,7 @@ def execute_calls(batch_indatas, parallelism):
             try:
                 enriched_result = future.result()
                 for resultrow in enriched_result:
-                    enriched_output[str(resultrow[settings.ENRICHER_PARAM_DOC_ID])] = resultrow
+                    enriched_output[resultrow[settings.ENRICHER_PARAM_DOC_ID]] = resultrow
                     # += operation is not atomic, so we need to get a lock:
                     with counter.get_lock():
                         counter.value += 1
