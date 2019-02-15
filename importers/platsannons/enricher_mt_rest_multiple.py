@@ -15,9 +15,6 @@ log = logging.getLogger(__name__)
 timeout_enrich_api = 90
 
 def init_process(args):
-
-
-
     global counter
     counter = args
 

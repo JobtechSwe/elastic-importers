@@ -118,8 +118,6 @@ def get_enrich_result(batch_indata, timeout):
     r.raise_for_status()
     return r.json()
 
-
-
 def execute_calls(batch_indatas, parallelism):
     global timeout_enrich_api
     global counter
