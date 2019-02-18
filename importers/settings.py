@@ -7,9 +7,18 @@ ES_PWD = os.getenv("ES_PWD")
 
 # For platsannonser
 WRITE_INDEX_SUFFIX = '-write'
+READ_INDEX_SUFFIX = '-read'
 ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX',
                              os.getenv('ES_ANNONS', 'platsannons'))
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
+
+# Parameter names corresponding to
+# narvaltextdocenrichments.textdocenrichments.NarvalEnricher
+ENRICHER_PARAM_DOC_ID = 'doc_id'
+ENRICHER_PARAM_DOC_HEADLINE = 'doc_headline'
+ENRICHER_PARAM_DOC_TEXT = 'doc_text'
+
+ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
 platsannons_mappings = {
     "mappings": {
@@ -46,6 +55,38 @@ platsannons_mappings = {
                             }
                         },
                         "location": {
+                            "type": "text",
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        }
+                    }
+                },
+                "keywords_enriched_binary": {
+                    "type": "object",
+                    "properties": {
+                        "occupation": {
+                            "type": "text",
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
+                        "skill": {
+                            "type": "text",
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
+                        "trait": {
                             "type": "text",
                             "fields": {
                                 "raw": {
@@ -112,6 +153,14 @@ PG_DBNAME = os.getenv("PG_DBNAME")
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
 PG_BATCH_SIZE = os.getenv("PG_BATCH_SIZE", 1000)
+PG_PLATSANNONS_TABLE = os.getenv("PG_PLATSANNONS_TABLE", "platsannonser")
+PG_AURANEST_TABLE = os.getenv("PG_AURANEST_TABLE", "auranest")
+PG_SSLMODE = os.getenv("PG_SSLMODE", 'require')
+
+# For berikning (platsannonser och auranest)
+URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
+    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
+              'http://localhost:6357/enrichtextdocumentsbinary')
 
 # For kandidat import
 ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
@@ -126,8 +175,6 @@ ORACLE_SERVICE = os.getenv('ORACLE_SERVICE')
 ES_AURANEST_PREFIX = os.getenv('ES_AURANEST_INDEX',
                                os.getenv('ES_AURANEST', 'auranest'))
 ES_AURANEST_INDEX = "%s%s" % (ES_AURANEST_PREFIX, WRITE_INDEX_SUFFIX)
-ES_ONTOLOGY_INDEX = os.getenv('ES_ONTOLOGY_INDEX',
-                              os.getenv('ES_ONTOLOGY', 'ontology'))
 
 auranest_mappings = {
     "settings": {
@@ -154,6 +201,16 @@ auranest_mappings = {
                         }
                     }
                 },
+                "occupations": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    },
+                    "copy_to": "keywords"
+                },
                 "skills": {
                     "type": "text",
                     "fields": {
@@ -164,7 +221,7 @@ auranest_mappings = {
                     },
                     "copy_to": "keywords"
                 },
-                "occupations": {
+                "traits": {
                     "type": "text",
                     "fields": {
                         "keyword": {

@@ -1,7 +1,5 @@
 elasticsearch
 psycopg2-binary
-# Next line due to 1.24 issue with requests module
-urllib3==1.21.1 
 zeep
 python-dateutil
 pytest

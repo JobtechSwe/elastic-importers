@@ -218,7 +218,7 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
             "kod": concept['concept_id'],
             "term": concept['label'],
             "taxonomi-kod": concept['legacy_ams_taxonomy_id']
-        }
+        } if concept else None
     return None
 
 
@@ -245,10 +245,11 @@ def parse_driving_licence(message):
     taxkorkortList = []
     for kkort in message.get('korkort'):
         taxkortkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
-        taxkorkortList.append({
-            "kod": taxkortkort['concept_id'],
-            "term": taxkortkort['label']
-        })
+        if taxkortkort:
+            taxkorkortList.append({
+                "kod": taxkortkort['concept_id'],
+                "term": taxkortkort['label']
+            })
     return taxkorkortList
 
 

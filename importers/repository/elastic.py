@@ -23,7 +23,9 @@ def _bulk_generator(documents, indexname, idkey, doctype='document'):
         if "concept_id" in document:
             doc_id = document["concept_id"]
         else:
-            doc_id = '-'.join([document[key] for key in idkey]) if isinstance(idkey, list) else document[idkey]
+            doc_id = '-'.join([document[key]
+                               for key in idkey]) \
+                if isinstance(idkey, list) else document[idkey]
 
         yield {
             '_index': indexname,
@@ -33,23 +35,8 @@ def _bulk_generator(documents, indexname, idkey, doctype='document'):
         }
 
 
-def load_terms(termtype):
-    dsl = {
-        "query": {
-            "bool": {
-                "must": [
-                    {"term": {"type.keyword": termtype.upper()}}
-                ]
-            }
-        }
-    }
-    results = scan(es, query=dsl, index=settings.ES_ONTOLOGY_INDEX, doc_type='default')
-    terms = [result['_source'] for result in results]
-    return terms
-
-
 def bulk_index(documents, indexname, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey))
+    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30)
 
 
 def get_last_timestamp(indexname):
@@ -84,14 +71,20 @@ def get_ids_with_timestamp(ts, indexname):
 
 def index_exists(indexname):
     es_available = False
+    fail_count = 0
     while not es_available:
         try:
             result = es.indices.exists(index=[indexname])
             es_available = True
             return result
         except Exception as e:
+            if fail_count > 1:
+                # Elastic has its own failure management, so > 1 is enough.
+                log.error("Elastic not available. Stop trying.")
+                raise e
             log.warning("Elasticsearch currently not available. Waiting ...")
             log.debug("Connection failed: %s" % str(e))
+            fail_count += 1
             time.sleep(1)
 
 
@@ -108,20 +101,25 @@ def put_alias(indexlist, aliasname):
 
 
 def setup_indices(args, default_index, mappings):
-    es_alias = None
+    write_alias = None
+    read_alias = None
     if len(args) > 1:
         es_index = args[1]
     else:
         es_index = default_index
-        es_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
+        write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
+        read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
     if not index_exists(es_index):
         log.info("Creating index %s" % es_index)
         create_index(es_index, mappings)
-    if es_alias and not alias_exists(es_alias):
-        log.info("Setting up alias %s for index %s" % (es_alias, es_index))
-        put_alias([es_index], es_alias)
+    if write_alias and not alias_exists(write_alias):
+        log.info("Setting up alias %s for index %s" % (write_alias, es_index))
+        put_alias([es_index], write_alias)
+    if read_alias and not alias_exists(read_alias):
+        log.info("Setting up alias %s for index %s" % (read_alias, es_index))
+        put_alias([es_index], read_alias)
 
-        return es_alias
+        return write_alias
 
     return es_index
 
