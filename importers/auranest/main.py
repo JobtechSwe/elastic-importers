@@ -1,10 +1,11 @@
 import sys
 import time
 import logging
+import json
 from importers.repository import elastic, postgresql
 from importers import settings
 from importers import common
-from importers.auranest import enricher_mt_rest_multiple
+from importers.auranest import enricher_mt_rest_multiple as enr
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -15,7 +16,8 @@ IMPORTER_NAME = 'auranest'
 
 
 def start():
-    log.info('Starting importer %s with PG_BATCH_SIZE: %s' % (IMPORTER_NAME, settings.PG_BATCH_SIZE))
+    log.info('Starting importer %s with PG_BATCH_SIZE: %s'
+             % (IMPORTER_NAME, settings.PG_BATCH_SIZE))
     start_time = time.time()
     try:
         es_index = elastic.setup_indices(sys.argv, settings.ES_AURANEST_PREFIX,
@@ -34,6 +36,9 @@ def start():
         (last_identifiers, last_timestamp, annonser) = \
             postgresql.read_from_pg_since(last_identifiers, last_timestamp,
                                           settings.PG_AURANEST_TABLE)
+        print("RAW AD")
+        print(json.dumps(annonser[0], indent=2))
+        # sys.exit(0)
         current_doc_count = len(annonser)
         doc_counter += current_doc_count
         log.debug("Read %d ads" % doc_counter)
@@ -41,7 +46,12 @@ def start():
         if annonser:
             try:
                 trim_auranest_ids(annonser)
-                enriched_annonser = enricher_mt_rest_multiple.enrich(annonser, parallelism=settings.ENRICHER_PROCESSES)
+                enriched_annonser = enr.enrich(annonser,
+                                               parallelism=settings.ENRICHER_PROCESSES)
+                print("ENRICHED AD")
+                print(json.dumps(enriched_annonser[0], indent=2))
+                sys.exit(0)
+
                 # enriched_annonser = enricher.enrich(annonser)
                 elastic.bulk_index(enriched_annonser, es_index)
                 log.info("Indexed %d docs so far." % doc_counter)
@@ -54,11 +64,9 @@ def start():
         else:
             break
 
-
-
     elapsed_time = time.time() - start_time
-
     log.info("Indexed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+
 
 def trim_auranest_ids(annonser):
     # Some id:s contains a lot of trailing whitespace,
