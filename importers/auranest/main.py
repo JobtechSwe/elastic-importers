@@ -44,8 +44,6 @@ def start():
                 trim_auranest_ids(annonser)
                 enriched_annonser = enr.enrich(annonser,
                                                parallelism=settings.ENRICHER_PROCESSES)
-                sys.exit(0)
-
                 # enriched_annonser = enricher.enrich(annonser)
                 elastic.bulk_index(enriched_annonser, es_index)
                 log.info("Indexed %d docs so far." % doc_counter)
