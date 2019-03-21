@@ -110,18 +110,18 @@ def convert_message(message_envelope):
         landskod = None
         longitud = None
         latitud = None
-        if 'kommun' in arbplatsmessage:
+        if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
             kommunkod = arbplatsmessage.get('kommun', {}).get('varde', {})
             kommun = taxonomy.get_term('kommun', kommunkod)
-        if 'lan' in arbplatsmessage:
+        if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
             lanskod = arbplatsmessage.get('lan', {}).get('varde', {})
             lansnamn = taxonomy.get_term('lan', lanskod)
-        if 'land' in arbplatsmessage:
+        if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
             landskod = arbplatsmessage.get('land', {}).get('varde', {})
             land = taxonomy.get_term('land', landskod)
-        if 'longitud'in arbplatsmessage:
+        if 'longitud'in arbplatsmessage and arbplatsmessage.get('longitud'):
             longitud = float(arbplatsmessage.get('longitud'))
-        if 'latitud' in arbplatsmessage:
+        if 'latitud' in arbplatsmessage and arbplatsmessage.get('latitud'):
             latitud = float(arbplatsmessage.get('latitud'))
 
         annons['arbetsplatsadress'] = {
@@ -210,22 +210,10 @@ def convert_message(message_envelope):
             ]
         }
         annons['publiceringsdatum'] = _isodate(message.get('publiceringsdatum'))
+        annons['sista_publiceringsdatum'] = _isodate(message.get('sistaPubliceringsdatum'))
+        annons['avpublicerad'] = message.get('avpublicerad')
+        annons['avpubliceringsdatum'] = _isodate(message.get('avpubliceringsdatum'))
         annons['kalla'] = message.get('kallaTyp')
-        annons['publiceringskanaler'] = {
-            'platsbanken': message.get('publiceringskanalPlatsbanken', False),
-            'ais': message.get('publiceringskanalAis', False),
-            'platsjournalen': message.get('publiceringskanalPlatsjournalen', False)
-        }
-        annons['status'] = {
-            'publicerad': (message.get('status') == 'PUBLICERAD'
-                           or message.get('status') == 'GODKAND_FOR_PUBLICERING'),
-            'sista_publiceringsdatum': _isodate(message.get('sistaPubliceringsdatum')),
-            'skapad': _isodate(message.get('skapadTid')),
-            'skapad_av': message.get('skapadAv'),
-            'uppdaterad': _isodate(message.get('uppdateradTid')),
-            'uppdaterad_av': message.get('uppdateradAv'),
-            'anvandarId': message.get('anvandarId')
-        }
         # Extract labels as keywords for easier searching
         return _add_keywords(annons)
     else:

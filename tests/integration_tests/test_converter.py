@@ -4,7 +4,7 @@ from importers.repository import taxonomy
 
 log = logging.getLogger(__name__)
 
-
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 @pytest.mark.parametrize("annons_key", ['anstallningstyp', '', None, 'sprak'])
 @pytest.mark.parametrize("message_key", ['anstallningTyp', 'mkey', '', None, 'sprak'])
@@ -25,7 +25,7 @@ def test_expand_taxonomy_value(annons_key, message_key, message_dict):
     else:
         assert d is None
 
-
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_convert_message(msg):
     # see msg fixture in conftest.py
