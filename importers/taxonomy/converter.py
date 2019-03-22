@@ -59,7 +59,7 @@ def create_valuestore_geo(file_places, taxonomy_municipalities, taxonomy_regions
     regions = {
         field['NationalNUTSLevel3Code']: OrderedDict(
             [('legacy_ams_taxonomy_id', str(field['NationalNUTSLevel3Code'])),
-             ('type', jt.COUNTY),
+             ('type', jt.REGION),
              ('label', field['Term']),
              ('concept_id', str(field['uuid_id'])),
              ('legacy_ams_taxonomy_num_id', int(field['NationalNUTSLevel3Code']))])
