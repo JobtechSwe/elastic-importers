@@ -33,7 +33,6 @@ def start():
         log.error("Elastic operations failed: %s" % str(e))
         sys.exit(1)
 
-
     doc_counter = 0
 
     while True:
@@ -42,8 +41,6 @@ def start():
                                           settings.PG_PLATSANNONS_TABLE, converter)
         current_doc_count = len(platsannonser)
         doc_counter += current_doc_count
-
-
 
         if platsannonser:
             try:
@@ -58,8 +55,6 @@ def start():
             #     break
         else:
             break
-
-
 
     elapsed_time = time.time() - start_time
 

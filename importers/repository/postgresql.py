@@ -21,7 +21,7 @@ try:
 except psycopg2.OperationalError as e:
     log.error("Failed to connect to PostgreSQL on %s:%s" % (settings.PG_HOST,
                                                             settings.PG_PORT))
-    log.debug("Reason for PostgreSQL failure: %s" % str(e))
+    log.error("Reason for PostgreSQL failure: %s" % str(e))
     sys.exit(1)
 
 

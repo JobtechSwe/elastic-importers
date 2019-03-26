@@ -5357,7 +5357,7 @@
     "65Ms_7r1_RTG": {
         "label": "Jämtlands län",
         "legacyAmsTaxonomyId": "23",
-        "type": "county"
+        "type": "region"
     },
     "65UW_uMB_qMm": {
         "label": "Reunion",
@@ -9032,7 +9032,7 @@
     "9QUH_2bb_6Np": {
         "label": "Kalmar län",
         "legacyAmsTaxonomyId": "08",
-        "type": "county"
+        "type": "region"
     },
     "9QWX_Hgw_3Pf": {
         "label": "Barnonkologi",
@@ -9422,7 +9422,7 @@
     "9hXe_F4g_eTG": {
         "label": "Norrbottens län",
         "legacyAmsTaxonomyId": "25",
-        "type": "county"
+        "type": "region"
     },
     "9hYy_FEc_KaX": {
         "label": "Kostekonomi",
@@ -12452,7 +12452,7 @@
     "CaRE_1nn_cSU": {
         "label": "Skåne län",
         "legacyAmsTaxonomyId": "12",
-        "type": "county"
+        "type": "region"
     },
     "CaRJ_bRy_pph": {
         "label": "Ortopediska skor, utformning",
@@ -12627,7 +12627,7 @@
     "CifL_Rzy_Mku": {
         "label": "Stockholms län",
         "legacyAmsTaxonomyId": "01",
-        "type": "county"
+        "type": "region"
     },
     "CixP_Crc_RzV": {
         "label": "Sten, konstkonservering",
@@ -13347,7 +13347,7 @@
     "DQZd_uYs_oKb": {
         "label": "Blekinge län",
         "legacyAmsTaxonomyId": "10",
-        "type": "county"
+        "type": "region"
     },
     "DR9r_t4m_4r2": {
         "label": "Hetvattencentral, underhåll",
@@ -14547,7 +14547,7 @@
     "EVVp_h6U_GSZ": {
         "label": "Värmlands län",
         "legacyAmsTaxonomyId": "17",
-        "type": "county"
+        "type": "region"
     },
     "EVxG_42f_4Yc": {
         "label": "Mekanikkonstruktion",
@@ -16247,7 +16247,7 @@
     "G6DV_fKE_Viz": {
         "label": "Västmanlands län",
         "legacyAmsTaxonomyId": "19",
-        "type": "county"
+        "type": "region"
     },
     "G6qJ_ytv_bUL": {
         "label": "Regummerare",
@@ -19602,7 +19602,7 @@
     "K8iD_VQv_2BA": {
         "label": "Gotlands län",
         "legacyAmsTaxonomyId": "09",
-        "type": "county"
+        "type": "region"
     },
     "K8yg_U4C_gkY": {
         "label": "Ingenjörer och tekniker inom maskinteknik",
@@ -22622,7 +22622,7 @@
     "MtbE_xWT_eMi": {
         "label": "Jönköpings län",
         "legacyAmsTaxonomyId": "06",
-        "type": "county"
+        "type": "region"
     },
     "Mtmj_FLt_uDk": {
         "label": "Neurologi",
@@ -23717,7 +23717,7 @@
     "NvUF_SP1_1zo": {
         "label": "Västernorrlands län",
         "legacyAmsTaxonomyId": "22",
-        "type": "county"
+        "type": "region"
     },
     "Nvb6_uT7_hSa": {
         "label": "Fönsterputsare",
@@ -42287,7 +42287,7 @@
     "g5Tt_CAV_zBd": {
         "label": "Västerbottens län",
         "legacyAmsTaxonomyId": "24",
-        "type": "county"
+        "type": "region"
     },
     "g5Wi_WaJ_2gS": {
         "label": "Mästarbrev, elektronisk kommunikation",
@@ -49657,7 +49657,7 @@
     "oDpK_oZ2_WYt": {
         "label": "Dalarnas län",
         "legacyAmsTaxonomyId": "20",
-        "type": "county"
+        "type": "region"
     },
     "oECX_Aj2_zdf": {
         "label": "Verktygsuppsättare",
@@ -49772,7 +49772,7 @@
     "oLT3_Q9p_3nn": {
         "label": "Östergötlands län",
         "legacyAmsTaxonomyId": "05",
-        "type": "county"
+        "type": "region"
     },
     "oLdc_4h6_rC8": {
         "label": "Gruvmätare",
@@ -53697,7 +53697,7 @@
     "s93u_BEb_sx2": {
         "label": "Södermanlands län",
         "legacyAmsTaxonomyId": "04",
-        "type": "county"
+        "type": "region"
     },
     "s9Jp_RBm_R57": {
         "label": "Svalsta",
@@ -54887,7 +54887,7 @@
     "tF3y_MF9_h5G": {
         "label": "Kronobergs län",
         "legacyAmsTaxonomyId": "07",
-        "type": "county"
+        "type": "region"
     },
     "tF8h_J5J_3Bq": {
         "label": "Kontorschef, utbildningsföretag",
@@ -58737,7 +58737,7 @@
     "wjee_qH2_yb6": {
         "label": "Hallands län",
         "legacyAmsTaxonomyId": "13",
-        "type": "county"
+        "type": "region"
     },
     "wjwY_9wu_nUH": {
         "label": "Anfångning",
@@ -59542,7 +59542,7 @@
     "xTCk_nT5_Zjm": {
         "label": "Örebro län",
         "legacyAmsTaxonomyId": "18",
-        "type": "county"
+        "type": "region"
     },
     "xTbr_3WN_dqq": {
         "label": "Litografi",
@@ -61457,7 +61457,7 @@
     "zBon_eET_fFU": {
         "label": "Uppsala län",
         "legacyAmsTaxonomyId": "03",
-        "type": "county"
+        "type": "region"
     },
     "zC84_aj6_nRs": {
         "label": "Flerkamerateknik",
@@ -61977,7 +61977,7 @@
     "zdoY_6u5_Krt": {
         "label": "Västra Götalands län",
         "legacyAmsTaxonomyId": "14",
-        "type": "county"
+        "type": "region"
     },
     "zeB7_Xk7_wZ5": {
         "label": "Bararbete",
@@ -62387,7 +62387,7 @@
     "zupA_8Nt_xcD": {
         "label": "Gävleborgs län",
         "legacyAmsTaxonomyId": "21",
-        "type": "county"
+        "type": "region"
     },
     "zv4Q_6iQ_zfe": {
         "label": "Göta",

@@ -1501,134 +1501,6 @@
             "type": "country"
         }
     },
-    "county": {
-        "01": {
-            "conceptId": "CifL_Rzy_Mku",
-            "legacyAmsTaxonomyId": "01",
-            "preferredTerm": "Stockholms län",
-            "type": "county"
-        },
-        "03": {
-            "conceptId": "zBon_eET_fFU",
-            "legacyAmsTaxonomyId": "03",
-            "preferredTerm": "Uppsala län",
-            "type": "county"
-        },
-        "04": {
-            "conceptId": "s93u_BEb_sx2",
-            "legacyAmsTaxonomyId": "04",
-            "preferredTerm": "Södermanlands län",
-            "type": "county"
-        },
-        "05": {
-            "conceptId": "oLT3_Q9p_3nn",
-            "legacyAmsTaxonomyId": "05",
-            "preferredTerm": "Östergötlands län",
-            "type": "county"
-        },
-        "06": {
-            "conceptId": "MtbE_xWT_eMi",
-            "legacyAmsTaxonomyId": "06",
-            "preferredTerm": "Jönköpings län",
-            "type": "county"
-        },
-        "07": {
-            "conceptId": "tF3y_MF9_h5G",
-            "legacyAmsTaxonomyId": "07",
-            "preferredTerm": "Kronobergs län",
-            "type": "county"
-        },
-        "08": {
-            "conceptId": "9QUH_2bb_6Np",
-            "legacyAmsTaxonomyId": "08",
-            "preferredTerm": "Kalmar län",
-            "type": "county"
-        },
-        "09": {
-            "conceptId": "K8iD_VQv_2BA",
-            "legacyAmsTaxonomyId": "09",
-            "preferredTerm": "Gotlands län",
-            "type": "county"
-        },
-        "10": {
-            "conceptId": "DQZd_uYs_oKb",
-            "legacyAmsTaxonomyId": "10",
-            "preferredTerm": "Blekinge län",
-            "type": "county"
-        },
-        "12": {
-            "conceptId": "CaRE_1nn_cSU",
-            "legacyAmsTaxonomyId": "12",
-            "preferredTerm": "Skåne län",
-            "type": "county"
-        },
-        "13": {
-            "conceptId": "wjee_qH2_yb6",
-            "legacyAmsTaxonomyId": "13",
-            "preferredTerm": "Hallands län",
-            "type": "county"
-        },
-        "14": {
-            "conceptId": "zdoY_6u5_Krt",
-            "legacyAmsTaxonomyId": "14",
-            "preferredTerm": "Västra Götalands län",
-            "type": "county"
-        },
-        "17": {
-            "conceptId": "EVVp_h6U_GSZ",
-            "legacyAmsTaxonomyId": "17",
-            "preferredTerm": "Värmlands län",
-            "type": "county"
-        },
-        "18": {
-            "conceptId": "xTCk_nT5_Zjm",
-            "legacyAmsTaxonomyId": "18",
-            "preferredTerm": "Örebro län",
-            "type": "county"
-        },
-        "19": {
-            "conceptId": "G6DV_fKE_Viz",
-            "legacyAmsTaxonomyId": "19",
-            "preferredTerm": "Västmanlands län",
-            "type": "county"
-        },
-        "20": {
-            "conceptId": "oDpK_oZ2_WYt",
-            "legacyAmsTaxonomyId": "20",
-            "preferredTerm": "Dalarnas län",
-            "type": "county"
-        },
-        "21": {
-            "conceptId": "zupA_8Nt_xcD",
-            "legacyAmsTaxonomyId": "21",
-            "preferredTerm": "Gävleborgs län",
-            "type": "county"
-        },
-        "22": {
-            "conceptId": "NvUF_SP1_1zo",
-            "legacyAmsTaxonomyId": "22",
-            "preferredTerm": "Västernorrlands län",
-            "type": "county"
-        },
-        "23": {
-            "conceptId": "65Ms_7r1_RTG",
-            "legacyAmsTaxonomyId": "23",
-            "preferredTerm": "Jämtlands län",
-            "type": "county"
-        },
-        "24": {
-            "conceptId": "g5Tt_CAV_zBd",
-            "legacyAmsTaxonomyId": "24",
-            "preferredTerm": "Västerbottens län",
-            "type": "county"
-        },
-        "25": {
-            "conceptId": "9hXe_F4g_eTG",
-            "legacyAmsTaxonomyId": "25",
-            "preferredTerm": "Norrbottens län",
-            "type": "county"
-        }
-    },
     "deprecated-education-field": {
         "1": {
             "conceptId": "CQ8x_ZaH_1KH",
@@ -40531,6 +40403,134 @@
             "legacyAmsTaxonomyId": "2584-vittangi",
             "preferredTerm": "Vittangi",
             "type": "place"
+        }
+    },
+    "region": {
+        "01": {
+            "conceptId": "CifL_Rzy_Mku",
+            "legacyAmsTaxonomyId": "01",
+            "preferredTerm": "Stockholms län",
+            "type": "region"
+        },
+        "03": {
+            "conceptId": "zBon_eET_fFU",
+            "legacyAmsTaxonomyId": "03",
+            "preferredTerm": "Uppsala län",
+            "type": "region"
+        },
+        "04": {
+            "conceptId": "s93u_BEb_sx2",
+            "legacyAmsTaxonomyId": "04",
+            "preferredTerm": "Södermanlands län",
+            "type": "region"
+        },
+        "05": {
+            "conceptId": "oLT3_Q9p_3nn",
+            "legacyAmsTaxonomyId": "05",
+            "preferredTerm": "Östergötlands län",
+            "type": "region"
+        },
+        "06": {
+            "conceptId": "MtbE_xWT_eMi",
+            "legacyAmsTaxonomyId": "06",
+            "preferredTerm": "Jönköpings län",
+            "type": "region"
+        },
+        "07": {
+            "conceptId": "tF3y_MF9_h5G",
+            "legacyAmsTaxonomyId": "07",
+            "preferredTerm": "Kronobergs län",
+            "type": "region"
+        },
+        "08": {
+            "conceptId": "9QUH_2bb_6Np",
+            "legacyAmsTaxonomyId": "08",
+            "preferredTerm": "Kalmar län",
+            "type": "region"
+        },
+        "09": {
+            "conceptId": "K8iD_VQv_2BA",
+            "legacyAmsTaxonomyId": "09",
+            "preferredTerm": "Gotlands län",
+            "type": "region"
+        },
+        "10": {
+            "conceptId": "DQZd_uYs_oKb",
+            "legacyAmsTaxonomyId": "10",
+            "preferredTerm": "Blekinge län",
+            "type": "region"
+        },
+        "12": {
+            "conceptId": "CaRE_1nn_cSU",
+            "legacyAmsTaxonomyId": "12",
+            "preferredTerm": "Skåne län",
+            "type": "region"
+        },
+        "13": {
+            "conceptId": "wjee_qH2_yb6",
+            "legacyAmsTaxonomyId": "13",
+            "preferredTerm": "Hallands län",
+            "type": "region"
+        },
+        "14": {
+            "conceptId": "zdoY_6u5_Krt",
+            "legacyAmsTaxonomyId": "14",
+            "preferredTerm": "Västra Götalands län",
+            "type": "region"
+        },
+        "17": {
+            "conceptId": "EVVp_h6U_GSZ",
+            "legacyAmsTaxonomyId": "17",
+            "preferredTerm": "Värmlands län",
+            "type": "region"
+        },
+        "18": {
+            "conceptId": "xTCk_nT5_Zjm",
+            "legacyAmsTaxonomyId": "18",
+            "preferredTerm": "Örebro län",
+            "type": "region"
+        },
+        "19": {
+            "conceptId": "G6DV_fKE_Viz",
+            "legacyAmsTaxonomyId": "19",
+            "preferredTerm": "Västmanlands län",
+            "type": "region"
+        },
+        "20": {
+            "conceptId": "oDpK_oZ2_WYt",
+            "legacyAmsTaxonomyId": "20",
+            "preferredTerm": "Dalarnas län",
+            "type": "region"
+        },
+        "21": {
+            "conceptId": "zupA_8Nt_xcD",
+            "legacyAmsTaxonomyId": "21",
+            "preferredTerm": "Gävleborgs län",
+            "type": "region"
+        },
+        "22": {
+            "conceptId": "NvUF_SP1_1zo",
+            "legacyAmsTaxonomyId": "22",
+            "preferredTerm": "Västernorrlands län",
+            "type": "region"
+        },
+        "23": {
+            "conceptId": "65Ms_7r1_RTG",
+            "legacyAmsTaxonomyId": "23",
+            "preferredTerm": "Jämtlands län",
+            "type": "region"
+        },
+        "24": {
+            "conceptId": "g5Tt_CAV_zBd",
+            "legacyAmsTaxonomyId": "24",
+            "preferredTerm": "Västerbottens län",
+            "type": "region"
+        },
+        "25": {
+            "conceptId": "9hXe_F4g_eTG",
+            "legacyAmsTaxonomyId": "25",
+            "preferredTerm": "Norrbottens län",
+            "type": "region"
         }
     },
     "skill": {

@@ -160,7 +160,9 @@ PG_SSLMODE = os.getenv("PG_SSLMODE", 'require')
 # For berikning (platsannonser och auranest)
 URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
     os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
-              'http://localhost:6357/enrichtextdocumentsbinary')
+              'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocumentsbinary')
+#    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
+#              'http://localhost:6357/enrichtextdocumentsbinary')
 
 # For kandidat import
 ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
