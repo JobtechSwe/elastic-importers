@@ -54,6 +54,15 @@ platsannons_mappings = {
                                 }
                             }
                         },
+                        "trait": {
+                            "type": "text",
+                            "fields": {
+                                "raw": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
                         "location": {
                             "type": "text",
                             "fields": {
@@ -63,38 +72,7 @@ platsannons_mappings = {
                                 }
                             }
                         }
-                    }
-                },
-                "keywords_enriched_binary": {
-                    "type": "object",
-                    "properties": {
-                        "occupation": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "skill": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "trait": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        }
+
                     }
                 },
                 "publiceringsdatum": {
@@ -160,7 +138,8 @@ PG_SSLMODE = os.getenv("PG_SSLMODE", 'require')
 # For berikning (platsannonser och auranest)
 URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
     os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
-              'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocumentsbinary')
+              'https://textdoc-enrichments.dev.services.jtech.se'
+              '/enrichtextdocumentsbinary')
 #    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
 #              'http://localhost:6357/enrichtextdocumentsbinary')
 

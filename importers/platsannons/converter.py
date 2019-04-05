@@ -135,52 +135,73 @@ def convert_message(message_envelope):
         }
         annons['krav'] = {
             'kompetenser': [
-                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'), kompetens.get('vikt'))
+                get_concept_as_annons_value_with_weight('kompetens',
+                                                        kompetens.get('varde'),
+                                                        kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) > 3
             ],
             'sprak': [
-                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'), sprak.get('vikt'))
+                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'),
+                                                        sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) > 3
             ],
             'utbildningsniva': [
-                get_concept_as_annons_value_with_weight('deprecated_educationlevel', utbn.get('varde'), utbn.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationlevel',
+                                                        utbn.get('varde'),
+                                                        utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn.get('vikt', 0) > 3
             ],
             'utbildningsinriktning': [
-                get_concept_as_annons_value_with_weight('deprecated_educationfield', utbi.get('varde'), utbi.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationfield',
+                                                        utbi.get('varde'),
+                                                        utbi.get('vikt'))
                 for utbi in
-                [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) > 3
+                [message.get('utbildningsinriktning', {})]
+                if utbi and utbi.get('vikt', 0) > 3
             ],
             'yrkeserfarenheter': [
-                get_concept_as_annons_value_with_weight('yrkesroll', yrkerf.get('varde'), yrkerf.get('vikt'))
+                get_concept_as_annons_value_with_weight('yrkesroll',
+                                                        yrkerf.get('varde'),
+                                                        yrkerf.get('vikt'))
                 for yrkerf in
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) > 3
             ]
         }
         annons['meriterande'] = {
             'kompetenser': [
-                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'), kompetens.get('vikt'))
+                get_concept_as_annons_value_with_weight('kompetens',
+                                                        kompetens.get('varde'),
+                                                        kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) < 4
             ],
             'sprak': [
-                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'), sprak.get('vikt'))
+                get_concept_as_annons_value_with_weight('sprak',
+                                                        sprak.get('varde'),
+                                                        sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) < 4
             ],
             'utbildningsniva': [
-                get_concept_as_annons_value_with_weight('deprecated_educationlevel', utbn.get('varde'), utbn.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationlevel',
+                                                        utbn.get('varde'),
+                                                        utbn.get('vikt'))
                 for utbn in
                 [message.get('utbildningsniva', {})] if utbn and utbn.get('vikt', 0) < 4
             ],
             'utbildningsinriktning': [
-                get_concept_as_annons_value_with_weight('deprecated_educationfield', utbi.get('varde'), utbi.get('vikt'))
+                get_concept_as_annons_value_with_weight('deprecated_educationfield',
+                                                        utbi.get('varde'),
+                                                        utbi.get('vikt'))
                 for utbi in
-                [message.get('utbildningsinriktning', {})] if utbi and utbi.get('vikt', 0) < 4 # hantera null värden
+                [message.get('utbildningsinriktning', {})]
+                if utbi and utbi.get('vikt', 0) < 4  # hantera nullvärden
             ],
             'yrkeserfarenheter': [
-                get_concept_as_annons_value_with_weight('yrkeserfarenheter', yrkerf.get('varde'), yrkerf.get('vikt'))
+                get_concept_as_annons_value_with_weight('yrkeserfarenheter',
+                                                        yrkerf.get('varde'),
+                                                        yrkerf.get('vikt'))
                 for yrkerf in
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) < 4
             ]
@@ -240,7 +261,6 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
     return weighted_concept
 
 
-
 def parse_driving_licence(message):
     taxkorkortList = []
     for kkort in message.get('korkort'):
@@ -257,27 +277,10 @@ def _add_keywords(annons):
     annons['keywords'] = dict()
     for key_dict in [
         {
-            'occupation':
-                [
-                    'yrkesroll.term',
-                    'yrkesgrupp.term',
-                    'yrkesomrade.term',
-                ]
-        },
-        {
-            'skill':
-                [
-
-                    'krav.kompetenser.term',
-                    'krav.sprak.term',
-                    'meriterande.kompetenser.term',
-                    'meriterande.sprak.term',
-                ]
-        },
-        {
             'location':
                 [
                     'arbetsplatsadress.postort',
+                    'arbetsplatsadress.postnummer',
                     'arbetsplatsadress.kommun',
                     'arbetsplatsadress.lan',
                     'arbetsplatsadress.land',

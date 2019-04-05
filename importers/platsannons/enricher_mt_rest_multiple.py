@@ -14,17 +14,16 @@ log = logging.getLogger(__name__)
 
 timeout_enrich_api = 90
 
+
 def init_process(args):
     global counter
     counter = args
 
 
 def enrich(annonser, parallelism=1):
-    # 2019-01-09 11:19:52+0100|INFO|importers.platsannons.main|MESSAGE: Indexed 999 docs in: 23.753832817077637 seconds.
-    # 2019-01-23 10:41:51+0100|INFO|importers.platsannons.main|MESSAGE: Indexed 10000 docs in: 62.099438190460205 seconds.
-
     log.info('Running enrich with %s processes' % str(parallelism))
-    log.info('Enriching documents calling: %s' % settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE)
+    log.info('Enriching documents calling: %s'
+             % settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE)
 
     global counter
     counter = Value('i', 0)
@@ -36,7 +35,8 @@ def enrich(annonser, parallelism=1):
         doc_headline = get_doc_headline_input(annons)
         doc_text = annons.get('beskrivning', {}).get('annonstext', '')
         if doc_id == '':
-            raise ValueError('Document has no id, enrichment is not possible, headline: ' % (doc_headline))
+            raise ValueError('Document has no id, enrichment is not possible, headline: '
+                             % (doc_headline))
 
         input_doc_params = {
             settings.ENRICHER_PARAM_DOC_ID: doc_id,
@@ -63,10 +63,8 @@ def enrich(annonser, parallelism=1):
         }
         batch_indatas.append(batch_indata)
 
-
     enrich_results_data = execute_calls(batch_indatas, parallelism)
     log.info('Enriched %s/%s documents' % (len(enrich_results_data), len(annonser)))
-
 
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
@@ -75,6 +73,7 @@ def enrich(annonser, parallelism=1):
         enrich_doc(annons, enriched_output)
 
     return annonser
+
 
 def get_doc_headline_input(annons):
     # Add occupation from structured data in headline.
@@ -93,13 +92,10 @@ def get_doc_headline_input(annons):
 
 def get_enrich_result(batch_indata, timeout):
     headers = {'Content-Type': 'application/json'}
-    # log.debug('len(batch_indata[documents_input])', len(batch_indata['documents_input']))
-    # log.info('get_enrich_result - Sending %s ads (documents_input) for enrichment' % (len(batch_indata['documents_input'])))
-    # log.debug('Enriching Id: %s' % (input_doc_params[NarvalEnricher.PARAM_DOC_ID]))
-    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE, headers=headers, json = batch_indata, timeout=timeout)
+    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE,
+                      headers=headers, json=batch_indata, timeout=timeout)
     r.raise_for_status()
     return r.json()
-
 
 
 def execute_calls(batch_indatas, parallelism):
@@ -109,7 +105,9 @@ def execute_calls(batch_indatas, parallelism):
     # We can use a with statement to ensure threads are cleaned up promptly
     with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
         # Start the load operations and mark each future with its URL
-        future_to_enrich_result = {executor.submit(get_enrich_result, batch_indata, timeout_enrich_api): batch_indata for batch_indata in batch_indatas}
+        future_to_enrich_result = {executor.submit(get_enrich_result, batch_indata,
+                                                   timeout_enrich_api): batch_indata
+                                   for batch_indata in batch_indatas}
         for future in concurrent.futures.as_completed(future_to_enrich_result):
             try:
                 enriched_result = future.result()
@@ -119,23 +117,26 @@ def execute_calls(batch_indatas, parallelism):
                     with counter.get_lock():
                         counter.value += 1
                         if counter.value % 100 == 0:
-                            log.info("enrichtextdocumentsbinary - Processed %s docs" % (str(counter.value)))
+                            log.info("enrichtextdocumentsbinary - Processed %s docs"
+                                     % (str(counter.value)))
             except Exception as exc:
                 log.error('Enrichment call generated an exception: %s' % (str(exc)))
                 raise exc
 
-
     return enriched_output
 
+
 def enrich_doc(annons, enriched_output):
-    annons['keywords_enriched_binary'] = {}
+    annons['keywords'] = {}
     enriched_candidates = enriched_output['enriched_candidates']
-    new_occupations = [candidate['concept_label'].lower() for candidate in enriched_candidates['occupations']]
-    annons['keywords_enriched_binary']['occupation'] = new_occupations
-    new_skills = [candidate['concept_label'].lower() for candidate in enriched_candidates['competencies']]
-    annons['keywords_enriched_binary']['skill'] = new_skills
-    new_traits = [candidate['concept_label'].lower() for candidate in enriched_candidates['traits']]
-    annons['keywords_enriched_binary']['trait'] = new_traits
+    new_occupations = [candidate['concept_label'].lower()
+                       for candidate in enriched_candidates['occupations']]
+    annons['keywords']['occupation'] = new_occupations
+    new_skills = [candidate['concept_label'].lower()
+                  for candidate in enriched_candidates['competencies']]
+    annons['keywords']['skill'] = new_skills
+    new_traits = [candidate['concept_label'].lower()
+                  for candidate in enriched_candidates['traits']]
+    annons['keywords']['trait'] = new_traits
 
     return annons
-
