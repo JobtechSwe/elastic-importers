@@ -274,7 +274,8 @@ def parse_driving_licence(message):
 
 
 def _add_keywords(annons):
-    annons['keywords'] = dict()
+    if 'enriched' not in annons:
+        annons['enriched'] = {'keywords': {}}
     for key_dict in [
         {
             'location':
@@ -294,7 +295,7 @@ def _add_keywords(annons):
             for value in values:
                 for kw in _extract_taxonomy_label(value):
                     keywords.add(kw)
-        annons['keywords'][field] = list(keywords)
+        annons['enriched']['keywords'][field] = list(keywords)
     return annons
 
 

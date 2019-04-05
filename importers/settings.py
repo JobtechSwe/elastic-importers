@@ -33,46 +33,51 @@ platsannons_mappings = {
                         }
                     }
                 },
-                "keywords": {
+                "enriched": {
                     "type": "object",
                     "properties": {
-                        "occupation": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                        "keywords": {
+                            "type": "object",
+                            "properties": {
+                                "occupation": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "skill": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "trait": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "location": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
                                 }
-                            }
-                        },
-                        "skill": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "trait": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "location": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
+
                             }
                         }
-
                     }
                 },
                 "publiceringsdatum": {
