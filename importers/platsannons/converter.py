@@ -85,13 +85,16 @@ def convert_message(message_envelope):
                 yrkesomrade = yrkesgrupp.get('parent')
                 annons['yrkesroll'] = {'kod': yrkesroll['concept_id'],
                                        'term': yrkesroll['label'],
-                                       'taxonomi-kod': yrkesroll['legacy_ams_taxonomy_id']}
+                                       'taxonomi-kod':
+                                       yrkesroll['legacy_ams_taxonomy_id']}
                 annons['yrkesgrupp'] = {'kod': yrkesgrupp['concept_id'],
                                         'term': yrkesgrupp['label'],
-                                        'taxonomi-kod': yrkesgrupp['legacy_ams_taxonomy_id']}
+                                        'taxonomi-kod':
+                                        yrkesgrupp['legacy_ams_taxonomy_id']}
                 annons['yrkesomrade'] = {'kod': yrkesomrade['concept_id'],
                                          'term': yrkesomrade['label'],
-                                         'taxonomi-kod': yrkesomrade['legacy_ams_taxonomy_id']}
+                                         'taxonomi-kod':
+                                         yrkesomrade['legacy_ams_taxonomy_id']}
             elif not yrkesroll:
                 log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
                             % message['yrkesroll'])
@@ -281,7 +284,6 @@ def _add_keywords(annons):
             'location':
                 [
                     'arbetsplatsadress.postort',
-                    'arbetsplatsadress.postnummer',
                     'arbetsplatsadress.kommun',
                     'arbetsplatsadress.lan',
                     'arbetsplatsadress.land',
