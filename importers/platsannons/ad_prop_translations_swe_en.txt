@@ -52,7 +52,7 @@ yrkesroll - occupation
 yrkesgrupp - occupation_group
 yrkesomrade = occupation_field
 kod - concept_id
-term - (denna är inte spikad än men blir förmodligen 'label'. Den andra kandidaten är 'term')
+term - label
 taxonomi-kod - legacy_ams_taxonomy_id
 
 
