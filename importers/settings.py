@@ -33,10 +33,10 @@ platsannons_mappings = {
                         }
                     }
                 },
-                "enriched": {
+                "keywords": {
                     "type": "object",
                     "properties": {
-                        "keywords": {
+                        "enriched": {
                             "type": "object",
                             "properties": {
                                 "occupation": {
@@ -65,17 +65,36 @@ platsannons_mappings = {
                                             "ignore_above": 256
                                         }
                                     }
-                                },
-                                "location": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
+                                }
+                            }
+                        },
+                        "extracted": {
+                            "occupation": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
                                     }
                                 }
-
+                            },
+                            "skill": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "location": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
                             }
                         }
                     }

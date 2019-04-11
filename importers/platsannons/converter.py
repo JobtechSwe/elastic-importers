@@ -277,17 +277,32 @@ def parse_driving_licence(message):
 
 
 def _add_keywords(annons):
-    if 'enriched' not in annons:
-        annons['enriched'] = {'keywords': {}}
+    if 'keywords' not in annons:
+        annons['keywords'] = {'extracted': {}}
     for key_dict in [
         {
-            'location':
-                [
-                    'arbetsplatsadress.postort',
-                    'arbetsplatsadress.kommun',
-                    'arbetsplatsadress.lan',
-                    'arbetsplatsadress.land',
-                ]
+            'occupation': [
+                'yrkesroll.term',
+                'yrkesgrupp.term',
+                'yrkesomrade.term',
+            ]
+        },
+        {
+            'skill': [
+                'krav.kompetenser.term',
+                'krav.sprak.term',
+                'meriterande.kompetenser.term',
+                'meriterande.sprak.term',
+            ]
+        },
+        {
+            'location': [
+                'arbetsplatsadress.postort',
+                'arbetsplatsadress.postnummer',
+                'arbetsplatsadress.kommun',
+                'arbetsplatsadress.lan',
+                'arbetsplatsadress.land',
+            ]
         }
     ]:
         field = list(key_dict.keys())[0]
@@ -297,7 +312,7 @@ def _add_keywords(annons):
             for value in values:
                 for kw in _extract_taxonomy_label(value):
                     keywords.add(kw)
-        annons['enriched']['keywords'][field] = list(keywords)
+        annons['keywords']['extracted'][field] = list(keywords)
     return annons
 
 
