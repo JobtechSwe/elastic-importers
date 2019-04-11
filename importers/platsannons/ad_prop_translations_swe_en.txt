@@ -28,7 +28,7 @@ annons['arbetsgivare'] = { - employer
 'id': - id (LA arbetsgivareId)
 'telefonnummer' - phone_number (LA telefonnummer)
 'epost': - email (LA epost)
-'webbadress': - web_site_url (LA webbadress)
+'webbadress': - url (LA webbadress)
 'organisationsnummer': - organization_number (LA organisationsnummer)
 'namn': - name (LA arbetsgivareNamn)
 'arbetsplats': - workplace (LA arbetsplatsNamn)
