@@ -44,7 +44,7 @@ def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
     cur.execute(sql_str,
                 {'ts':timestamp,
                  'exp': ts_today,
-                 'excl_id': tuple(last_ids if len(last_ids) > 0 else ['this string needed for sql syntax']),
+                 'excl_id': tuple(str(last_ids) if len(last_ids) > 0 else ['this string needed for sql syntax']),
                  'limit': settings.PG_BATCH_SIZE})
     rows = cur.fetchall()
 
