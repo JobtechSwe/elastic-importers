@@ -1,6 +1,6 @@
-FROM ubuntu:18.04
+FROM ubuntu:latest
 
-# RUN apt-get update
+RUN apt-get update
 
 # Install packages to allow apt to use a repository over HTTPS:
 RUN apt-get install -yq --no-install-recommends --fix-missing \
