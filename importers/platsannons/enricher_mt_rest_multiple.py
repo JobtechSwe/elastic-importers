@@ -128,16 +128,22 @@ def execute_calls(batch_indatas, parallelism):
 
 def enrich_doc(annons, enriched_output):
     if 'keywords' not in annons:
-        annons['keywords'] = {'enriched': {}}
+        annons['keywords'] = {}
+
+
+    if 'enriched' not in annons['keywords']:
+        annons['keywords']['enriched'] = {}
+
     enriched_candidates = enriched_output['enriched_candidates']
     new_occupations = [candidate['concept_label'].lower()
                        for candidate in enriched_candidates['occupations']]
-    annons['keyword']['enriched']['occupation'] = new_occupations
+    enriched_node = annons['keywords']['enriched']
+    enriched_node['occupation'] = new_occupations
     new_skills = [candidate['concept_label'].lower()
                   for candidate in enriched_candidates['competencies']]
-    annons['keywords']['enriched']['skill'] = new_skills
+    enriched_node['skill'] = new_skills
     new_traits = [candidate['concept_label'].lower()
                   for candidate in enriched_candidates['traits']]
-    annons['keywords']['enriched']['trait'] = new_traits
+    enriched_node['trait'] = new_traits
 
     return annons
