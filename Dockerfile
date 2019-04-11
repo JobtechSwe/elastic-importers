@@ -11,8 +11,8 @@ RUN apt-get install -yq --no-install-recommends --fix-missing \
     python3-setuptools \
     python3-pip \
     postgresql-client \
-    libxml2-dev \
-    libxslt-dev \
+    # libxml2-dev \
+    # libxslt-dev \
     git \
     curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
