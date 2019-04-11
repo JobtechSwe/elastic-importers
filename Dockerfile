@@ -1,11 +1,11 @@
 FROM ubuntu:18.04
 
-# RUN apt-get update
+RUN apt-get update
 
 # Install packages to allow apt to use a repository over HTTPS:
-RUN apt-get install -y --no-install-recommends \
-    apt-transport-https \
-    ca-certificates \
+RUN apt-get install -yq --no-install-recommends \
+    # apt-transport-https \
+    # ca-certificates \
     python3.7 \
     python3-dev \
     python3-setuptools \
