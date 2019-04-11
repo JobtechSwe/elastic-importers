@@ -21,10 +21,11 @@ def _isodate(bad_date):
 
 
 def convert_message(message_envelope):
-    if 'annons' in message_envelope and 'version' in message_envelope:
-        message = message_envelope['annons']
+    if 'version' in message_envelope:
+        message = message_envelope
         annons = dict()
         annons['id'] = message.get('annonsId')
+        annons['external_id'] = message.get('externtAnnonsId')
         annons['rubrik'] = message.get('annonsrubrik')
         annons['sista_ansokningsdatum'] = _isodate(message.get('sistaAnsokningsdatum'))
         annons['antal_platser'] = message.get('antalPlatser')
@@ -112,13 +113,13 @@ def convert_message(message_envelope):
         latitud = None
         if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
             kommunkod = arbplatsmessage.get('kommun', {}).get('varde', {})
-            kommun = taxonomy.get_term('kommun', kommunkod)
+            kommun = arbplatsmessage.get('kommun', {}).get('namn', {})
         if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
             lanskod = arbplatsmessage.get('lan', {}).get('varde', {})
-            lansnamn = taxonomy.get_term('lan', lanskod)
+            lansnamn = arbplatsmessage.get('lan', {}).get('namn', {})
         if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
             landskod = arbplatsmessage.get('land', {}).get('varde', {})
-            land = taxonomy.get_term('land', landskod)
+            land = arbplatsmessage.get('land', {}).get('namn', {})
         if 'longitud'in arbplatsmessage and arbplatsmessage.get('longitud'):
             longitud = float(arbplatsmessage.get('longitud'))
         if 'latitud' in arbplatsmessage and arbplatsmessage.get('latitud'):
@@ -134,7 +135,7 @@ def convert_message(message_envelope):
             'gatuadress': message.get('besoksadress', {}).get('gatuadress'),
             'postnummer': message.get('postadress', {}).get('postnr'),
             'postort': message.get('postadress', {}).get('postort'),
-            'coordinates': [longitud, latitud],
+            'coordinates': [longitud, latitud]
         }
         annons['krav'] = {
             'kompetenser': [

@@ -22,8 +22,8 @@ def init_process(args):
 
 def enrich(annonser, parallelism=1):
     log.info('Running enrich with %s processes' % str(parallelism))
-    log.info('Enriching documents calling: %s'
-             % settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE)
+    log.info('Enriching %s documents calling: %s'
+             % (len(annonser), settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE))
 
     global counter
     counter = Value('i', 0)

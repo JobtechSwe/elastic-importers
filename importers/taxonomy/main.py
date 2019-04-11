@@ -58,7 +58,7 @@ def update_search_engine_valuestore(indexname, indexexists, values):
                     elastic.add_indices_to_alias(list(alias.keys()),
                                                  settings.ES_TAX_ARCHIVE_ALIAS)
                 else:
-                    log.info("Creating {} alias and adding index {}".format(settings.ES_TAX_ARCHIVE_ALIAS))
+                    log.info("Creating {} alias and adding index {}".format(settings.ES_TAX_ARCHIVE_ALIAS, indexname))
                     elastic.put_alias(
                         list(alias.keys()), settings.ES_TAX_ARCHIVE_ALIAS)
         else:

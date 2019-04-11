@@ -24,6 +24,9 @@ platsannons_mappings = {
     "mappings": {
         "document": {
             "properties": {
+                "external_id": {
+                    "type": "keyword"
+                },
                 "complete": {
                     "type": "text",
                     "fields": {
@@ -123,9 +126,21 @@ platsannons_mappings = {
                         "kommunkod": {
                             "type": "text"
                         },
+                        "kommun": {
+                            "type": "text"
+                        },
+                        "lanskod": {
+                            "type": "text"
+                        },
+                        "lan": {
+                            "type": "text"
+                        },
                         "landskod": {
                             "type": "keyword",
                             "null_value": "199"  # Assume Sweden when not specified
+                        },
+                        "land": {
+                            "type": "text"
                         },
                         "coordinates": {
                             "type": "geo_point",
