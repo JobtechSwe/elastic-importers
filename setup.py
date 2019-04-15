@@ -24,6 +24,8 @@ setup(
             'importers.indexmaint.main:set_auranest_read_alias',
             'set-write-alias-auranest = '
             'importers.indexmaint.main:set_auranest_write_alias',
+            'create-platsannons-index = '
+            'importers.indexmaint.main:create_platsannons_index'
         ],
     },
     setup_requires=["pytest-runner"],
