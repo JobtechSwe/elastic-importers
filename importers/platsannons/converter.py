@@ -256,7 +256,6 @@ def _add_keywords(annons):
         },
         {
             'location': [
-                'workplace_address.postcode',
                 'workplace_address.city',
                 'workplace_address.municipality',
                 'workplace_address.region',
