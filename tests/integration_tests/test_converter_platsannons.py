@@ -19,6 +19,7 @@ import pytest
 # Nya properties:
 # 'avpublicerad' (boolean)
 # 'avpubliceringsdatum' - finns endast om avpublicerad är True
+# 'external_id'
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
@@ -54,19 +55,35 @@ def assert_ad_properties(annons_id, source_ads, target_ads, converter):
     source_ad = get_source_ad(annons_id, source_ads)
     # pprint(source_ad)
     target_ad = get_target_ad(annons_id, target_ads)
+    # pprint(target_ad)
     message_envelope = {}
-    message_envelope['annons'] = source_ad
+    # message_envelope['annons'] = source_ad
+    message_envelope = source_ad
+
+
     message_envelope['version'] = 1
-    message_envelope['annons']['timestamp'] = target_ad['timestamp']
+    message_envelope['timestamp'] = target_ad['timestamp']
     # pprint(message_envelope)
     conv_ad = converter.convert_message(message_envelope)
-    # pprint(conv_ad)
+    pprint(conv_ad)
     # pprint(target_ad)
     for key, val in target_ad.items():
-        # print(key2)
-        if key not in ['publiceringskanaler', 'status', 'timestamp', 'keywords_enriched_binary', 'keywords']:
+        # print(key)
+        # if key not in ['publiceringskanaler', 'status', 'timestamp', 'keywords_enriched_binary', 'keywords']:
+        # if key not in ['avpublicerad']:
+        if key not in ['keywords', 'timestamp']:
+            # print(key)
             assert key in conv_ad.keys()
+            assert type(val) == type(conv_ad[key])
             assert val == conv_ad[key]
+        elif key == 'keywords':
+            # print('keywords', conv_ad['keywords'])
+            company_node = conv_ad['keywords']['extracted']['employer']
+            # print('company_node', company_node)
+            assert 'fazer food services' in company_node
+            assert 'gateau' in company_node
+            assert 'fazer food services ab' not in company_node
+            assert 'gateau ab' not in company_node
 
     #########################
     # Borttagna attribut
@@ -74,26 +91,26 @@ def assert_ad_properties(annons_id, source_ads, target_ads, converter):
     assert 'status' not in conv_ad
     assert 'publiceringskanaler' not in conv_ad
 
+    #########################
+    # Nya/strukturellt ändrade attribut
+    #########################
+    assert 'removed' in conv_ad
+    assert conv_ad['removed'] == source_ad['avpublicerad']
+    assert 'last_publication_date' in conv_ad
+    assert converter._isodate(source_ad['sistaPubliceringsdatum']) == conv_ad['last_publication_date']
 
-
-    key1 = 'avpublicerad'
-    assert key1 in conv_ad
-    assert conv_ad[key1] == source_ad[key1]
-    key2 = 'sista_publiceringsdatum'
-    assert key2 in conv_ad
-    assert converter._isodate(source_ad['sistaPubliceringsdatum']) == conv_ad[key2]
-    key3 = 'avpubliceringsdatum'
-    assert key3 in conv_ad
-    if key3 in source_ad:
-        assert converter._isodate(source_ad[key3]) == conv_ad[key3]
+    removed_date_key = 'removed_date'
+    assert removed_date_key in conv_ad
+    if 'avpubliceringsdatum' in source_ad:
+        assert converter._isodate(source_ad['avpubliceringsdatum']) == conv_ad[removed_date_key]
     else:
-        assert conv_ad[key3] is None
-    # TODO: Attributet 'lonebeskrivning' finns i ny källa, vill vi ha med denna?
-
+        assert conv_ad[removed_date_key] is None
 
 def get_source_ad(annons_id, ads):
     ads_with_id = [ad for ad in ads if str(ad['annonsId']) == str(annons_id)]
-    return None if len(ads_with_id) == 0 else ads_with_id[0]
+    ad = None if len(ads_with_id) == 0 else ads_with_id[0]
+    ad['annonsId'] = str(ad['annonsId'])
+    return ad
 
 def get_target_ad(annons_id, ads):
     ads_with_id = [ad['_source'] for ad in ads if str(ad['_source']['id']) == str(annons_id)]

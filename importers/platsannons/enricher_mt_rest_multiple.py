@@ -33,7 +33,7 @@ def enrich(annonser, parallelism=1):
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
         doc_headline = get_doc_headline_input(annons)
-        doc_text = annons.get('beskrivning', {}).get('annonstext', '')
+        doc_text = annons.get('description', {}).get('text', '')
         if doc_id == '':
             raise ValueError('Document has no id, enrichment is not possible, headline: '
                              % (doc_headline))
@@ -77,11 +77,11 @@ def enrich(annonser, parallelism=1):
 
 def get_doc_headline_input(annons):
     # Add occupation from structured data in headline.
-    doc_headline1 = annons.get('yrkesroll', {}).get('term', '')
+    doc_headline1 = annons.get('occupation', {}).get('label', '')
     if(doc_headline1 is None):
         doc_headline1 = ''
 
-    doc_headline2 = annons.get('rubrik', '')
+    doc_headline2 = annons.get('headline', '')
     if doc_headline1 != '' and doc_headline1 != doc_headline2:
         doc_headline = doc_headline1 + ' ' + doc_headline2
     else:

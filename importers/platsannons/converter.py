@@ -26,56 +26,56 @@ def convert_message(message_envelope):
         annons = dict()
         annons['id'] = message.get('annonsId')
         annons['external_id'] = message.get('externtAnnonsId')
-        annons['rubrik'] = message.get('annonsrubrik')
-        annons['sista_ansokningsdatum'] = _isodate(message.get('sistaAnsokningsdatum'))
-        annons['antal_platser'] = message.get('antalPlatser')
-        annons['beskrivning'] = {
-            'annonstext': message.get('annonstext'),
-            'information': message.get('ftgInfo'),
-            'behov': message.get('beskrivningBehov'),
-            'krav': message.get('beskrivningKrav'),
-            'villkor': message.get('villkorsbeskrivning'),
+        annons['headline'] = message.get('annonsrubrik')
+        annons['application_deadline'] = _isodate(message.get('sistaAnsokningsdatum'))
+        annons['number_of_vacancies'] = message.get('antalPlatser')
+        annons['description'] = {
+            'text': message.get('annonstext'),
+            'company_information': message.get('ftgInfo'),
+            'needs': message.get('beskrivningBehov'),
+            'requirements': message.get('beskrivningKrav'),
+            'conditions': message.get('villkorsbeskrivning'),
         }
-        annons['arbetsplats_id'] = message.get('arbetsplatsId')
-        annons['anstallningstyp'] = _expand_taxonomy_value('anstallningstyp',
+        annons['workplace_id'] = message.get('arbetsplatsId')
+        annons['employment_type'] = _expand_taxonomy_value('anstallningstyp',
                                                            'anstallningTyp',
                                                            message)
-        annons['lonetyp'] = _expand_taxonomy_value('lonetyp', 'lonTyp', message)
-        annons['varaktighet'] = _expand_taxonomy_value('varaktighet',
+        annons['salary_type'] = _expand_taxonomy_value('lonetyp', 'lonTyp', message)
+        annons['duration'] = _expand_taxonomy_value('varaktighet',
                                                        'varaktighetTyp', message)
-        annons['arbetstidstyp'] = _expand_taxonomy_value('arbetstidstyp',
+        annons['working_hours_type'] = _expand_taxonomy_value('arbetstidstyp',
                                                          'arbetstidTyp', message)
         # If arbetstidstyp == 1 (heltid) then default omfattning == 100%
         default_omf = 100 if message.get('arbetstidTyp', {}).get('varde') == "1" else None
-        annons['arbetsomfattning'] = {
+        annons['scope_of_work'] = {
             'min': message.get('arbetstidOmfattningFran', default_omf),
             'max': message.get('arbetstidOmfattningTill', default_omf)
         }
-        annons['tilltrade'] = message.get('tilltrade')
-        annons['arbetsgivare'] = {
+        annons['access'] = message.get('tilltrade')
+        annons['employer'] = {
             'id': message.get('arbetsgivareId'),
-            'telefonnummer': message.get('telefonnummer'),
-            'epost': message.get('epost'),
-            'webbadress': message.get('webbadress'),
-            'organisationsnummer': message.get('organisationsnummer'),
-            'namn': message.get('arbetsgivareNamn'),
-            'arbetsplats': message.get('arbetsplatsNamn')
+            'phone_number': message.get('telefonnummer'),
+            'email': message.get('epost'),
+            'url': message.get('webbadress'),
+            'organization_number': message.get('organisationsnummer'),
+            'name': message.get('arbetsgivareNamn'),
+            'workplace': message.get('arbetsplatsNamn')
         }
-        annons['ansokningsdetaljer'] = {
+        annons['application_details'] = {
             'information': message.get('informationAnsokningssatt'),
-            'referens': message.get('referens'),
-            'epost': message.get('ansokningssattEpost'),
+            'reference': message.get('referens'),
+            'email': message.get('ansokningssattEpost'),
             'via_af': message.get('ansokningssattViaAF'),
-            'webbadress': message.get('ansokningssattWebbadress'),
-            'annat': message.get('ansokningssattAnnatSatt')
+            'url': message.get('ansokningssattWebbadress'),
+            'other': message.get('ansokningssattAnnatSatt')
         }
-        annons['erfarenhet_kravs'] = not message.get('ingenErfarenhetKravs', False)
-        annons['egen_bil'] = message.get('tillgangTillEgenBil', False)
+        annons['experience_required'] = not message.get('ingenErfarenhetKravs', False)
+        annons['access_to_own_car'] = message.get('tillgangTillEgenBil', False)
         if message.get('korkort', []):
-            annons['korkort_kravs'] = True
-            annons['korkort'] = parse_driving_licence(message)
+            annons['driving_license_required'] = True
+            annons['driving_license'] = parse_driving_licence(message)
         else:
-            annons['korkort_kravs'] = False
+            annons['driving_license_required'] = False
         if 'yrkesroll' in message:
             # jafhk fixa parsning för dessa med get_concept_by_legacy_id
             yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll',
@@ -84,17 +84,17 @@ def convert_message(message_envelope):
             if yrkesroll and 'parent' in yrkesroll:
                 yrkesgrupp = yrkesroll.get('parent')
                 yrkesomrade = yrkesgrupp.get('parent')
-                annons['yrkesroll'] = {'kod': yrkesroll['concept_id'],
-                                       'term': yrkesroll['label'],
-                                       'taxonomi-kod':
+                annons['occupation'] = {'concept_id': yrkesroll['concept_id'],
+                                       'label': yrkesroll['label'],
+                                       'legacy_ams_taxonomy_id':
                                        yrkesroll['legacy_ams_taxonomy_id']}
-                annons['yrkesgrupp'] = {'kod': yrkesgrupp['concept_id'],
-                                        'term': yrkesgrupp['label'],
-                                        'taxonomi-kod':
+                annons['occupation_group'] = {'concept_id': yrkesgrupp['concept_id'],
+                                        'label': yrkesgrupp['label'],
+                                        'legacy_ams_taxonomy_id':
                                         yrkesgrupp['legacy_ams_taxonomy_id']}
-                annons['yrkesomrade'] = {'kod': yrkesomrade['concept_id'],
-                                         'term': yrkesomrade['label'],
-                                         'taxonomi-kod':
+                annons['occupation_field'] = {'concept_id': yrkesomrade['concept_id'],
+                                         'label': yrkesomrade['label'],
+                                         'legacy_ams_taxonomy_id':
                                          yrkesomrade['legacy_ams_taxonomy_id']}
             elif not yrkesroll:
                 log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
@@ -125,47 +125,32 @@ def convert_message(message_envelope):
         if 'latitud' in arbplatsmessage and arbplatsmessage.get('latitud'):
             latitud = float(arbplatsmessage.get('latitud'))
 
-        annons['arbetsplatsadress'] = {
-            'kommunkod': kommunkod,
-            'lanskod': lanskod,
-            'kommun': kommun,
-            'lan': lansnamn,
-            'landskod': landskod,
-            'land': land,
-            'gatuadress': message.get('besoksadress', {}).get('gatuadress'),
-            'postnummer': message.get('postadress', {}).get('postnr'),
-            'postort': message.get('postadress', {}).get('postort'),
+        annons['workplace_address'] = {
+            'municipality_code': kommunkod,
+            'municipality': kommun,
+            'region_code': lanskod,
+            'region': lansnamn,
+            'country_code': landskod,
+            'country': land,
+            'street_address': message.get('besoksadress', {}).get('gatuadress'),
+            'postcode': message.get('postadress', {}).get('postnr'),
+            'city': message.get('postadress', {}).get('postort'),
             'coordinates': [longitud, latitud]
         }
-        annons['krav'] = {
-            'kompetenser': [
+        annons['must_have'] = {
+            'skills': [
                 get_concept_as_annons_value_with_weight('kompetens',
                                                         kompetens.get('varde'),
                                                         kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) > 3
             ],
-            'sprak': [
+            'languages': [
                 get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'),
                                                         sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) > 3
             ],
-            'utbildningsniva': [
-                get_concept_as_annons_value_with_weight('deprecated_educationlevel',
-                                                        utbn.get('varde'),
-                                                        utbn.get('vikt'))
-                for utbn in
-                [message.get('utbildningsniva', {})] if utbn.get('vikt', 0) > 3
-            ],
-            'utbildningsinriktning': [
-                get_concept_as_annons_value_with_weight('deprecated_educationfield',
-                                                        utbi.get('varde'),
-                                                        utbi.get('vikt'))
-                for utbi in
-                [message.get('utbildningsinriktning', {})]
-                if utbi and utbi.get('vikt', 0) > 3
-            ],
-            'yrkeserfarenheter': [
+            'work_experiences': [
                 get_concept_as_annons_value_with_weight('yrkesroll',
                                                         yrkerf.get('varde'),
                                                         yrkerf.get('vikt'))
@@ -173,36 +158,21 @@ def convert_message(message_envelope):
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) > 3
             ]
         }
-        annons['meriterande'] = {
-            'kompetenser': [
+        annons['nice_to_have'] = {
+            'skills': [
                 get_concept_as_annons_value_with_weight('kompetens',
                                                         kompetens.get('varde'),
                                                         kompetens.get('vikt'))
                 for kompetens in
                 message.get('kompetenser', []) if kompetens.get('vikt', 0) < 4
             ],
-            'sprak': [
+            'languages': [
                 get_concept_as_annons_value_with_weight('sprak',
                                                         sprak.get('varde'),
                                                         sprak.get('vikt'))
                 for sprak in message.get('sprak', []) if sprak.get('vikt', 0) < 4
             ],
-            'utbildningsniva': [
-                get_concept_as_annons_value_with_weight('deprecated_educationlevel',
-                                                        utbn.get('varde'),
-                                                        utbn.get('vikt'))
-                for utbn in
-                [message.get('utbildningsniva', {})] if utbn and utbn.get('vikt', 0) < 4
-            ],
-            'utbildningsinriktning': [
-                get_concept_as_annons_value_with_weight('deprecated_educationfield',
-                                                        utbi.get('varde'),
-                                                        utbi.get('vikt'))
-                for utbi in
-                [message.get('utbildningsinriktning', {})]
-                if utbi and utbi.get('vikt', 0) < 4  # hantera nullvärden
-            ],
-            'yrkeserfarenheter': [
+            'work_experiences': [
                 get_concept_as_annons_value_with_weight('yrkeserfarenheter',
                                                         yrkerf.get('varde'),
                                                         yrkerf.get('vikt'))
@@ -210,11 +180,11 @@ def convert_message(message_envelope):
                 message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) < 4
             ]
         }
-        annons['publiceringsdatum'] = _isodate(message.get('publiceringsdatum'))
-        annons['sista_publiceringsdatum'] = _isodate(message.get('sistaPubliceringsdatum'))
-        annons['avpublicerad'] = message.get('avpublicerad')
-        annons['avpubliceringsdatum'] = _isodate(message.get('avpubliceringsdatum'))
-        annons['kalla'] = message.get('kallaTyp')
+        annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
+        annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
+        annons['removed'] = message.get('avpublicerad')
+        annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
+        annons['source_type'] = message.get('kallaTyp')
         # Extract labels as keywords for easier searching
         return _add_keywords(annons)
     else:
@@ -228,9 +198,9 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
     if message_value:
         concept = taxonomy.get_concept_by_legacy_id(annons_key, message_value)
         return {
-            "kod": concept['concept_id'],
-            "term": concept['label'],
-            "taxonomi-kod": concept['legacy_ams_taxonomy_id']
+            "concept_id": concept['concept_id'],
+            "label": concept['label'],
+            "legacy_ams_taxonomy_id": concept['legacy_ams_taxonomy_id']
         } if concept else None
     return None
 
@@ -238,16 +208,16 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
 def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
     concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
     weighted_concept = {
-        'kod': None,
-        'term': None,
-        'vikt': None,
-        'taxonomi-kod': None
+        'concept_id': None,
+        'label': None,
+        'weight': None,
+        'legacy_ams_taxonomy_id': None
     }
     try:
-        weighted_concept['kod'] = concept.get('concept_id', None)
-        weighted_concept['term'] = concept.get('label', None)
-        weighted_concept['vikt'] = weight
-        weighted_concept['taxonomi-kod'] = concept.get('legacy_ams_taxonomy_id', None)
+        weighted_concept['concept_id'] = concept.get('concept_id', None)
+        weighted_concept['label'] = concept.get('label', None)
+        weighted_concept['weight'] = weight
+        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id', None)
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
     return weighted_concept
@@ -259,8 +229,8 @@ def parse_driving_licence(message):
         taxkortkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
         if taxkortkort:
             taxkorkortList.append({
-                "kod": taxkortkort['concept_id'],
-                "term": taxkortkort['label']
+                "concept_id": taxkortkort['concept_id'],
+                "label": taxkortkort['label']
             })
     return taxkorkortList
 
@@ -278,18 +248,25 @@ def _add_keywords(annons):
         },
         {
             'skill': [
-                'krav.kompetenser.term',
-                'krav.sprak.term',
-                'meriterande.kompetenser.term',
-                'meriterande.sprak.term',
+                'must_have.skills.label',
+                'must_have.languages.label',
+                'nice_to_have.skills.label',
+                'nice_to_have.languages.label',
             ]
         },
         {
             'location': [
-                'arbetsplatsadress.postort',
-                'arbetsplatsadress.kommun',
-                'arbetsplatsadress.lan',
-                'arbetsplatsadress.land',
+                'workplace_address.postcode',
+                'workplace_address.city',
+                'workplace_address.municipality',
+                'workplace_address.region',
+                'workplace_address.country',
+            ]
+        },
+        {
+            'employer': [
+                'employer.name',
+                'employer.workplace'
             ]
         }
     ]:
@@ -297,11 +274,32 @@ def _add_keywords(annons):
         keywords = set()
         for key in list(key_dict.values())[0]:
             values = _get_nested_value(key, annons)
-            for value in values:
-                for kw in _extract_taxonomy_label(value):
-                    keywords.add(kw)
+            if field == 'employer':
+                for value in values:
+                    for kw_employer_name in create_employer_name_keywords(value):
+                        keywords.add(kw_employer_name)
+            else:
+                for value in values:
+                    for kw in _extract_taxonomy_label(value):
+                        keywords.add(kw)
         annons['keywords']['extracted'][field] = list(keywords)
     return annons
+
+def create_employer_name_keywords(companyname):
+    kw_list = []
+    if companyname:
+        converted_name = companyname.lower().strip()
+        converted_name = rightreplace(converted_name, ' ab', '')
+        converted_name = leftreplace(converted_name, 'ab ', '')
+        kw_list.append(converted_name)
+
+    return kw_list
+
+def rightreplace(astring, pattern, sub):
+    return sub.join(astring.rsplit(pattern, 1))
+
+def leftreplace(astring, pattern, sub):
+    return sub.join(astring.split(pattern, 1))
 
 
 def _get_nested_value(path, data):

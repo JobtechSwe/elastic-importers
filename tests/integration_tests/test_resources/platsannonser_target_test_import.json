@@ -1,1018 +1,209 @@
 {
-  "took" : 5,
-  "timed_out" : false,
-  "_shards" : {
-    "total" : 5,
-    "successful" : 5,
-    "skipped" : 0,
-    "failed" : 0
+  "took": 7,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
   },
-  "hits" : {
-    "total" : 128585,
-    "max_score" : null,
-    "hits" : [
+  "hits": {
+    "total": 1,
+    "max_score": 8.930185,
+    "hits": [
       {
-        "_index" : "platsannons",
-        "_type" : "document",
-        "_id" : "23189102",
-        "_score" : null,
-        "_source" : {
-          "id" : 23189102,
-          "rubrik" : "Läxhjälpare sökes inom Mekanik och Hållfasthetslära",
-          "sista_ansokningsdatum" : "2019-03-29T23:59:59",
-          "antal_platser" : 1,
-          "beskrivning" : {
-            "annonstext" : "Just nu söker vi särskilt personer med ämneskunskaper inom Mekanik och Hållfasthetslära på högskolenivå.\n\nSom person är du positivt inriktad, kan förklara problem och uppgifter på ett lättbegripligt sätt och kan anpassa din undervisning efter elevens behov.\n\nDu har även studerat minst ett år på högskola eller universitet.\n\nLäxhjälpen sker under vardagar, vardagskvällar och helger. Ju mer tillgänglig läxhjälparen är desto bättre.\n\nDet är positivt om du behärskar många olika ämnen, men det är inget krav. Även om du endast vill undervisa i några få ämnen är du ett viktigt tillskott till vår läxhjälparpool. Alla ämnen är välkomna, vanliga som ovanliga. Vi söker fler läxhjälpare som vill hjälpa elever i grundskola, gymnasium, universitet och högskola att bli godkända i sina kurser och att höja sina betyg.\n\nSom läxhjälpare hjälper du elever på den nivå som du själv känner dig trygg i att undervisa på. Du arbetar på din ort och/eller på distans. \n\nSom läxhjälpare på Creataurus Tjänster hjälper du elever främst på kvällar och helger, men även på dagtid om kunderna är tillgängliga under de tiderna. Arbetet är självständigt genom att du planerar själv med eleven när, var och hur ni vill träffas. Du träffar oftast din elev i elevens hem, på ett bibliotek/universitet eller hjälper eleven på distans. \n\nDu hjälper eleven med specifika läxor eller kontinuerligt i ett eller flera ämnen för att eleven ska öka sin kunskap och förståelse samt uppnå önskat resultat på kommande prov/tentamen.\n\nSom läxhjälpare får du ett flexibelt extrajobb och du jobbar när du kan. Det lämpar sig perfekt för studenter som vill ha en extra inkomst vid sidan av studierna eller vid sidan av annat arbete. Arbetet som läxhjälpare är mycket givande. Det är självutvecklande eftersom du omsätter dina kunskaper och lär dem vidare till andra vilket gör att du fördjupar dig i ämnet och utökar dina egna kunskaper på samma gång. Creataurus Invest AB grundades 2017 och är i grunden ett bolag som investerar i onoterade aktiebolag och fastigheter. I företagets tjänstedel utgör emellertid läxhjälp den största delen av näringsverksamheten som går under namnet Creataurus Tjänster. Behovet av läxhjälp är stort och vi riktar oss till alla elever från de som har svårt att nå målen i sin utbildning till de som önskar höja sina betyg. Creataurus mål är att erbjuda läxhjälp till ett lägre pris än konkurrenterna för att fler ska ha råd med och få tillgång till läxhjälp.",
-            "information" : null,
-            "behov" : null,
-            "krav" : null,
-            "villkor" : null
+        "_index": "platsannons",
+        "_type": "document",
+        "_id": "22884504",
+        "_score": 8.930185,
+        "_source": {
+          "id": "22884504",
+          "external_id": null,
+          "headline": "Trafikledare sökes till växande transportföretag i Abisko/Kiruna området",
+          "application_deadline": "2019-04-15T23:59:59",
+          "number_of_vacancies": 1,
+          "description": {
+            "text": "Krav för tjänsten:\n\n* Erfarenhet som handledare/chef eller liknande roll samt behörig träning inom området.\n* Väl informerad kring lagar och regler inom yrket.\n* Förmågan och viljan att lära sig nya program, egenskaper och processer.\n* Exemplarisk kommunikationsförmåga i både Engelska och Svenska.\n* Mycket organiserad och en bred lednings- och samverkansförmåga.\n* Innehar alla nödvändiga körkort (minst B, D samt YKB-licens).\n* Lätta att bemöta gäster/kollegor med ett positivt och glatt beteende.\n* Bekväm att köra på vinterväglag i mörker med mycket snö och is.\nVi söker en trafikledare inför kommande höst/vintersäsong för att ansvara för bussarna, chaufförerna, logistik och hjälpa till med schemaläggning under året. Du kommer snabbt lära känna dina medarbetare och kollegor som alla jobbar för att alla ska trivas på jobbet. Ett härligt gäng med erfarenheter och egenskaper ifrån många delar av världen. Trivs du med att vara ute i naturen, möta nytt folk och arbeta både i grupp enskilt så är du den vi söker!\n\nHur ser din dag ut?\n\nDå du kommer vara ansvarig för den dagliga transporten och alla chaufförer kommer det vara mycket arbete med att hålla allting i rullning och se till så alla chaufförer, bussar är i bästa möjliga skicka och att vi levererar en professionell service till våra kunder. Din roll kommer vara uppdela i kontorsarbete, körningar, fordonshantering, basisk fordons behandling och vara huvudkontakt för alla chaufförer på plats. Du kommer även arbete nära tillsammans med resten av Visit Abiskos team för att säkerställa planeringen av schemaläggningen blir så effektiv som möjligt.\n\nDu kommer rapportera till teamet du arbetar tillsammans med dagligen, för att säkerställa att arbetet för planeringen och leveransen av alla produkter som Visit Abisko erbjuder håller den högsta möjligt standarden. Du kommer ansvara så att hela flottan med fordon underhålls till den professionella nivån som krävs inom renlighet, säkerhet och mekanisk funktionalitet.\n\nPersonliga egenskaper och utbildning:\nDu bör vara en flexibel person med lång erfarenhet inom branschen. Du möter stressiga situationer och behöver kunna ta snabba beslut för att lösa problem. Du är utåtriktad, tycker om människor och ser en utmaning i att alltid ha nöjda kunder och kollegor. För att klara jobbet krävs det att du behärskar engelska väl i tal eftersom majoriteten av den turism som sker i området under denna period är engelsktalande turister. Vi vill gärna att chaufförerna ser dig som en förebild och mentor så du behöver därför vara självsäker och inte vara rädd för att dela ut arbetsuppgifter, ge feedback osv.\nVisit Abisko är ett etablerat transport och aktivitetsföretag som har sin verksamhet i Abisko, norr om Kiruna. Vi kör persontransporter mellan Kiruna flygplats och Abisko, samt lokala bussturer i Abisko/Björkliden. Vi erbjuder även guidade turer till Narvik, och Icehotel i Jukkasjärvi m.m under vintersäsong. Vårt team består av 6 chaufförer, 2 administrativa arbetare samt en trafikledare (nytt för kommande år) och 3 ägare. Vi hyr ut enklare personalbostäder under arbetstiden och säsongsanställer personal under norrskenssäsongen (okt-mar) och skidsäsongen (apr-maj).\n\nLäs gärna mer om våra transfers & aktiviteter på vår hemsida:",
+            "company_information": null,
+            "needs": null,
+            "requirements": null,
+            "conditions": "Heltidsanställning.\n1 st tjänst."
           },
-          "arbetsplats_id" : "86711688",
-          "anstallningstyp" : {
-            "kod" : "1paU_aCR_nGn",
-            "term" : "Behovsanställning",
-            "taxonomi-kod" : "4"
+          "workplace_id": "85444530",
+          "employment_type": {
+            "concept_id": "J2_FjLyAzW",
+            "label": "Vanlig anställning",
+            "legacy_ams_taxonomy_id": "1"
           },
-          "lonetyp" : {
-            "kod" : "oG8G_9cW_nRf",
-            "term" : "Fast månads- vecko- eller timlön",
-            "taxonomi-kod" : "1"
+          "salary_type": {
+            "concept_id": "D5EJNkXV2R",
+            "label": "Fast månads- vecko- eller timlön",
+            "legacy_ams_taxonomy_id": "1"
           },
-          "varaktighet" : null,
-          "arbetstidstyp" : null,
-          "arbetsomfattning" : {
-            "min" : null,
-            "max" : null
+          "duration": {
+            "concept_id": "xA9_jXptzv",
+            "label": "Tillsvidare",
+            "legacy_ams_taxonomy_id": "1"
           },
-          "tilltrade" : null,
-          "arbetsgivare" : {
-            "id" : "21146596",
-            "telefonnummer" : "010-1234567",
-            "epost" : null,
-            "webbadress" : "http://www.creataurus.com",
-            "organisationsnummer" : "5591210157",
-            "namn" : "Creataurus Invest AB",
-            "arbetsplats" : "Creataurus Invest AB"
+          "working_hours_type": {
+            "concept_id": "cigrjL76wD",
+            "label": "Heltid",
+            "legacy_ams_taxonomy_id": "1"
           },
-          "ansokningsdetaljer" : {
-            "information" : "Skicka CV och personligt brev till oss där du berättar om varför du är rätt person som läxhjälpare samt beskriv vilka ämnen och på vilken nivå du är intresserad av att läxläsa inom.",
-            "referens" : "LäxhjälpareMekanik",
-            "epost" : "epost@epostadress.se",
-            "via_af" : false,
-            "webbadress" : null,
-            "annat" : null
+          "scope_of_work": {
+            "min": 100,
+            "max": 100
           },
-          "erfarenhet_kravs" : false,
-          "egen_bil" : false,
-          "korkort_kravs" : false,
-          "yrkesroll" : {
-            "kod" : "Sbzf_iBA_MAS",
-            "term" : "Elevassistent",
-            "taxonomi-kod" : "5718"
+          "access": null,
+          "employer": {
+            "id": "20984857",
+            "phone_number": "0701234567",
+            "email": "info@visitabisko.com",
+            "url": "http://www.visitabisko.com",
+            "organization_number": "5569616161",
+            "name": "Fazer Food Services AB",
+            "workplace": "Gateau AB"
           },
-          "yrkesgrupp" : {
-            "kod" : "XW9L_tA9_WaX",
-            "term" : "Elevassistenter m.fl.",
-            "taxonomi-kod" : "5312"
+          "application_details": {
+            "information": "Vi tar emot ansökan via e-post och följer upp med telefonintervjuer under ansökningsperioden.\nSkicka ditt CV och personliga brev till oss.",
+            "reference": "Trafikledare",
+            "email": "fornamn.efternamn@emailadress.se",
+            "via_af": false,
+            "url": null,
+            "other": null
           },
-          "yrkesomrade" : {
-            "kod" : "MVqp_eS8_kDZ",
-            "term" : "Pedagogiskt arbete",
-            "taxonomi-kod" : "15"
-          },
-          "arbetsplatsadress" : {
-            "kommunkod" : "0580",
-            "lanskod" : "05",
-            "kommun" : "Linköping",
-            "lan" : "Östergötlands län",
-            "landskod" : null,
-            "land" : null,
-            "gatuadress" : "Spannmålsgatan 9",
-            "postnummer" : "58336",
-            "postort" : "Linköping",
-            "coordinates" : [
-              15.5771966914631,
-              58.3801473356018
-            ]
-          },
-          "krav" : {
-            "kompetenser" : [ ],
-            "sprak" : [
-              {
-                "kod" : "zSLA_vw2_FXN",
-                "term" : "Svenska",
-                "vikt" : 10,
-                "taxonomi-kod" : "502"
-              },
-              {
-                "kod" : "NVxJ_hLg_TYS",
-                "term" : "Engelska",
-                "vikt" : 5,
-                "taxonomi-kod" : "283"
-              }
-            ],
-            "utbildningsniva" : [
-              {
-                "kod" : "uroQ_Pag_grS",
-                "term" : "Eftergymnasial utbildning kortare än två år",
-                "vikt" : 10,
-                "taxonomi-kod" : "5"
-              }
-            ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "meriterande" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "publiceringsdatum" : "2019-03-19T00:00:00",
-          "kalla" : "VIA_AF_FORMULAR",
-          "publiceringskanaler" : {
-            "platsbanken" : true,
-            "ais" : true,
-            "platsjournalen" : false
-          },
-          "status" : {
-            "publicerad" : true,
-            "sista_publiceringsdatum" : "2019-03-29T23:59:59",
-            "skapad" : "2019-03-19T12:59:43",
-            "skapad_av" : "86711689",
-            "uppdaterad" : "2019-03-19T13:00:22",
-            "uppdaterad_av" : "86711689",
-            "anvandarId" : "86711689"
-          },
-          "keywords" : {
-            "occupation" : [
-              "pedagogiskt arbete",
-              "elevassistent",
-              "elevassistenter"
-            ],
-            "skill" : [
-              "engelska",
-              "svenska"
-            ],
-            "location" : [
-              "östergötlands län",
-              "linköping"
-            ]
-          },
-          "timestamp" : 1552996854771,
-          "keywords_enriched_binary" : {
-            "occupation" : [
-              "elevassistent"
-            ],
-            "skill" : [
-              "gymnasium",
-              "mekanik",
-              "hållfasthetslära"
-            ],
-            "trait" : [ ]
-          }
-        }
-      },
-      {
-        "_index" : "platsannons",
-        "_type" : "document",
-        "_id" : "23189097",
-        "_score" : null,
-        "_ignored" : [
-          "arbetsplatsadress.coordinates"
-        ],
-        "_source" : {
-          "id" : 23189097,
-          "rubrik" : "Nyckelbiotopsinventerare",
-          "sista_ansokningsdatum" : "2019-04-04T23:59:59",
-          "antal_platser" : 1,
-          "beskrivning" : {
-            "annonstext" : " Naturföretaget är ett konsultföretag inom naturvård som arbetar med naturvärdesinventeringar, artinventeringar, andra naturinventeringar, skötselplaner, GIS-analyser, praktisk naturvård och informationsmaterial. Vi har en bred kundbas med både små och stora kunder inom både offentlig och privat sektor. \n\nNaturföretaget är ett litet företag, med platt organisation och korta beslutsvägar. Hos oss får anställda ta stort eget ansvar. Vi är verksamma i hela landet, men med tyngdpunkt i Mälardalen. Vi är PEFC-certifierade sedan 2011. Vi använder oss av Svensk standard för naturvärdesinventering (SS 199000:2014) i våra naturvärdesinventeringar. Alla våra anställda är anslutna till kollektivavtal och därmed berättigade till tjänstepension. \n\nArbetsuppgifter \nDu kommer främst att arbeta med nyckelbiotopsinventering i Jämtlands och Västerbottens län. Inventeringen utförs enligt en befintlig manual för nyckelbiotopsinventering, och även signalarter registreras. Under inventeringarna samlas data in med hjälp av handdatorer. Arbetet förutsätter god fysik eftersom terrängen ibland kan vara besvärlig. Arbetet förutsätter även B-körkort. Du kommer att arbeta ensam ute i fält, men oftast bo på samma ställe som våra andra två inventerare så att ni kan ta stöd av varandra i arbetet. \n\nNaturföretaget betalar boende, traktamente samt två hemresor per månad. Du ska vara beredd på att bo borta i längre perioder. I början av din anställning kommer du att få gå en tvådagars kurs i metodik och signalarter. Under anställningstiden kan även andra uppdrag bli aktuella, såsom naturvärdesinventering eller någon artinventering. \n\nKvalifikationer: \n-minst 3 års högskoleutbildning inom biologi, eller jägmästare eller motsvarande \n-goda kunskaper i muntlig och skriftlig framställning på svenska \n-B-körkort \n-erfarenhet av nyckelbiotopsinventering eller liknande\n-minst 1 fältsäsongs arbetslivserfarenhet \n-kunna arbeta självständigt och kunna strukturera ditt arbete \n\nMeriterande: \n-kunskaper inom GIS \n-kunnig inom kärlväxter, kryptogamer eller annan artgrupp \n-att kunna resa på uppdrag i hela landet \n\nTillträde: 13 maj 2019 eller enl. ök. \nTid: Heltid till 30 september 2019, med god chans till förlängning \n\nVi undanber oss alla erbjudanden om annonserings- och rekryteringshjälp i samband med denna annons. \n\nSista ansökningsdag 4 april, men rekrytering sker löpande.",
-            "information" : null,
-            "behov" : null,
-            "krav" : null,
-            "villkor" : null
-          },
-          "arbetsplats_id" : "83979784",
-          "anstallningstyp" : {
-            "kod" : "PFZr_Syz_cUq",
-            "term" : "Vanlig anställning",
-            "taxonomi-kod" : "1"
-          },
-          "lonetyp" : {
-            "kod" : "oG8G_9cW_nRf",
-            "term" : "Fast månads- vecko- eller timlön",
-            "taxonomi-kod" : "1"
-          },
-          "varaktighet" : {
-            "kod" : "Xj7x_7yZ_jEn",
-            "term" : "3 - 6 månader",
-            "taxonomi-kod" : "3"
-          },
-          "arbetstidstyp" : {
-            "kod" : "6YE1_gAC_R2G",
-            "term" : "Heltid",
-            "taxonomi-kod" : "1"
-          },
-          "arbetsomfattning" : {
-            "min" : 100,
-            "max" : 100
-          },
-          "tilltrade" : null,
-          "arbetsgivare" : {
-            "id" : "20825016",
-            "telefonnummer" : null,
-            "epost" : null,
-            "webbadress" : "www.naturforetaget.se",
-            "organisationsnummer" : "7696204382",
-            "namn" : "Naturföretaget i Sverige Ek. För.",
-            "arbetsplats" : "NATURFÖRETAGET I SVERIGE EK. FÖR."
-          },
-          "ansokningsdetaljer" : {
-            "information" : null,
-            "referens" : null,
-            "epost" : "epost@epostadress.se",
-            "via_af" : false,
-            "webbadress" : null,
-            "annat" : null
-          },
-          "erfarenhet_kravs" : true,
-          "egen_bil" : false,
-          "korkort_kravs" : true,
-          "korkort" : [
+          "experience_required": true,
+          "access_to_own_car": false,
+          "driving_license_required": true,
+          "driving_license": [
             {
-              "kod" : "VTK8_WRx_GcM",
-              "term" : "B"
+              "concept_id": "72XZA4Dzt4",
+              "label": "D"
             }
           ],
-          "yrkesroll" : {
-            "kod" : "ZNyx_1tG_w4E",
-            "term" : "Biolog",
-            "taxonomi-kod" : "6305"
+          "occupation": {
+            "concept_id": "yxm4WoUU11",
+            "label": "Trafikledare, vägtrafik",
+            "legacy_ams_taxonomy_id": "5003"
           },
-          "yrkesgrupp" : {
-            "kod" : "Z2MZ_eYc_Lfv",
-            "term" : "Cell- och molekylärbiologer m.fl.",
-            "taxonomi-kod" : "2131"
+          "occupation_group": {
+            "concept_id": "aNFin7QrCZ",
+            "label": "Transportledare och transportsamordnare",
+            "legacy_ams_taxonomy_id": "4323"
           },
-          "yrkesomrade" : {
-            "kod" : "kJeN_wmw_9wX",
-            "term" : "Naturvetenskapligt arbete",
-            "taxonomi-kod" : "14"
+          "occupation_field": {
+            "concept_id": "X9SUF3Ywbo",
+            "label": "Transport",
+            "legacy_ams_taxonomy_id": "19"
           },
-          "arbetsplatsadress" : {
-            "kommunkod" : null,
-            "lanskod" : "90",
-            "kommun" : null,
-            "lan" : null,
-            "landskod" : null,
-            "land" : null,
-            "gatuadress" : null,
-            "postnummer" : null,
-            "postort" : null,
-            "coordinates" : [
-              null,
-              null
+          "workplace_address": {
+            "municipality_code": "2584",
+            "municipality": "Kiruna",
+            "region_code": "25",
+            "region": "Norrbottens län",
+            "country_code": null,
+            "country": null,
+            "street_address": "Steinholtzgatan 35",
+            "postcode": "98132",
+            "city": "Kiruna",
+            "coordinates": [
+              20.2274210124801,
+              67.8576127184316
             ]
           },
-          "krav" : {
-            "kompetenser" : [
+          "must_have": {
+            "skills": [],
+            "languages": [
               {
-                "kod" : "hGug_af2_p1b",
-                "term" : "Jägarexamen",
-                "vikt" : 10,
-                "taxonomi-kod" : "601772"
-              }
-            ],
-            "sprak" : [
-              {
-                "kod" : "zSLA_vw2_FXN",
-                "term" : "Svenska",
-                "vikt" : 10,
-                "taxonomi-kod" : "502"
+                "concept_id": "6ciNNT8M_s",
+                "label": "Engelska",
+                "weight": 10,
+                "legacy_ams_taxonomy_id": "283"
               },
               {
-                "kod" : "NVxJ_hLg_TYS",
-                "term" : "Engelska",
-                "vikt" : 5,
-                "taxonomi-kod" : "283"
+                "concept_id": "De8aCoBBpy",
+                "label": "Svenska",
+                "weight": 5,
+                "legacy_ams_taxonomy_id": "502"
               }
             ],
-            "utbildningsniva" : [
+            "work_experiences": [
               {
-                "kod" : "uroQ_Pag_grS",
-                "term" : "Eftergymnasial utbildning kortare än två år",
-                "vikt" : 5,
-                "taxonomi-kod" : "5"
-              }
-            ],
-            "utbildningsinriktning" : [
+                "concept_id": "mFbMzm5xmj",
+                "label": "Bussförare/Busschaufför",
+                "weight": 10,
+                "legacy_ams_taxonomy_id": "5561"
+              },
               {
-                "kod" : "6sfS_LFu_iNd",
-                "term" : "Teknik och teknisk industri",
-                "vikt" : 5,
-                "taxonomi-kod" : "52"
-              }
-            ],
-            "yrkeserfarenheter" : [
-              {
-                "kod" : "tuoE_9Nj_fAS",
-                "term" : "Frisör",
-                "vikt" : 5,
-                "taxonomi-kod" : "5491"
+                "concept_id": "yxm4WoUU11",
+                "label": "Trafikledare, vägtrafik",
+                "weight": 5,
+                "legacy_ams_taxonomy_id": "5003"
               }
             ]
           },
-          "meriterande" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
+          "nice_to_have": {
+            "skills": [],
+            "languages": [],
+            "work_experiences": []
           },
-          "publiceringsdatum" : "2019-03-19T00:00:00",
-          "kalla" : "VIA_ANNONSERA",
-          "publiceringskanaler" : {
-            "platsbanken" : true,
-            "ais" : true,
-            "platsjournalen" : true
-          },
-          "status" : {
-            "publicerad" : true,
-            "sista_publiceringsdatum" : "2019-04-04T23:59:59",
-            "skapad" : "2019-03-19T12:54:05",
-            "skapad_av" : "87056543",
-            "uppdaterad" : "2019-03-19T12:54:36",
-            "uppdaterad_av" : "87056543",
-            "anvandarId" : "87056543"
-          },
-          "keywords" : {
-            "occupation" : [
-              "naturvetenskapligt arbete",
-              "cell- och molekylärbiologer",
-              "biolog"
-            ],
-            "skill" : [ ],
-            "location" : [ ]
-          },
-          "timestamp" : 1552996494804,
-          "keywords_enriched_binary" : {
-            "occupation" : [
-              "biolog"
-            ],
-            "skill" : [
-              "metodik",
-              "gis",
-              "högskoleutbildning",
-              "biologi",
-              "nyckelbiotopsinventering",
-              "svenska"
-            ],
-            "trait" : [
-              "arbeta självständigt"
-            ]
-          }
-        }
-      },
-      {
-        "_index" : "platsannons",
-        "_type" : "document",
-        "_id" : "23189096",
-        "_score" : null,
-        "_source" : {
-          "id" : 23189096,
-          "rubrik" : "Snickare till Trestads området med omnejd.",
-          "sista_ansokningsdatum" : "2019-05-01T23:59:59",
-          "antal_platser" : 4,
-          "beskrivning" : {
-            "annonstext" : " Vi söker driftiga snickare/ träarbetare/ arbetande arbetsledare för omgående tillsvidareanställning.\nMeriterande om du yrkesbevis, men inget krav.\n\nKrav: Erfarenhet från liknande arbetsuppgifter, \nB- körkort, att du talar svenska.\n\nVi ser fram emot din ansökan till tjänsten redan idag!",
-            "information" : null,
-            "behov" : null,
-            "krav" : null,
-            "villkor" : null
-          },
-          "arbetsplats_id" : "86072303",
-          "anstallningstyp" : {
-            "kod" : "PFZr_Syz_cUq",
-            "term" : "Vanlig anställning",
-            "taxonomi-kod" : "1"
-          },
-          "lonetyp" : {
-            "kod" : "oG8G_9cW_nRf",
-            "term" : "Fast månads- vecko- eller timlön",
-            "taxonomi-kod" : "1"
-          },
-          "varaktighet" : {
-            "kod" : "a7uU_j21_mkL",
-            "term" : "Tillsvidare",
-            "taxonomi-kod" : "1"
-          },
-          "arbetstidstyp" : {
-            "kod" : "6YE1_gAC_R2G",
-            "term" : "Heltid",
-            "taxonomi-kod" : "1"
-          },
-          "arbetsomfattning" : {
-            "min" : 100,
-            "max" : 100
-          },
-          "tilltrade" : null,
-          "arbetsgivare" : {
-            "id" : "21068636",
-            "telefonnummer" : null,
-            "epost" : null,
-            "webbadress" : "www.lidbergbygg.se",
-            "organisationsnummer" : "5566159397",
-            "namn" : "C.Lidberg Bygg AB",
-            "arbetsplats" : "Lidberg Bygg AB, C"
-          },
-          "ansokningsdetaljer" : {
-            "information" : null,
-            "referens" : null,
-            "epost" : "epost@epostadress.se",
-            "via_af" : false,
-            "webbadress" : null,
-            "annat" : null
-          },
-          "erfarenhet_kravs" : true,
-          "egen_bil" : false,
-          "korkort_kravs" : true,
-          "korkort" : [
-            {
-              "kod" : "VTK8_WRx_GcM",
-              "term" : "B"
+          "publication_date": "2018-10-19T00:00:00",
+          "last_publication_date": "2019-04-15T23:59:59",
+          "removed": false,
+          "removed_date": "2018-10-01T14:55:33",
+          "source_type": "VIA_AF_FORMULAR",
+          "keywords": {
+            "extracted": {
+              "occupation": [
+                "trafikledare",
+                "transportsamordnare",
+                "transport",
+                "transportledare",
+                "vägtrafik"
+              ],
+              "skill": [
+                "svenska",
+                "engelska"
+              ],
+              "location": [
+                "98132",
+                "kiruna",
+                "norrbottens län"
+              ],
+              "employer": [
+                "fazer food services",
+                "gateau"
+              ]
+            },
+            "enriched": {
+              "occupation": [
+                "trafikledare",
+                "handledare"
+              ],
+              "skill": [
+                "engelska",
+                "körning",
+                "svenska",
+                "ykb",
+                "schemaläggning",
+                "behandling",
+                "logistik",
+                "fordonshantering",
+                "turism",
+                "fordon",
+                "träning",
+                "säkerhet",
+                "feedback"
+              ],
+              "trait": [
+                "samverkansförmåga",
+                "utåtriktad",
+                "självsäker",
+                "flexibel"
+              ]
             }
-          ],
-          "yrkesroll" : {
-            "kod" : "4Z7F_oBG_vMG",
-            "term" : "Träarbetare/Snickare",
-            "taxonomi-kod" : "6581"
           },
-          "yrkesgrupp" : {
-            "kod" : "9mJN_VwW_Xjg",
-            "term" : "Träarbetare, snickare m.fl.",
-            "taxonomi-kod" : "7111"
-          },
-          "yrkesomrade" : {
-            "kod" : "j7Cq_ZJe_GkT",
-            "term" : "Bygg och anläggning",
-            "taxonomi-kod" : "2"
-          },
-          "arbetsplatsadress" : {
-            "kommunkod" : "1462",
-            "lanskod" : "14",
-            "kommun" : "Lilla Edet",
-            "lan" : "Västra Götalands län",
-            "landskod" : null,
-            "land" : null,
-            "gatuadress" : null,
-            "postnummer" : null,
-            "postort" : null,
-            "coordinates" : [
-              12.134467513362443,
-              58.12580461125666
-            ]
-          },
-          "krav" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "meriterande" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "publiceringsdatum" : "2019-03-19T00:00:00",
-          "kalla" : "VIA_ANNONSERA",
-          "publiceringskanaler" : {
-            "platsbanken" : true,
-            "ais" : true,
-            "platsjournalen" : true
-          },
-          "status" : {
-            "publicerad" : true,
-            "sista_publiceringsdatum" : "2019-05-01T23:59:59",
-            "skapad" : "2019-03-19T12:52:54",
-            "skapad_av" : "86072304",
-            "uppdaterad" : "2019-03-19T12:54:08",
-            "uppdaterad_av" : "86072304",
-            "anvandarId" : "86072304"
-          },
-          "keywords" : {
-            "occupation" : [
-              "snickare",
-              "anläggning",
-              "träarbetare",
-              "bygg"
-            ],
-            "skill" : [ ],
-            "location" : [
-              "västra götalands län",
-              "lilla edet"
-            ]
-          },
-          "timestamp" : 1552996464773,
-          "keywords_enriched_binary" : {
-            "occupation" : [
-              "träarbetare",
-              "arbetsledare",
-              "snickare"
-            ],
-            "skill" : [
-              "körkort",
-              "svenska",
-              "yrkebevis"
-            ],
-            "trait" : [ ]
-          }
-        }
-      },
-      {
-        "_index" : "platsannons",
-        "_type" : "document",
-        "_id" : "23189095",
-        "_score" : null,
-        "_source" : {
-          "id" : 23189095,
-          "rubrik" : "Konsult inom digital strategi!",
-          "sista_ansokningsdatum" : "2019-03-30T23:59:59",
-          "antal_platser" : 1,
-          "beskrivning" : {
-            "annonstext" : " KPMG Digital Transformation och Innovation (DTI) står i framkant vad det gäller rådgivning kring den digitala förändringsresa som (mer eller mindre) alla organisationer i nuläget befinner sig mitt i. Vi stöttar upp på en hög strategisk nivå inom digitala strategier, styrning, automation, implementation och mycket annat. Är du redo att ta ytterligare ett kliv i din karriär och äntligen få utforska hur du kan nå din fulla potential inom den digitala världen?\nOm ja, bli en del av vår växande familj! \n\nDin roll\nDu kommer ta plats i en grupp på drygt 50 kollegor som tillsammans arbetar hårt för att leverera digital rådgivning av bästa kvalitet och följa våra kunder genom deras transformationsresor. Vi hjälper våra dem att möta framtiden och navigera i ett allt mer komplext affärsklimat, som präglas av global konkurrens, digitaliserings- och teknikskiften, regelverksmässiga förändringar, för att inte nämna stöd att hantera de övergripande hållbarhetsutmaningarna. Alla dessa frågor kräver skräddarsydda lösningar för varje specifik kund och vi motiveras av att kunna ta fram dessa lösningar och följa våra kunder genom processen.\nVår gemensamma expertis ger oss möjligheter att stötta i varje frågeställning. Vi har ett nätverk med över 200.000 kollegor världen över, ett nätverk som vi använder oss av dagligen och som ger oss en svårslagen konkurrenskraft!\nVår rådgivning omfattar ofta hur kunder ställer sig till och implementerar företagstransformationer, kostnadseffektivitet, verksamhetsstyrning, operativa modeller och digital strategi, digital supply chain, digital insights och customer experience. Kort sagt deras mest kritiska utmaningar.\n\nDin profil/Vad vi erbjuder\nDu har arbetat 12-15 år troligen i en roll som konsult och känner att du vill prova något nytt. \nDu ska gilla att komma in i en miljö som präglas av entreprenörsanda och en stark familjär känsla. Du ska trivas med att ta eget ansvar och prova på nya sätt att tänka och arbeta. Du är duktig på strategisk IT och kan designa och säkerställa leveransen inom digital transformation, IT portfolio assessments, TOM, kostnadsbesparing kopplat till det digitala och outsourcing inom IT. \nVi erbjuder dig att vara en del av ett team där nyfikenhet driver oss att dela erfarenheter med varandra. Vi verkar i en internationellt stimulerande miljö där vi är en naturlig del i vårt globala nätverk av digitala managementkonsulter och vi håller oss uppdaterade vad gäller de senaste trenderna inom vårt område.\nVi kommer att värdera dig och din erfarenhet högt och du erbjuds en arbetssituation som till stor del anpassas efter dina behov.\n\nVill du göra skillnad tillsammans med oss?\nVi ser fram emot att få din ansökan via vår hemsida, gärna så fort som möjligt men senast den 30 mars 2019.",
-            "information" : null,
-            "behov" : null,
-            "krav" : null,
-            "villkor" : null
-          },
-          "arbetsplats_id" : "86995378",
-          "anstallningstyp" : {
-            "kod" : "PFZr_Syz_cUq",
-            "term" : "Vanlig anställning",
-            "taxonomi-kod" : "1"
-          },
-          "lonetyp" : {
-            "kod" : "oG8G_9cW_nRf",
-            "term" : "Fast månads- vecko- eller timlön",
-            "taxonomi-kod" : "1"
-          },
-          "varaktighet" : {
-            "kod" : "a7uU_j21_mkL",
-            "term" : "Tillsvidare",
-            "taxonomi-kod" : "1"
-          },
-          "arbetstidstyp" : {
-            "kod" : "6YE1_gAC_R2G",
-            "term" : "Heltid",
-            "taxonomi-kod" : "1"
-          },
-          "arbetsomfattning" : {
-            "min" : 100,
-            "max" : 100
-          },
-          "tilltrade" : null,
-          "arbetsgivare" : {
-            "id" : "10820217",
-            "telefonnummer" : null,
-            "epost" : null,
-            "webbadress" : null,
-            "organisationsnummer" : "5560434465",
-            "namn" : "KPMG AB",
-            "arbetsplats" : "KPMG AB"
-          },
-          "ansokningsdetaljer" : {
-            "information" : null,
-            "referens" : "Konsult inom digital strategi",
-            "epost" : null,
-            "via_af" : false,
-            "webbadress" : "http://www.kpmg.se",
-            "annat" : null
-          },
-          "erfarenhet_kravs" : true,
-          "egen_bil" : false,
-          "korkort_kravs" : false,
-          "yrkesroll" : {
-            "kod" : "A1xB_vHm_maW",
-            "term" : "DIT (Digital Imaging Technician)",
-            "taxonomi-kod" : "7624"
-          },
-          "yrkesgrupp" : {
-            "kod" : "CkRH_4Qn_iX3",
-            "term" : "Bild- och sändningstekniker",
-            "taxonomi-kod" : "3521"
-          },
-          "yrkesomrade" : {
-            "kod" : "9puE_nYg_crq",
-            "term" : "Kultur, media, design",
-            "taxonomi-kod" : "11"
-          },
-          "arbetsplatsadress" : {
-            "kommunkod" : "0180",
-            "lanskod" : "01",
-            "kommun" : "Stockholm",
-            "lan" : "Stockholms län",
-            "landskod" : null,
-            "land" : null,
-            "gatuadress" : null,
-            "postnummer" : null,
-            "postort" : null,
-            "coordinates" : [
-              18.05997209880538,
-              59.33023961795134
-            ]
-          },
-          "krav" : {
-            "kompetenser" : [ ],
-            "sprak" : [
-              {
-                "kod" : "NVxJ_hLg_TYS",
-                "term" : "Engelska",
-                "vikt" : 10,
-                "taxonomi-kod" : "283"
-              }
-            ],
-            "utbildningsniva" : [
-              {
-                "kod" : "koDU_EcD_k6Q",
-                "term" : "Eftergymnasial utbildning två år eller längre",
-                "vikt" : 10,
-                "taxonomi-kod" : "3"
-              }
-            ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "meriterande" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "publiceringsdatum" : "2019-03-19T00:00:00",
-          "kalla" : "VIA_ANNONSERA",
-          "publiceringskanaler" : {
-            "platsbanken" : true,
-            "ais" : true,
-            "platsjournalen" : true
-          },
-          "status" : {
-            "publicerad" : true,
-            "sista_publiceringsdatum" : "2019-03-30T23:59:59",
-            "skapad" : "2019-03-19T12:52:30",
-            "skapad_av" : "86835718",
-            "uppdaterad" : "2019-03-19T12:54:41",
-            "uppdaterad_av" : "86835718",
-            "anvandarId" : "86835718"
-          },
-          "keywords" : {
-            "occupation" : [
-              "dit (digital imaging technician)",
-              "kultur",
-              "design",
-              "media",
-              "bild- och sändningstekniker"
-            ],
-            "skill" : [
-              "engelska"
-            ],
-            "location" : [
-              "stockholms län",
-              "stockholm"
-            ]
-          },
-          "timestamp" : 1552996495097,
-          "keywords_enriched_binary" : {
-            "occupation" : [
-              "dit",
-              "digital imaging technician"
-            ],
-            "skill" : [ ],
-            "trait" : [
-              "nyfikenhet",
-              "strategisk",
-              "entreprenörsanda"
-            ]
-          }
-        }
-      },
-      {
-        "_index" : "platsannons",
-        "_type" : "document",
-        "_id" : "8203249",
-        "_score" : null,
-        "_source" : {
-          "id" : 8203249,
-          "rubrik" : "Sjuksköterska Psykiatriska Öppenvården i Lycksele",
-          "sista_ansokningsdatum" : "2019-04-09T23:59:59",
-          "antal_platser" : 2,
-          "beskrivning" : {
-            "annonstext" : " Region Västerbotten drivs av att skapa en trygg och stark region som människor vill leva i, flytta till, verka i, besöka och samarbeta med. Vi visar hur god hälsa och hållbar utveckling hänger ihop och verkar för att de stärker varandra. Vårt uppdrag är att erbjuda och utveckla hälsa, vård och regional utveckling tillsammans med människor, näringsliv och samhällsaktörer. Vi erbjuder också universitetssjukvård för norra Sverige med nationell och internationell spetsforskning samt utbildning av hälso- och sjukvårdens alla professioner. \n\nArbetsplatsbeskrivning\nVi är inne i en generationsväxling och nu går två av våra sjuksköterskor i pension, därför söker vi dig som är legitimerad sjuksköterska med ett intresse för psykiatri. Har du en vidareutbildning inom området så är det en fördel dock inte ett krav. Vi har i dagsläget mottagningsenheter i Storuman, Vilhelmina och Lycksele som även är en jourenhet, våra slutenvårdsplatser finns i Skellefteå. Vi ingår i närsjukvårdsområde Södra Lappland där vi genomför ett patientcentrerat utvecklingsarbete som syftar till att ge patienten: God och Nära vård. Detta arbete görs tillsammans med Primärvården och Kommunen. I verksamheten för södra Lappland är vi ca 45 medarbetare varav 30 är placerade i Lycksele. I våra mottagningar arbetar vi i tvärprofessionella team och arbetet sker ofta i samarbete med patientens familj och övriga nätverk. I vårt patient- och i vårt interna arbete använder vi oss ofta av videolänk, vilket är uppskattat både av patienter och personal. Vi söker nu dig som har ett empatiskt förhållningssätt till våra patienter och värdesätter en arbetsplats fylld med arbetsglädje. Hjärtligt Välkommen med en ansökan!\n\n\r\n\r\nARBETSUPPGIFTER\nSom sjuksköterska hos oss arbetar du med behandling till vuxna som kräver specialiserad psykiatrisk vård. Arbetet innebär uppföljning av farmakologiska behandlingar samt bedömningar och behandlingsarbete. I vår verksamhet ingår  även vård och behandling för patienter med beroende och missbruksproblematik. Mottagningen i Lycksele bedriver både jour- och en elektiv verksamhet. Vi håller öppet för patienter mellan 8,00 till 16,30. Handledning, utbildning inom klinik och teamkonferenser sker löpande och kontinuerligt. Resor inom Södra Lappland kan förekomma.     \r\n\r\nKVALIFIKATIONER\nLeg sjuksköterska med intresse för psykiatri. Vi värderar personlig lämplighet och god samarbetsförmåga. \r\n\nÖVRIGT\nVi strävar efter en jämn könsfördelning och ser mångfald som en styrka och välkomnar därför sökande med olika bakgrund.\n\nInför rekryteringsarbetet har vi tagit ställning till rekryteringskanaler och marknadsföring. Vi undanbeder oss därför bestämt kontakt med mediesäljare, rekryteringssajter och liknande.\n\nVi använder e-rekrytering för att effektivisera och kvalitetssäkra rekryteringsarbetet. Alla dina uppgifter sparas på ditt CV-konto och du kan enkelt logga in och uppdatera dina uppgifter när du vill. Fyll därför i dina uppgifter så omsorgsfullt som möjligt för att ge en rättvisande bild av dig själv.",
-            "information" : null,
-            "behov" : null,
-            "krav" : null,
-            "villkor" : "Heltid.  Dagtid.\r\nTillsvidareanställning"
-          },
-          "arbetsplats_id" : "0",
-          "anstallningstyp" : {
-            "kod" : "PFZr_Syz_cUq",
-            "term" : "Vanlig anställning",
-            "taxonomi-kod" : "1"
-          },
-          "lonetyp" : {
-            "kod" : "oG8G_9cW_nRf",
-            "term" : "Fast månads- vecko- eller timlön",
-            "taxonomi-kod" : "1"
-          },
-          "varaktighet" : {
-            "kod" : "a7uU_j21_mkL",
-            "term" : "Tillsvidare",
-            "taxonomi-kod" : "1"
-          },
-          "arbetstidstyp" : {
-            "kod" : "6YE1_gAC_R2G",
-            "term" : "Heltid",
-            "taxonomi-kod" : "1"
-          },
-          "arbetsomfattning" : {
-            "min" : 100,
-            "max" : 100
-          },
-          "tilltrade" : null,
-          "arbetsgivare" : {
-            "id" : "10820093",
-            "telefonnummer" : null,
-            "epost" : null,
-            "webbadress" : null,
-            "organisationsnummer" : "2321000222",
-            "namn" : "Västerbottens Läns Landsting",
-            "arbetsplats" : "Region Västerbotten, RV"
-          },
-          "ansokningsdetaljer" : {
-            "information" : null,
-            "referens" : "PÖ 1904",
-            "epost" : null,
-            "via_af" : false,
-            "webbadress" : "https://recruit.visma.com/Public/Apply.aspx?guidAssignment=0006d402-eb6d-4026-b747-27cf2650114e&publishCode=AMS&TK=1f1e2071-fee7-4c80-b3c5-170d80d8c90d",
-            "annat" : null
-          },
-          "erfarenhet_kravs" : false,
-          "egen_bil" : false,
-          "korkort_kravs" : false,
-          "yrkesroll" : {
-            "kod" : "bXNH_MNX_dUR",
-            "term" : "Sjuksköterska, grundutbildad",
-            "taxonomi-kod" : "7296"
-          },
-          "yrkesgrupp" : {
-            "kod" : "Z8ci_bBE_tmx",
-            "term" : "Grundutbildade sjuksköterskor",
-            "taxonomi-kod" : "2221"
-          },
-          "yrkesomrade" : {
-            "kod" : "NYW6_mP6_vwf",
-            "term" : "Hälso- och sjukvård",
-            "taxonomi-kod" : "8"
-          },
-          "arbetsplatsadress" : {
-            "kommunkod" : "2481",
-            "lanskod" : "24",
-            "kommun" : "Lycksele",
-            "lan" : "Västerbottens län",
-            "landskod" : "199",
-            "land" : "Sverige",
-            "gatuadress" : "Köksvägen 11 90189 UMEÅ",
-            "postnummer" : "90189",
-            "postort" : "Umeå",
-            "coordinates" : [
-              18.676367,
-              64.59581
-            ]
-          },
-          "krav" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "meriterande" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "publiceringsdatum" : "2019-03-20T00:00:00",
-          "kalla" : "VIA_PLATSBANKEN_DXA",
-          "publiceringskanaler" : {
-            "platsbanken" : true,
-            "ais" : true,
-            "platsjournalen" : true
-          },
-          "status" : {
-            "publicerad" : true,
-            "sista_publiceringsdatum" : "2019-04-09T23:59:59",
-            "skapad" : "2019-03-19T12:51:40",
-            "skapad_av" : "0",
-            "uppdaterad" : "2019-03-19T12:51:39",
-            "uppdaterad_av" : "0",
-            "anvandarId" : "0"
-          },
-          "keywords" : {
-            "occupation" : [
-              "hälso- och sjukvård",
-              "sjuksköterska",
-              "grundutbildade sjuksköterskor",
-              "grundutbildad"
-            ],
-            "skill" : [ ],
-            "location" : [
-              "lycksele",
-              "umeå",
-              "sverige",
-              "västerbottens län"
-            ]
-          },
-          "timestamp" : 1552996316832,
-          "keywords_enriched_binary" : {
-            "occupation" : [
-              "sjuksköterska"
-            ],
-            "skill" : [
-              "behandling",
-              "psykiatri"
-            ],
-            "trait" : [
-              "samarbetsförmåga"
-            ]
-          }
-        }
-      },
-      {
-        "_index" : "platsannons",
-        "_type" : "document",
-        "_id" : "8203253",
-        "_score" : null,
-        "_source" : {
-          "id" : 8203253,
-          "rubrik" : "Copy of Sales Represenative med akademisk bakgrund sökes till ABInbev",
-          "sista_ansokningsdatum" : "2019-09-05T23:59:59",
-          "antal_platser" : 1,
-          "beskrivning" : {
-            "annonstext" : " AB InBev is the world’s leading brewer. Stella Artois, Corona, Leffe, Budweiser ... These are just four of the 400 powerful brands that make up our global portfolio. If you are interested in both sales and you live for brands and consumers, then apply to be a Business Development Representative in Sweden now.\n\nOm Kunden\n\nVi söker nu efter ytterligare en Fältsäljare kallade Business Development Representative som skall förstärka befintligt nuvarande team för AB Inbev. AB Inbev har varumärken såsom Stella Artois, Corona, Leffe och Budweiser för att bara nämna några. I rollen kommer du att ansvara för relationsbearbetningen för AB Inbev´s kunder. Rollen kommer vara placerad i Göteborg. Bearbetningen kommer att ske i Göteborg med omnejd.\n\nDina arbetsuppgifter\n\n- Sales Representative för AB Inbev\n- Bygga relationer och hitta säljmöjligheter\n- Generera nya leads och affärsmöjligheter för ABI´s varumärken (Stella Artois, Corona, Budweiser, Leffe, Hoegaarden, etc.)\n- Ansvara för slutkundsevent tillsammans med dina återförsäljare\n- Ansvara för varumärkes exponering med hjälp av Point of Sales material\n- Sälja in kampanjer till dina kunder\n\nDin bakgrund\n\nVi söker dig som har en akademisk utbildning inom Marketing alternativt Business Development.Vi tror att du som söker har erfarenhet från försäljning sedan tidigare men det är inte ett krav.Du trivs med att arbeta med människor och är van att synas och ta plats vid sociala tillställningar. Vi söker dig som är i början/mitten av din karriär ochvill utvecklas tillsammans med ABInbev och på sikt växa in i nya roller.\n\nErfarenhet i punktform:\n\n- Socialt utåtriktad\n- Akademisk utbildning inom Marketing alt. Business Development\n- Gillar försäljning och trivs med att arbeta mot utsatta mål\n- Driven och självgående\n- Hanterar Engelska i både tal och skrift\n- B-Körkort\n\nÖvrigt\n\nTycker du ovanstående låter intressant kan vi erbjuda dig en spännande tjänst i en framgångsrik organisation med stora utvecklingsmöjligheter.\nI det här uppdraget blir du anställd av Nordic Retail Group (NRG) som konsult men arbetar heltid för Inbev. Som konsult hos NRG erbjuds du trygga anställningsvillkor, utbildning inom sälj och marknadsföring, utvecklande uppdrag hos spännande kunder och möjlighet till karriär i vårt långa och upparbetade nätverk i branschen.\n\nTjänsten är Tillsvidare. Ersättningen består av fast lön + bonus. Urvalet av sökande sker löpande, så ansök nu via vårt webbformulär. Frågor om tjänsten kan ställas till Förnamn Efternamn, epost@epostadress.se\n\nTillsättning så fort som möjligt.\n\nOm Nordic Retail Group\n\nThe foundation of our business has always been to support brands in order to increase their sales locally and globally. We support a large number of brands both out of a strategic and tactical perspective.\n\nWe have a great history and it all started with Sale Nordic back in 1997. In 2003 our sister agency TODAY saw the light. For quite some time, we’ve been planning to merge these two strong brands into one. For one good reason. We believe that one strong company with one brand is better than two separate. This gives us the unity and strength that the market demands. As of today, we are joining forces under one strong name, Nordic Retail Group. As a full service retail agency we offer our clients complete solutions within concept and strategy, creative services and sales support.\n\nVisit www.nordicretailgroup.com (http://www.nordicretailgroup.com/)for more information",
-            "information" : null,
-            "behov" : null,
-            "krav" : null,
-            "villkor" : "Heltid\r\nAnställningstid enligt överenskommelse"
-          },
-          "arbetsplats_id" : "0",
-          "anstallningstyp" : {
-            "kod" : "PFZr_Syz_cUq",
-            "term" : "Vanlig anställning",
-            "taxonomi-kod" : "1"
-          },
-          "lonetyp" : {
-            "kod" : "oG8G_9cW_nRf",
-            "term" : "Fast månads- vecko- eller timlön",
-            "taxonomi-kod" : "1"
-          },
-          "varaktighet" : {
-            "kod" : "a7uU_j21_mkL",
-            "term" : "Tillsvidare",
-            "taxonomi-kod" : "1"
-          },
-          "arbetstidstyp" : {
-            "kod" : "6YE1_gAC_R2G",
-            "term" : "Heltid",
-            "taxonomi-kod" : "1"
-          },
-          "arbetsomfattning" : {
-            "min" : 100,
-            "max" : 100
-          },
-          "tilltrade" : null,
-          "arbetsgivare" : {
-            "id" : "20373360",
-            "telefonnummer" : null,
-            "epost" : null,
-            "webbadress" : "http://nordicretailgroup.com/",
-            "organisationsnummer" : "5566119474",
-            "namn" : "NRG Sweden AB",
-            "arbetsplats" : "Nordic Retail Group "
-          },
-          "ansokningsdetaljer" : {
-            "information" : null,
-            "referens" : null,
-            "epost" : null,
-            "via_af" : false,
-            "webbadress" : "https://career.nordicretailgroup.com/jobs/205303-copy-of-sales-represenative-med-akademisk-bakgrund-sokes-till-abinbev?promotion=82036-arbetsformedlingen",
-            "annat" : null
-          },
-          "erfarenhet_kravs" : false,
-          "egen_bil" : false,
-          "korkort_kravs" : false,
-          "yrkesroll" : {
-            "kod" : "8jrL_5RZ_9Kt",
-            "term" : "Account manager",
-            "taxonomi-kod" : "6728"
-          },
-          "yrkesgrupp" : {
-            "kod" : "oXSW_fbY_XrY",
-            "term" : "Företagssäljare",
-            "taxonomi-kod" : "3322"
-          },
-          "yrkesomrade" : {
-            "kod" : "RPTn_bxG_ExZ",
-            "term" : "Försäljning, inköp, marknadsföring",
-            "taxonomi-kod" : "5"
-          },
-          "arbetsplatsadress" : {
-            "kommunkod" : "1480",
-            "lanskod" : "14",
-            "kommun" : "Göteborg",
-            "lan" : "Västra Götalands län",
-            "landskod" : "199",
-            "land" : "Sverige",
-            "gatuadress" : "Linnegatan 9-11, Stockholm",
-            "postnummer" : "11447",
-            "postort" : "Stockholm",
-            "coordinates" : [
-              11.97456,
-              57.70887
-            ]
-          },
-          "krav" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "meriterande" : {
-            "kompetenser" : [ ],
-            "sprak" : [ ],
-            "utbildningsniva" : [ ],
-            "utbildningsinriktning" : [ ],
-            "yrkeserfarenheter" : [ ]
-          },
-          "publiceringsdatum" : "2019-03-19T12:38:11",
-          "kalla" : "VIA_PLATSBANKEN_DXA",
-          "publiceringskanaler" : {
-            "platsbanken" : true,
-            "ais" : true,
-            "platsjournalen" : true
-          },
-          "status" : {
-            "publicerad" : true,
-            "sista_publiceringsdatum" : "2019-09-05T23:59:59",
-            "skapad" : "2019-03-19T12:51:34",
-            "skapad_av" : "0",
-            "uppdaterad" : "2019-03-19T12:51:34",
-            "uppdaterad_av" : "0",
-            "anvandarId" : "0"
-          },
-          "keywords" : {
-            "occupation" : [
-              "företagssäljare",
-              "account manager",
-              "marknadsföring",
-              "försäljning",
-              "inköp"
-            ],
-            "skill" : [ ],
-            "location" : [
-              "västra götalands län",
-              "sverige",
-              "stockholm",
-              "göteborg"
-            ]
-          },
-          "timestamp" : 1552996315648,
-          "keywords_enriched_binary" : {
-            "occupation" : [
-              "representative",
-              "fältsäljare",
-              "account manager",
-              "copy"
-            ],
-            "skill" : [
-              "marketing",
-              "material",
-              "sales",
-              "försäljning"
-            ],
-            "trait" : [
-              "självgående",
-              "driven"
-            ]
-          }
+          "timestamp": 1539958052330
         }
       }
     ]

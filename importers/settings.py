@@ -100,49 +100,48 @@ platsannons_mappings = {
                                             "ignore_above": 256
                                         }
                                     }
+                                },
+                                "employer": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 },
-                "publiceringsdatum": {
+                "publication_date": {
                     "type": "date"
                 },
-                "sista_ansokningsdatum": {
+                "last_publication_date": {
                     "type": "date"
                 },
-                "status": {
-                    "properties": {
-                        "sista_publiceringsdatum": {
-                            "type": "date"
-                        },
-                        "skapad": {
-                            "type": "date"
-                        },
-                        "uppdaterad": {
-                            "type": "date"
-                        },
-                    }
+                "application_deadline": {
+                    "type": "date"
                 },
-                "arbetsplatsadress": {
+                "workplace_address": {
                     "properties": {
-                        "kommunkod": {
+                        "municipality_code": {
                             "type": "text"
                         },
-                        "kommun": {
+                        "municipality": {
                             "type": "text"
                         },
-                        "lanskod": {
+                        "region_code": {
                             "type": "text"
                         },
-                        "lan": {
+                        "region": {
                             "type": "text"
                         },
-                        "landskod": {
+                        "country_code": {
                             "type": "keyword",
                             "null_value": "199"  # Assume Sweden when not specified
                         },
-                        "land": {
+                        "country": {
                             "type": "text"
                         },
                         "coordinates": {
@@ -151,7 +150,7 @@ platsannons_mappings = {
                         }
                     }
                 },
-                "arbetsomfattning": {
+                "scope_of_work": {
                     "properties": {
                         "min": {
                             "type": "float"
