@@ -36,7 +36,7 @@ def get_target_ads_from_file():
         # pprint(result)
         return result['hits']['hits']
 
-# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_platsannons_conversion():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
