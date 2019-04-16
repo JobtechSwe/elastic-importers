@@ -91,7 +91,7 @@ def get_doc_headline_input(annons):
 
 
 def get_enrich_result(batch_indata, timeout):
-    headers = {'Content-Type': 'application/json'}
+    headers = {'Content-Type': 'application/json', 'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
     r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE,
                       headers=headers, json=batch_indata, timeout=timeout)
     r.raise_for_status()

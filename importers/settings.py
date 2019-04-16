@@ -181,6 +181,7 @@ URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
     os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
               'https://textdoc-enrichments.dev.services.jtech.se'
               '/enrichtextdocumentsbinary')
+API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
 #    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
 #              'http://localhost:6357/enrichtextdocumentsbinary')
 
