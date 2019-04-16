@@ -271,9 +271,9 @@ def _add_keywords(annons):
     for key_dict in [
         {
             'occupation': [
-                'yrkesroll.term',
-                'yrkesgrupp.term',
-                'yrkesomrade.term',
+                'occupation.label',
+                'occupation_group.label',
+                'occupation_field.label',
             ]
         },
         {
@@ -287,7 +287,6 @@ def _add_keywords(annons):
         {
             'location': [
                 'arbetsplatsadress.postort',
-                'arbetsplatsadress.postnummer',
                 'arbetsplatsadress.kommun',
                 'arbetsplatsadress.lan',
                 'arbetsplatsadress.land',
