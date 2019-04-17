@@ -44,10 +44,13 @@ def test_platsannons_conversion():
     source_ads = get_source_ads_from_file()
     target_ads = get_target_ads_from_file()
 
-    for source_ad in source_ads:
-        annons_id = source_ad['annonsId']
-        # annons_id = '23189097'
-        assert_ad_properties(annons_id, source_ads, target_ads, converter)
+
+    annons_id = '22884504'
+    source_ad = get_source_ad(annons_id, source_ads)
+
+    annons_id = source_ad['annonsId']
+    assert_ad_properties(annons_id, source_ads, target_ads, converter)
+
 
 
 def assert_ad_properties(annons_id, source_ads, target_ads, converter):
@@ -105,6 +108,38 @@ def assert_ad_properties(annons_id, source_ads, target_ads, converter):
         assert converter._isodate(source_ad['avpubliceringsdatum']) == conv_ad[removed_date_key]
     else:
         assert conv_ad[removed_date_key] is None
+
+
+@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.integration
+def test_corrupt_platsannons():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
+    from importers.platsannons import converter
+    source_ads = get_source_ads_from_file()
+    target_ads = get_target_ads_from_file()
+
+    annons_id = '20159374'
+    source_ad = get_source_ad(annons_id, source_ads)
+    # target_ad = get_target_ad(annons_id, target_ads)
+    message_envelope = source_ad
+
+
+    message_envelope['version'] = 1
+    message_envelope['timestamp'] = 1539958052330
+    # pprint(message_envelope)
+    conv_ad = converter.convert_message(message_envelope)
+    pprint(conv_ad)
+
+    assert len(conv_ad['must_have']['languages']) == 0
+    assert len(conv_ad['must_have']['skills']) == 0
+    assert len(conv_ad['must_have']['work_experiences']) == 0
+
+    assert len(conv_ad['nice_to_have']['languages']) > 0
+    assert len(conv_ad['nice_to_have']['skills']) > 0
+    assert len(conv_ad['nice_to_have']['work_experiences']) > 0
+
+
+
 
 def get_source_ad(annons_id, ads):
     ads_with_id = [ad for ad in ads if str(ad['annonsId']) == str(annons_id)]

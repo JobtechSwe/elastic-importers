@@ -31,22 +31,22 @@
           },
           "workplace_id": "85444530",
           "employment_type": {
-            "concept_id": "J2_FjLyAzW",
+            "concept_id": "PFZr_Syz_cUq",
             "label": "Vanlig anställning",
             "legacy_ams_taxonomy_id": "1"
           },
           "salary_type": {
-            "concept_id": "D5EJNkXV2R",
+            "concept_id": "oG8G_9cW_nRf",
             "label": "Fast månads- vecko- eller timlön",
             "legacy_ams_taxonomy_id": "1"
           },
           "duration": {
-            "concept_id": "xA9_jXptzv",
+            "concept_id": "a7uU_j21_mkL",
             "label": "Tillsvidare",
             "legacy_ams_taxonomy_id": "1"
           },
           "working_hours_type": {
-            "concept_id": "cigrjL76wD",
+            "concept_id": "6YE1_gAC_R2G",
             "label": "Heltid",
             "legacy_ams_taxonomy_id": "1"
           },
@@ -77,22 +77,22 @@
           "driving_license_required": true,
           "driving_license": [
             {
-              "concept_id": "72XZA4Dzt4",
+              "concept_id": "hK1a_wsQ_4UG",
               "label": "D"
             }
           ],
           "occupation": {
-            "concept_id": "yxm4WoUU11",
+            "concept_id": "2sRC_oHm_7XA",
             "label": "Trafikledare, vägtrafik",
             "legacy_ams_taxonomy_id": "5003"
           },
           "occupation_group": {
-            "concept_id": "aNFin7QrCZ",
+            "concept_id": "957L_kZK_rHZ",
             "label": "Transportledare och transportsamordnare",
             "legacy_ams_taxonomy_id": "4323"
           },
           "occupation_field": {
-            "concept_id": "X9SUF3Ywbo",
+            "concept_id": "ASGV_zcE_bWf",
             "label": "Transport",
             "legacy_ams_taxonomy_id": "19"
           },
@@ -115,13 +115,26 @@
             "skills": [],
             "languages": [
               {
-                "concept_id": "6ciNNT8M_s",
+                "concept_id": "NVxJ_hLg_TYS",
                 "label": "Engelska",
                 "weight": 10,
                 "legacy_ams_taxonomy_id": "283"
-              },
+              }
+            ],
+            "work_experiences": [
               {
-                "concept_id": "De8aCoBBpy",
+                "concept_id": "qSXj_aXc_EGp",
+                "label": "Bussförare/Busschaufför",
+                "weight": 10,
+                "legacy_ams_taxonomy_id": "5561"
+              }
+            ]
+          },
+          "nice_to_have": {
+            "skills": [],
+            "languages": [
+              {
+                "concept_id": "zSLA_vw2_FXN",
                 "label": "Svenska",
                 "weight": 5,
                 "legacy_ams_taxonomy_id": "502"
@@ -129,23 +142,12 @@
             ],
             "work_experiences": [
               {
-                "concept_id": "mFbMzm5xmj",
-                "label": "Bussförare/Busschaufför",
-                "weight": 10,
-                "legacy_ams_taxonomy_id": "5561"
-              },
-              {
-                "concept_id": "yxm4WoUU11",
+                "concept_id": "2sRC_oHm_7XA",
                 "label": "Trafikledare, vägtrafik",
                 "weight": 5,
                 "legacy_ams_taxonomy_id": "5003"
               }
             ]
-          },
-          "nice_to_have": {
-            "skills": [],
-            "languages": [],
-            "work_experiences": []
           },
           "publication_date": "2018-10-19T00:00:00",
           "last_publication_date": "2019-04-15T23:59:59",

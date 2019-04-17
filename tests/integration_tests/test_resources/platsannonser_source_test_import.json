@@ -136,6 +136,184 @@
       "sistaAnsokningsdatum": "2019-04-15 23:59:59",
       "sistaPubliceringsdatum": "2019-04-15 23:59:59",
       "informationAnsokningssatt": "Vi tar emot ansökan via e-post och följer upp med telefonintervjuer under ansökningsperioden.\nSkicka ditt CV och personliga brev till oss."
+    },
+    {
+      "id": "20159374",
+      "epost": "epost@ams.se",
+      "sprak": [
+        {
+          "namn": "Tigrinja/Tigrinska",
+          "vikt": null,
+          "varde": "472"
+        },
+        {
+          "namn": "Finska",
+          "vikt": null,
+          "varde": "292"
+        }
+      ],
+      "lonTyp": {
+        "namn": "Fast månads- vecko- eller timlön",
+        "varde": "1"
+      },
+      "korkort": [
+        {
+          "namn": "B",
+          "varde": "3"
+        },
+        {
+          "namn": "C",
+          "varde": "4"
+        }
+      ],
+      "version": "2.0",
+      "annonsId": 20159374,
+      "kallaTyp": "VIA_ANNONSERA",
+      "referens": "referens",
+      "expiresAt": "2019-04-17 23:59:59",
+      "tilltrade": "Så fort som möjligt",
+      "updatedAt": 1553751044907,
+      "yrkesroll": {
+        "namn": "Diskare",
+        "varde": "5556"
+      },
+      "annonstext": "Test AB söker en driven områdesansvarig till Falun. Test AB är ett företag vars affärsidé är att skänka lite magi till våra kunders vardag genom att avlasta dem bekymret att hinna med både hem, jobb och familj.Vi tar ansvar för våra kunders hem, verkar och agerar lokalt utifrån de förutsättningar som råder just där.Test AB finns idag representerat på 14 orter och vi erbjuder våra tjänster till privatpersoner, företag och kommuner. Önskad profil och erfarenhet: - minimum gymnasieutbildning med påbyggnadskurser. Erfarenhet från service och/eller tjänsteverksamhet där du arbetat mot resultat. Förmåga att arbeta självständigt, med integritet och stundtals under press. Ha förståelse för ekonomiska samband, kunna analysera dessa för att ha som bas i verksamhetsförbättringar - flerårigt arbete i affärs- och planeringssystem - din kreativitet och framåtanda driver dig att ständigt vilja förbättra verksamheten och du uttrycker dig väl i tal och skrift - en god lagspelare B körkort samt egen bil fordras.Minimum gymnasieutbildning med påbyggnadskurser - erfarenhet från service och/eller tjänsteverksamhet där du arbetat mot resultat - förmåga att arbeta självständigt. Vi söker en driven områdesansvarig till Falun!Som områdesansvarig fyller du en mycket viktig funktion då du är Test ABs ansikte utåt mot existerande och blivande kunder samt i samordningen och utvecklingen av driften och som engagerande chef för dina medarbetare.Dina ansvarsområden är: - Säkra en effektiv och trygg daglig drift omfattande schemaläggning, tidsrapportering, prissättning mm.Leda din personal, rekrytera och utbilda. - Etablera, underhålla och upprätthålla kundrelationer, genomföra kundbesök, kvalitetsmätningar och uppföljning - Säljaktiviteter och marknadsbearbetning - Deltaga i utvecklingsprojekt för Test ABs räkning, både hemma och på annan ort.Du kommer även att arbeta med investeringskalkyler och fastighetsvärdering samt ha en central roll i våra hyresförhandlingar och hyressättningsfrågor.",
+      "postadress": {
+        "land": "SE",
+        "postnr": "33333",
+        "postort": "Postadress postort",
+        "gatuadress": "Postadress gata"
+      },
+      "webbadress": "mittforetag@ams.se",
+      "kompetenser": [
+        {
+          "namn": "Socionomexamen",
+          "vikt": null,
+          "varde": "607247"
+        },
+        {
+          "namn": "JavaScript, programmeringsspråk",
+          "vikt": null,
+          "varde": "602449"
+        }
+      ],
+      "annonsrubrik": "RegTest FM SkapaAnnonsV2 Geoposition VisaEjArbetsplatsAdress",
+      "antalPlatser": 1,
+      "arbetstidTyp": {
+        "namn": "Heltid",
+        "varde": "1"
+      },
+      "avpublicerad": false,
+      "besoksadress": {
+        "land": null,
+        "postnr": "22222",
+        "postort": "Besöksadress postort",
+        "gatuadress": "Besöksadress gata"
+      },
+      "arbetsplatsId": "82723845",
+      "telefonnummer": "1234567890",
+      "anstallningTyp": {
+        "namn": "Vanlig anställning",
+        "varde": "1"
+      },
+      "arbetsgivareId": "10819829",
+      "varaktighetTyp": {
+        "namn": "Tillsvidare",
+        "varde": "1"
+      },
+      "arbetsplatsNamn": "ArbetsplatsNamn",
+      "kontaktpersoner": [
+        {
+          "epost": "kp1@ams.se",
+          "fornamn": "Nils",
+          "efternamn": "Nilsson",
+          "befattning": "Rekryteringsansvarig",
+          "beskrivning": "Beskrivning",
+          "mobilnummer": "202020202020",
+          "telefonnummer": "01010101010",
+          "fackligRepresentant": false
+        },
+        {
+          "epost": "kp2@ams.se",
+          "fornamn": "Olle",
+          "efternamn": "Olsson",
+          "befattning": "Rekryteringsansvarig",
+          "beskrivning": "Beskrivning",
+          "mobilnummer": "040404040404",
+          "telefonnummer": "3030303030",
+          "fackligRepresentant": true
+        }
+      ],
+      "utbildningsniva": {
+        "namn": "Gymnasial utbildning",
+        "vikt": null,
+        "varde": "2"
+      },
+      "ansokningsadress": {
+        "land": "SE",
+        "postnr": "11111",
+        "postort": "Ansökningsberga",
+        "mottagare": "Test Testsson",
+        "gatuadress": "Ansökningsgatan 12"
+      },
+      "arbetsgivareNamn": "ArbetsgivareNamn",
+      "arbetsplatsadress": {
+        "lan": {
+          "namn": "Stockholms län",
+          "varde": "01"
+        },
+        "land": null,
+        "kommun": {
+          "namn": "Stockholm",
+          "varde": "0180"
+        },
+        "postnr": null,
+        "latitud": null,
+        "postort": null,
+        "longitud": null,
+        "gatuadress": null,
+        "koordinatPrecision": null
+      },
+      "publiceringsdatum": "2019-03-28 06:30:44",
+      "yrkeserfarenheter": [
+        {
+          "namn": "Diskare",
+          "vikt": null,
+          "varde": "5556",
+          "erfarenhetsniva": {
+            "namn": "Ingen erfarenhet",
+            "varde": "1"
+          }
+        },
+        {
+          "namn": "Behandlingsassistent/Socialpedagog",
+          "vikt": null,
+          "varde": "5711",
+          "erfarenhetsniva": {
+            "namn": "Mindre än 1 års erfarenhet",
+            "varde": "2"
+          }
+        }
+      ],
+      "ansokningssattEpost": "ansokan@ams.se",
+      "ansokningssattViaAF": false,
+      "organisationsnummer": "2021002114",
+      "tillgangTillEgenBil": true,
+      "villkorsbeskrivning": "Fritextbeskrivning av anställningsvillkor",
+      "annonstextFormaterad": "Vi söker en driven områdesansvarig till Falun!Som områdesansvarig fyller du en mycket viktig funktion då du är Test ABs ansikte utåt mot existerande och blivande kunder samt i samordningen och utvecklingen av driften och som engagerande chef för dina medarbetare.Dina ansvarsområden är: - Säkra en effektiv och trygg daglig drift omfattande schemaläggning, tidsrapportering, prissättning mm.Leda din personal, rekrytera och utbilda. - Etablera, underhålla och upprätthålla kundrelationer, genomföra kundbesök, kvalitetsmätningar och uppföljning - Säljaktiviteter och marknadsbearbetning - Deltaga i utvecklingsprojekt för Test ABs räkning, både hemma och på annan ort.Du kommer även att arbeta med investeringskalkyler och fastighetsvärdering samt ha en central roll i våra hyresförhandlingar och hyressättningsfrågor.",
+      "ingenErfarenhetKravs": false,
+      "sistaAnsokningsdatum": "2019-04-17 23:59:59",
+      "utbildningsinriktning": {
+        "namn": "Säkerhetstjänster",
+        "vikt": null,
+        "varde": "86"
+      },
+      "sistaPubliceringsdatum": "2019-04-17 23:59:59",
+      "ansokningssattAnnatSatt": "Kom på våran rekryteringsträff",
+      "arbetstidOmfattningFran": 30.0,
+      "arbetstidOmfattningTill": 75.83,
+      "ansokningssattWebbadress": "http://ams.se",
+      "informationAnsokningssatt": "Vi tar enbart emot ansökningar via mail"
     }
   ]
 }

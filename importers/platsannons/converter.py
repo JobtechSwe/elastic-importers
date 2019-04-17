@@ -8,6 +8,8 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 
 log = logging.getLogger(__name__)
 
+MUST_HAVE_WEIGHT = 10
+
 
 def _isodate(bad_date):
     if not bad_date:
@@ -42,9 +44,9 @@ def convert_message(message_envelope):
                                                            message)
         annons['salary_type'] = _expand_taxonomy_value('lonetyp', 'lonTyp', message)
         annons['duration'] = _expand_taxonomy_value('varaktighet',
-                                                       'varaktighetTyp', message)
+                                                    'varaktighetTyp', message)
         annons['working_hours_type'] = _expand_taxonomy_value('arbetstidstyp',
-                                                         'arbetstidTyp', message)
+                                                              'arbetstidTyp', message)
         # If arbetstidstyp == 1 (heltid) then default omfattning == 100%
         default_omf = 100 if message.get('arbetstidTyp', {}).get('varde') == "1" else None
         annons['scope_of_work'] = {
@@ -85,17 +87,17 @@ def convert_message(message_envelope):
                 yrkesgrupp = yrkesroll.get('parent')
                 yrkesomrade = yrkesgrupp.get('parent')
                 annons['occupation'] = {'concept_id': yrkesroll['concept_id'],
-                                       'label': yrkesroll['label'],
-                                       'legacy_ams_taxonomy_id':
-                                       yrkesroll['legacy_ams_taxonomy_id']}
-                annons['occupation_group'] = {'concept_id': yrkesgrupp['concept_id'],
-                                        'label': yrkesgrupp['label'],
+                                        'label': yrkesroll['label'],
                                         'legacy_ams_taxonomy_id':
-                                        yrkesgrupp['legacy_ams_taxonomy_id']}
+                                            yrkesroll['legacy_ams_taxonomy_id']}
+                annons['occupation_group'] = {'concept_id': yrkesgrupp['concept_id'],
+                                              'label': yrkesgrupp['label'],
+                                              'legacy_ams_taxonomy_id':
+                                                  yrkesgrupp['legacy_ams_taxonomy_id']}
                 annons['occupation_field'] = {'concept_id': yrkesomrade['concept_id'],
-                                         'label': yrkesomrade['label'],
-                                         'legacy_ams_taxonomy_id':
-                                         yrkesomrade['legacy_ams_taxonomy_id']}
+                                              'label': yrkesomrade['label'],
+                                              'legacy_ams_taxonomy_id':
+                                                  yrkesomrade['legacy_ams_taxonomy_id']}
             elif not yrkesroll:
                 log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
                             % message['yrkesroll'])
@@ -120,7 +122,7 @@ def convert_message(message_envelope):
         if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
             landskod = arbplatsmessage.get('land', {}).get('varde', {})
             land = arbplatsmessage.get('land', {}).get('namn', {})
-        if 'longitud'in arbplatsmessage and arbplatsmessage.get('longitud'):
+        if 'longitud' in arbplatsmessage and arbplatsmessage.get('longitud'):
             longitud = float(arbplatsmessage.get('longitud'))
         if 'latitud' in arbplatsmessage and arbplatsmessage.get('latitud'):
             latitud = float(arbplatsmessage.get('latitud'))
@@ -137,47 +139,52 @@ def convert_message(message_envelope):
             'city': message.get('postadress', {}).get('postort'),
             'coordinates': [longitud, latitud]
         }
+
         annons['must_have'] = {
             'skills': [
-                get_concept_as_annons_value_with_weight('kompetens',
-                                                        kompetens.get('varde'),
+                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'),
                                                         kompetens.get('vikt'))
-                for kompetens in
-                message.get('kompetenser', []) if kompetens.get('vikt', 0) > 3
+                for kompetens in message.get('kompetenser', [])
+                if get_null_safe_value(kompetens, 'vikt', 0) == MUST_HAVE_WEIGHT
             ],
             'languages': [
                 get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'),
                                                         sprak.get('vikt'))
-                for sprak in message.get('sprak', []) if sprak.get('vikt', 0) > 3
+                for sprak in message.get('sprak', [])
+                if get_null_safe_value(sprak, 'vikt', 0) == MUST_HAVE_WEIGHT
             ],
             'work_experiences': [
                 get_concept_as_annons_value_with_weight('yrkesroll',
                                                         yrkerf.get('varde'),
                                                         yrkerf.get('vikt'))
-                for yrkerf in
-                message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) > 3
+                for yrkerf in message.get('yrkeserfarenheter', [])
+                if get_null_safe_value(yrkerf, 'vikt', 0) == MUST_HAVE_WEIGHT
             ]
         }
+
         annons['nice_to_have'] = {
             'skills': [
                 get_concept_as_annons_value_with_weight('kompetens',
                                                         kompetens.get('varde'),
                                                         kompetens.get('vikt'))
                 for kompetens in
-                message.get('kompetenser', []) if kompetens.get('vikt', 0) < 4
+                message.get('kompetenser', [])
+                if get_null_safe_value(kompetens, 'vikt', 0) < MUST_HAVE_WEIGHT
             ],
             'languages': [
                 get_concept_as_annons_value_with_weight('sprak',
                                                         sprak.get('varde'),
                                                         sprak.get('vikt'))
-                for sprak in message.get('sprak', []) if sprak.get('vikt', 0) < 4
+                for sprak in message.get('sprak', [])
+                if get_null_safe_value(sprak, 'vikt', 0) < MUST_HAVE_WEIGHT
             ],
             'work_experiences': [
-                get_concept_as_annons_value_with_weight('yrkeserfarenheter',
+                get_concept_as_annons_value_with_weight('yrkesroll',
                                                         yrkerf.get('varde'),
                                                         yrkerf.get('vikt'))
                 for yrkerf in
-                message.get('yrkeserfarenheter', []) if yrkerf.get('vikt', 0) < 4
+                message.get('yrkeserfarenheter', [])
+                if get_null_safe_value(yrkerf, 'vikt', 0) < MUST_HAVE_WEIGHT
             ]
         }
         annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
@@ -190,6 +197,13 @@ def convert_message(message_envelope):
     else:
         # Message is already in correct format
         return message_envelope
+
+
+def get_null_safe_value(element, key, replacement_val):
+    val = element.get(key, replacement_val)
+    if val is None:
+        val = replacement_val
+    return val
 
 
 def _expand_taxonomy_value(annons_key, message_key, message_dict):
@@ -284,6 +298,7 @@ def _add_keywords(annons):
         annons['keywords']['extracted'][field] = list(keywords)
     return annons
 
+
 def create_employer_name_keywords(companyname):
     kw_list = []
     if companyname:
@@ -294,8 +309,10 @@ def create_employer_name_keywords(companyname):
 
     return kw_list
 
+
 def rightreplace(astring, pattern, sub):
     return sub.join(astring.rsplit(pattern, 1))
+
 
 def leftreplace(astring, pattern, sub):
     return sub.join(astring.split(pattern, 1))
@@ -311,7 +328,7 @@ def _get_nested_value(path, data):
             break
         if isinstance(element, list):
             for item in element:
-                values.append(item.get(keypath[i+1]))
+                values.append(item.get(keypath[i + 1]))
             break
         if isinstance(element, dict):
             data = element
