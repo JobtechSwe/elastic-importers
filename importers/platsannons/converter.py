@@ -291,6 +291,9 @@ def _add_keywords(annons):
                 for value in values:
                     for kw_employer_name in create_employer_name_keywords(value):
                         keywords.add(kw_employer_name)
+            if field == 'location':
+                for value in values:
+                    keywords.add(_trim_location(value))
             else:
                 for value in values:
                     for kw in _extract_taxonomy_label(value):
@@ -316,6 +319,18 @@ def rightreplace(astring, pattern, sub):
 
 def leftreplace(astring, pattern, sub):
     return sub.join(astring.split(pattern, 1))
+
+
+def _trim_location(locationstring):
+    if locationstring:
+        # Magic regex
+        valid_words = []
+        for word in locationstring.lower().split():
+            if not re.match('^[0-9r\\-]+$|^\\(.*$|^.*\\)$|\\(\\)', word):
+                valid_words.append(word)
+        print("VALID", valid_words)
+        return ' '.join(valid_words)
+    return locationstring
 
 
 def _get_nested_value(path, data):
