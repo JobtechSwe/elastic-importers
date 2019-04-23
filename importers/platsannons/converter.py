@@ -328,7 +328,6 @@ def _trim_location(locationstring):
         for word in locationstring.lower().split():
             if not re.match('^[0-9r\\-]+$|^\\(.*$|^.*\\)$|\\(\\)', word):
                 valid_words.append(word)
-        print("VALID", valid_words)
         return ' '.join(valid_words)
     return locationstring
 

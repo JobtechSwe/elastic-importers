@@ -23,8 +23,10 @@ def test_isodate(parsing_date, not_parsing_date):
 @pytest.mark.unit
 @pytest.mark.parametrize("location, expected", [("Solna", "solna"),
                                                 ("Upplands Väsby", "upplands väsby"),
+                                                ("Upplands-Bro", "upplands-bro"),
                                                 ("Malmö (huvudkontor)", "malmö"),
                                                 ("12345 Danderyd", "danderyd"),
+                                                ("34-5 Sundsvall", "sundsvall"),
                                                 ("34-5 Sundsvall", "sundsvall"),
                                                 ("Stockholm 8", "stockholm"),
                                                 ("Gävle (avd. 8)", "gävle"),
