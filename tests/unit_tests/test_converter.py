@@ -29,8 +29,16 @@ def test_isodate(parsing_date, not_parsing_date):
                                                 ("34-5 Sundsvall", "sundsvall"),
                                                 ("34-5 Sundsvall", "sundsvall"),
                                                 ("Stockholm 8", "stockholm"),
+                                                ("Gävle (avd.8)", "gävle"),
                                                 ("Gävle (avd. 8)", "gävle"),
                                                 ("Liljeholmen ()", "liljeholmen"),
+                                                ("dk-5000 odense", "odense"),
+                                                ("d02 r299 dublin", "dublin"),
+                                                ("02d 299r dublin", "dublin"),
+                                                ("campanillas, málaga", "málaga"),
+                                                ("box 215, se-251 helsingborg",
+                                                 "helsingborg"),
+                                                ("bromma stockholm", "bromma stockholm"),
                                                 ])
 def test_trim_location(location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')

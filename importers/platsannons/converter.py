@@ -322,11 +322,14 @@ def leftreplace(astring, pattern, sub):
 
 
 def _trim_location(locationstring):
+    # Look for unwanted words (see tests/unit/test_converter.py)
+    regex = re.compile('[0-9\\-]+|.+,|([\\d\\w]+\\-[\\d]+)|\\(.*|.*\\)|\\(\\)|\\w*\\d+\\w*')
+    stopwords = ['box']
     if locationstring:
         # Magic regex
         valid_words = []
         for word in locationstring.lower().split():
-            if not re.match('^[0-9r\\-]+$|^\\(.*$|^.*\\)$|\\(\\)', word):
+            if not re.match(regex, word) and word not in stopwords:
                 valid_words.append(word)
         return ' '.join(valid_words)
     return locationstring
