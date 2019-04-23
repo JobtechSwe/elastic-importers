@@ -1,3 +1,5 @@
+urllib3==1.22
+requests
 elasticsearch
 psycopg2-binary
 zeep
