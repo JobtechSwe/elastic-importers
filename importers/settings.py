@@ -126,23 +126,53 @@ platsannons_mappings = {
                 "workplace_address": {
                     "properties": {
                         "municipality_code": {
-                            "type": "text"
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         },
                         "municipality": {
-                            "type": "text"
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         },
                         "region_code": {
-                            "type": "text"
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         },
                         "region": {
-                            "type": "text"
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         },
                         "country_code": {
                             "type": "keyword",
                             "null_value": "199"  # Assume Sweden when not specified
                         },
                         "country": {
-                            "type": "text"
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         },
                         "coordinates": {
                             "type": "geo_point",
