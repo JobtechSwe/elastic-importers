@@ -24,6 +24,9 @@ platsannons_mappings = {
     "mappings": {
         "document": {
             "properties": {
+                "id": {
+                    "type": "keyword"
+                },
                 "external_id": {
                     "type": "keyword"
                 },
