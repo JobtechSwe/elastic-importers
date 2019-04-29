@@ -1,0 +1,213 @@
+{
+  "took": 7,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 1,
+    "max_score": 8.930185,
+    "hits": [
+      {
+        "_index": "platsannons",
+        "_type": "document",
+        "_id": "22884504",
+        "_score": 8.930185,
+        "_source": {
+          "id": "22884504",
+          "external_id": null,
+          "headline": "Trafikledare sökes till växande transportföretag i Abisko/Kiruna området",
+          "application_deadline": "2019-04-15T23:59:59",
+          "number_of_vacancies": 1,
+          "description": {
+            "text": "Krav för tjänsten:\n\n* Erfarenhet som handledare/chef eller liknande roll samt behörig träning inom området.\n* Väl informerad kring lagar och regler inom yrket.\n* Förmågan och viljan att lära sig nya program, egenskaper och processer.\n* Exemplarisk kommunikationsförmåga i både Engelska och Svenska.\n* Mycket organiserad och en bred lednings- och samverkansförmåga.\n* Innehar alla nödvändiga körkort (minst B, D samt YKB-licens).\n* Lätta att bemöta gäster/kollegor med ett positivt och glatt beteende.\n* Bekväm att köra på vinterväglag i mörker med mycket snö och is.\nVi söker en trafikledare inför kommande höst/vintersäsong för att ansvara för bussarna, chaufförerna, logistik och hjälpa till med schemaläggning under året. Du kommer snabbt lära känna dina medarbetare och kollegor som alla jobbar för att alla ska trivas på jobbet. Ett härligt gäng med erfarenheter och egenskaper ifrån många delar av världen. Trivs du med att vara ute i naturen, möta nytt folk och arbeta både i grupp enskilt så är du den vi söker!\n\nHur ser din dag ut?\n\nDå du kommer vara ansvarig för den dagliga transporten och alla chaufförer kommer det vara mycket arbete med att hålla allting i rullning och se till så alla chaufförer, bussar är i bästa möjliga skicka och att vi levererar en professionell service till våra kunder. Din roll kommer vara uppdela i kontorsarbete, körningar, fordonshantering, basisk fordons behandling och vara huvudkontakt för alla chaufförer på plats. Du kommer även arbete nära tillsammans med resten av Visit Abiskos team för att säkerställa planeringen av schemaläggningen blir så effektiv som möjligt.\n\nDu kommer rapportera till teamet du arbetar tillsammans med dagligen, för att säkerställa att arbetet för planeringen och leveransen av alla produkter som Visit Abisko erbjuder håller den högsta möjligt standarden. Du kommer ansvara så att hela flottan med fordon underhålls till den professionella nivån som krävs inom renlighet, säkerhet och mekanisk funktionalitet.\n\nPersonliga egenskaper och utbildning:\nDu bör vara en flexibel person med lång erfarenhet inom branschen. Du möter stressiga situationer och behöver kunna ta snabba beslut för att lösa problem. Du är utåtriktad, tycker om människor och ser en utmaning i att alltid ha nöjda kunder och kollegor. För att klara jobbet krävs det att du behärskar engelska väl i tal eftersom majoriteten av den turism som sker i området under denna period är engelsktalande turister. Vi vill gärna att chaufförerna ser dig som en förebild och mentor så du behöver därför vara självsäker och inte vara rädd för att dela ut arbetsuppgifter, ge feedback osv.\nVisit Abisko är ett etablerat transport och aktivitetsföretag som har sin verksamhet i Abisko, norr om Kiruna. Vi kör persontransporter mellan Kiruna flygplats och Abisko, samt lokala bussturer i Abisko/Björkliden. Vi erbjuder även guidade turer till Narvik, och Icehotel i Jukkasjärvi m.m under vintersäsong. Vårt team består av 6 chaufförer, 2 administrativa arbetare samt en trafikledare (nytt för kommande år) och 3 ägare. Vi hyr ut enklare personalbostäder under arbetstiden och säsongsanställer personal under norrskenssäsongen (okt-mar) och skidsäsongen (apr-maj).\n\nLäs gärna mer om våra transfers & aktiviteter på vår hemsida:",
+            "company_information": null,
+            "needs": null,
+            "requirements": null,
+            "conditions": "Heltidsanställning.\n1 st tjänst."
+          },
+          "workplace_id": "85444530",
+          "employment_type": {
+            "concept_id": "PFZr_Syz_cUq",
+            "label": "Vanlig anställning",
+            "legacy_ams_taxonomy_id": "1"
+          },
+          "salary_type": {
+            "concept_id": "oG8G_9cW_nRf",
+            "label": "Fast månads- vecko- eller timlön",
+            "legacy_ams_taxonomy_id": "1"
+          },
+          "duration": {
+            "concept_id": "a7uU_j21_mkL",
+            "label": "Tillsvidare",
+            "legacy_ams_taxonomy_id": "1"
+          },
+          "working_hours_type": {
+            "concept_id": "6YE1_gAC_R2G",
+            "label": "Heltid",
+            "legacy_ams_taxonomy_id": "1"
+          },
+          "scope_of_work": {
+            "min": 100,
+            "max": 100
+          },
+          "access": null,
+          "employer": {
+            "id": "20984857",
+            "phone_number": "0701234567",
+            "email": "info@visitabisko.com",
+            "url": "http://www.visitabisko.com",
+            "organization_number": "5569616161",
+            "name": "Fazer Food Services AB",
+            "workplace": "Gateau AB"
+          },
+          "application_details": {
+            "information": "Vi tar emot ansökan via e-post och följer upp med telefonintervjuer under ansökningsperioden.\nSkicka ditt CV och personliga brev till oss.",
+            "reference": "Trafikledare",
+            "email": "fornamn.efternamn@emailadress.se",
+            "via_af": false,
+            "url": null,
+            "other": null
+          },
+          "experience_required": true,
+          "access_to_own_car": false,
+          "driving_license_required": true,
+          "driving_license": [
+            {
+              "concept_id": "hK1a_wsQ_4UG",
+              "label": "D"
+            }
+          ],
+          "occupation": {
+            "concept_id": "2sRC_oHm_7XA",
+            "label": "Trafikledare, vägtrafik",
+            "legacy_ams_taxonomy_id": "5003"
+          },
+          "occupation_group": {
+            "concept_id": "957L_kZK_rHZ",
+            "label": "Transportledare och transportsamordnare",
+            "legacy_ams_taxonomy_id": "4323"
+          },
+          "occupation_field": {
+            "concept_id": "ASGV_zcE_bWf",
+            "label": "Transport",
+            "legacy_ams_taxonomy_id": "19"
+          },
+          "workplace_address": {
+            "municipality_code": "2584",
+            "municipality": "Kiruna",
+            "region_code": "25",
+            "region": "Norrbottens län",
+            "country_code": null,
+            "country": null,
+            "street_address": "Steinholtzgatan 35",
+            "postcode": "98132",
+            "city": "Kiruna",
+            "coordinates": [
+              20.2274210124801,
+              67.8576127184316
+            ]
+          },
+          "must_have": {
+            "skills": [],
+            "languages": [
+              {
+                "concept_id": "NVxJ_hLg_TYS",
+                "label": "Engelska",
+                "weight": 10,
+                "legacy_ams_taxonomy_id": "283"
+              }
+            ],
+            "work_experiences": [
+              {
+                "concept_id": "qSXj_aXc_EGp",
+                "label": "Bussförare/Busschaufför",
+                "weight": 10,
+                "legacy_ams_taxonomy_id": "5561"
+              }
+            ]
+          },
+          "nice_to_have": {
+            "skills": [],
+            "languages": [
+              {
+                "concept_id": "zSLA_vw2_FXN",
+                "label": "Svenska",
+                "weight": 5,
+                "legacy_ams_taxonomy_id": "502"
+              }
+            ],
+            "work_experiences": [
+              {
+                "concept_id": "2sRC_oHm_7XA",
+                "label": "Trafikledare, vägtrafik",
+                "weight": 5,
+                "legacy_ams_taxonomy_id": "5003"
+              }
+            ]
+          },
+          "publication_date": "2018-10-19T00:00:00",
+          "last_publication_date": "2019-04-15T23:59:59",
+          "removed": false,
+          "removed_date": "2018-10-01T14:55:33",
+          "source_type": "VIA_AF_FORMULAR",
+          "keywords": {
+            "extracted": {
+              "occupation": [
+                "trafikledare",
+                "transportsamordnare",
+                "transport",
+                "transportledare",
+                "vägtrafik"
+              ],
+              "skill": [
+                "svenska",
+                "engelska"
+              ],
+              "location": [
+                "98132",
+                "kiruna",
+                "norrbottens län"
+              ],
+              "employer": [
+                "fazer food services",
+                "gateau"
+              ]
+            },
+            "enriched": {
+              "occupation": [
+                "trafikledare",
+                "handledare"
+              ],
+              "skill": [
+                "engelska",
+                "körning",
+                "svenska",
+                "ykb",
+                "schemaläggning",
+                "behandling",
+                "logistik",
+                "fordonshantering",
+                "turism",
+                "fordon",
+                "träning",
+                "säkerhet",
+                "feedback"
+              ],
+              "trait": [
+                "samverkansförmåga",
+                "utåtriktad",
+                "självsäker",
+                "flexibel"
+              ]
+            }
+          },
+          "timestamp": 1539958052330
+        }
+      }
+    ]
+  }
+}

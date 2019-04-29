@@ -1,0 +1,103 @@
+annons/platsannons - job_ad (LA annons)
+id - id (LA annonsId)
+rubrik - headline (LA annonsrubrik)
+sista_ansokningsdatum - application_deadline (LA sistaAnsokningsdatum)
+antal_platser - number_of_vacancies (LA antalPlatser)
+
+annons['beskrivning'] = { - description
+  'annonstext' - text (LA annonstext)
+  'information' - company_information - (LA ftgInfo)
+  'behov' -  needs (LA beskrivningBehov)
+  'krav': requirements - (LA beskrivningKrav)
+  'villkor': conditions - (LA villkorsbeskrivning)
+}
+arbetsplats_id - workplace_id (LA arbetsplatsId)
+anstallningstyp - employment_type (LA anstallningstyp)
+lonetyp - salary_type (LA lonetyp och lonTyp)
+
+varaktighet - duration (LA varaktighet och varaktighetTyp)
+arbetstidstyp - working_hours_type (LA arbetstidstyp och arbetstidTyp)
+
+annons['arbetsomfattning'] = { - scope_of_work
+'min': - min (LA arbetstidOmfattningFran)
+'max': - max (LA arbetstidOmfattningTill)
+}
+annons['tilltrade'] - access (LA tilltrade)
+
+annons['arbetsgivare'] = { - employer
+'id': - id (LA arbetsgivareId)
+'telefonnummer' - phone_number (LA telefonnummer)
+'epost': - email (LA epost)
+'webbadress': - url (LA webbadress)
+'organisationsnummer': - organization_number (LA organisationsnummer)
+'namn': - name (LA arbetsgivareNamn)
+'arbetsplats': - workplace (LA arbetsplatsNamn)
+}
+annons['ansokningsdetaljer'] = { - application_details
+'information': information (LA informationAnsokningssatt)
+'referens': reference (LA referens)
+'epost': email - (LA ansokningssattEpost)
+'via_af': via_af - (LA ansokningssattViaAF)
+'webbadress': url (LA ansokningssattWebbadress)
+'annat': other - (LA ansokningssattAnnatSatt)
+}
+annons['erfarenhet_kravs'] - experience_required (LA ingenErfarenhetKravs)
+annons['egen_bil'] - access_to_own_car (LA tillgangTillEgenBil)
+
+annons['korkort_kravs'] - driving_license_required (LA korkort)
+annons['korkort'] - driving_license
+
+
+yrkesroll - occupation
+yrkesgrupp - occupation_group
+yrkesomrade = occupation_field
+kod - concept_id
+term - label
+taxonomi-kod - legacy_ams_taxonomy_id
+
+
+annons['arbetsplatsadress'] = { - workplace_address
+'kommunkod': - municipality_code
+'kommun': municipality,
+'lanskod': region_code
+'lan': region,
+
+
+'landskod': country_code
+'land': country
+'gatuadress': - street_address (LA besoksadress - gatuadress)
+'postnummer': - postcode (LA postnr)
+'postort': - city (LA postort)
+'coordinates': [longitud, latitud],
+}
+
+
+annons['krav'] = { - must_have (requirements)
+'kompetenser': [ - skills
+],
+'sprak': [ - languages
+],
+'utbildningsniva': [ - avveckla! (deprecated och används inte i sökning eller presentation i Platsbanken)
+],
+'utbildningsinriktning': [ - avveckla! (deprecated och används inte i sökning eller presentation i Platsbanken)
+],
+'yrkeserfarenheter': [ - work_experiences
+]
+}
+annons['meriterande'] = { - nice_to_have
+'kompetenser': [ - skills
+],
+'sprak': [ - languages
+],
+'utbildningsniva': [  - avveckla! (deprecated och används inte i sökning eller presentation i Platsbanken)
+],
+'utbildningsinriktning': [ - avveckla! (deprecated och används inte i sökning eller presentation i Platsbanken)
+],
+'yrkeserfarenheter': [ - work_experiences
+]
+}
+annons['publiceringsdatum'] - publication_date (LA publiceringsdatum)
+annons['sista_publiceringsdatum'] - last_publication_date (LA sistaPubliceringsdatum)
+annons['avpublicerad'] - removed (LA avpublicerad)
+annons['avpubliceringsdatum'] - removed_date (LA avpubliceringsdatum)
+annons['kalla'] = source_type (LA kallaTyp)

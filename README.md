@@ -65,3 +65,19 @@ På så sätt kan man skriva datat till ett nytt index och när det är klart ka
 TBD
 #### Användning
 TBD
+
+### Test
+
+## Köra unittester
+    $ python3 -m pytest -svv -ra -m unit tests/
+    
+## Köra integrationstester    
+Skapa fil /elastic-importers/tests/integration_tests/pytest_secrets.env
+
+...och lägg in följande rader i pytest_secrets.env samt byt ut <värde> till faktiska usernames och password etc:
+ES_USER=<elastic username>
+ES_PWD=<elastic password>
+ES_HOST=<elastic host, utan protokoll och port>
+ES_PORT=9243
+
+    $ python3 -m pytest -svv -ra -m integration tests/

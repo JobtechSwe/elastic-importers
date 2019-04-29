@@ -36,17 +36,27 @@ def query(sql, args):
 def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
     cur = pg_conn.cursor()
     ts_today = int(round(time.time() * 1000))  # Get current timestamp
-    cur.execute("SELECT id, timestamp, doc FROM " + tablename +
-                " WHERE timestamp >= %s AND (expires IS NULL OR expires > %s)"
-                " ORDER BY timestamp ASC LIMIT %s",
-                [timestamp, ts_today, settings.PG_BATCH_SIZE])
+
+    sql_last_ids = [str(id) for id in last_ids]
+
+    sql_str = "SELECT id, timestamp, doc FROM " + tablename + \
+              " WHERE timestamp >= %(ts)s AND (expires IS NULL OR expires > %(exp)s)" \
+              " AND id not in %(excl_id)s" \
+              " ORDER BY timestamp ASC LIMIT %(limit)s"
+    cur.execute(sql_str,
+                {'ts':timestamp,
+                 'exp': ts_today,
+                 'excl_id': tuple(sql_last_ids if len(sql_last_ids) > 0 else ['this string needed for sql syntax']),
+                 'limit': settings.PG_BATCH_SIZE})
     rows = cur.fetchall()
+
     # Create a list of dictionaries from row[2] adding to it the id and
     # timestamp from row[0] and row[1] unless the id is the one of the
     # same as last time method was called
     documents = [dict(converter.convert_message(row[2]) if converter else dict(row[2]),
                       **{'id': row[0], 'timestamp': row[1]})
                  for row in rows if row[0] not in last_ids]
+
     # Return a tuple containing a list of last ids, last timestamp and
     # list of dictionaries (annonser to save)
     return [row[0] for row in rows], rows[-1][1] if rows else 0, documents

@@ -45,6 +45,15 @@ def set_auranest_write_alias():
     change_alias(idxname, settings.ES_AURANEST_INDEX)
 
 
+def create_platsannons_index():
+    if len(sys.argv) < 1:
+        print("Must provide name of index to alias against.")
+        sys.exit(1)
+
+    idxname = sys.argv[1]
+    elastic.create_index(idxname, settings.platsannons_mappings)
+
+
 def change_alias(idxname, aliasname):
     print(f"Setting alias {aliasname} to point to {idxname}")
     try:

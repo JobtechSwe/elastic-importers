@@ -1,8 +1,11 @@
+urllib3==1.24.2
+requests
 elasticsearch
 psycopg2-binary
 zeep
 python-dateutil
 pytest
 pytest-runner
+pytest-envfiles
 git+https://github.com/JobtechSwe/valuestore-module.git
 flashtext

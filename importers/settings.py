@@ -24,6 +24,12 @@ platsannons_mappings = {
     "mappings": {
         "document": {
             "properties": {
+                "id": {
+                    "type": "keyword"
+                },
+                "external_id": {
+                    "type": "keyword"
+                },
                 "complete": {
                     "type": "text",
                     "fields": {
@@ -36,94 +42,140 @@ platsannons_mappings = {
                 "keywords": {
                     "type": "object",
                     "properties": {
-                        "occupation": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                        "enriched": {
+                            "type": "object",
+                            "properties": {
+                                "occupation": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "skill": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "trait": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
                                 }
                             }
                         },
-                        "skill": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "location": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                        "extracted": {
+                            "type": "object",
+                            "properties": {
+                                "occupation": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "skill": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "location": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
+                                },
+                                "employer": {
+                                    "type": "text",
+                                    "fields": {
+                                        "raw": {
+                                            "type": "keyword",
+                                            "ignore_above": 256
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 },
-                "keywords_enriched_binary": {
-                    "type": "object",
-                    "properties": {
-                        "occupation": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "skill": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "trait": {
-                            "type": "text",
-                            "fields": {
-                                "raw": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        }
-                    }
-                },
-                "publiceringsdatum": {
+                "publication_date": {
                     "type": "date"
                 },
-                "sista_ansokningsdatum": {
+                "last_publication_date": {
                     "type": "date"
                 },
-                "status": {
-                    "properties": {
-                        "sista_publiceringsdatum": {
-                            "type": "date"
-                        },
-                        "skapad": {
-                            "type": "date"
-                        },
-                        "uppdaterad": {
-                            "type": "date"
-                        },
-                    }
+                "application_deadline": {
+                    "type": "date"
                 },
-                "arbetsplatsadress": {
+                "workplace_address": {
                     "properties": {
-                        "kommunkod": {
-                            "type": "text"
+                        "municipality_code": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         },
-                        "landskod": {
+                        "municipality": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
+                        "region_code": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
+                        "region": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
+                        },
+                        "country_code": {
                             "type": "keyword",
                             "null_value": "199"  # Assume Sweden when not specified
+                        },
+                        "country": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword",
+                                    "ignore_above": 256
+                                }
+                            }
                         },
                         "coordinates": {
                             "type": "geo_point",
@@ -131,7 +183,7 @@ platsannons_mappings = {
                         }
                     }
                 },
-                "arbetsomfattning": {
+                "scope_of_work": {
                     "properties": {
                         "min": {
                             "type": "float"
@@ -160,7 +212,9 @@ PG_SSLMODE = os.getenv("PG_SSLMODE", 'require')
 # For berikning (platsannonser och auranest)
 URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
     os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
-              'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocumentsbinary')
+              'https://textdoc-enrichments.dev.services.jtech.se'
+              '/enrichtextdocumentsbinary')
+API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
 #    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
 #              'http://localhost:6357/enrichtextdocumentsbinary')
 

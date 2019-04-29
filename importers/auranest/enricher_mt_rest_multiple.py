@@ -110,7 +110,7 @@ def clean_text(text):
 
 
 def get_enrich_result(batch_indata, timeout):
-    headers = {'Content-Type': 'application/json'}
+    headers = {'Content-Type': 'application/json', 'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
     # log.debug('len(batch_indata[documents_input])', len(batch_indata['documents_input']))
     # log.info('get_enrich_result - Sending %s ads (documents_input) for enrichment' % (len(batch_indata['documents_input'])))
     # log.debug('Enriching Id: %s' % (input_doc_params[NarvalEnricher.PARAM_DOC_ID]))
