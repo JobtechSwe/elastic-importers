@@ -22,180 +22,178 @@ ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
 platsannons_mappings = {
     "mappings": {
-        "document": {
-            "properties": {
-                "id": {
-                    "type": "keyword"
-                },
-                "external_id": {
-                    "type": "keyword"
-                },
-                "complete": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "keywords": {
-                    "type": "object",
-                    "properties": {
-                        "enriched": {
-                            "type": "object",
-                            "properties": {
-                                "occupation": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                },
-                                "skill": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                },
-                                "trait": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "extracted": {
-                            "type": "object",
-                            "properties": {
-                                "occupation": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                },
-                                "skill": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                },
-                                "location": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                },
-                                "employer": {
-                                    "type": "text",
-                                    "fields": {
-                                        "raw": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "publication_date": {
-                    "type": "date"
-                },
-                "last_publication_date": {
-                    "type": "date"
-                },
-                "application_deadline": {
-                    "type": "date"
-                },
-                "workplace_address": {
-                    "properties": {
-                        "municipality_code": {
-                            "type": "text",
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "municipality": {
-                            "type": "text",
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "region_code": {
-                            "type": "text",
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "region": {
-                            "type": "text",
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "country_code": {
-                            "type": "keyword",
-                            "null_value": "199"  # Assume Sweden when not specified
-                        },
-                        "country": {
-                            "type": "text",
-                            "fields": {
-                                "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                }
-                            }
-                        },
-                        "coordinates": {
-                            "type": "geo_point",
-                            "ignore_malformed": True
-                        }
-                    }
-                },
-                "scope_of_work": {
-                    "properties": {
-                        "min": {
-                            "type": "float"
-                        },
-                        "max": {
-                            "type": "float"
-                        }
+        "properties": {
+            "id": {
+                "type": "keyword"
+            },
+            "external_id": {
+                "type": "keyword"
+            },
+            "complete": {
+                "type": "text",
+                "fields": {
+                    "keyword": {
+                        "type": "keyword",
+                        "ignore_above": 256
                     }
                 }
+            },
+            "keywords": {
+                "type": "object",
+                "properties": {
+                    "enriched": {
+                        "type": "object",
+                        "properties": {
+                            "occupation": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "skill": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "trait": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "extracted": {
+                        "type": "object",
+                        "properties": {
+                            "occupation": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "skill": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "location": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "employer": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    }
+}
+},
+"publication_date": {
+    "type": "date"
+},
+"last_publication_date": {
+    "type": "date"
+},
+"application_deadline": {
+    "type": "date"
+},
+"workplace_address": {
+    "properties": {
+        "municipality_code": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
             }
+        },
+        "municipality": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "region_code": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "region": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "country_code": {
+            "type": "keyword",
+            "null_value": "199"  # Assume Sweden when not specified
+        },
+        "country": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                }
+            }
+        },
+        "coordinates": {
+            "type": "geo_point",
+            "ignore_malformed": True
+        }
+}
+},
+"scope_of_work": {
+    "properties": {
+        "min": {
+            "type": "float"
+        },
+        "max": {
+            "type": "float"
         }
     }
+}
+}
+}
 }
 
 # For postgres (platsannonser and auranest)

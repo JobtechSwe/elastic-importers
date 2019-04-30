@@ -2,7 +2,7 @@ import logging
 import certifi
 import time
 from ssl import create_default_context
-from elasticsearch.helpers import bulk, scan
+from elasticsearch.helpers import bulk
 from elasticsearch import Elasticsearch
 from importers import settings
 
@@ -18,7 +18,7 @@ else:
     es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
 
 
-def _bulk_generator(documents, indexname, idkey, doctype='document'):
+def _bulk_generator(documents, indexname, idkey):
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
@@ -29,7 +29,6 @@ def _bulk_generator(documents, indexname, idkey, doctype='document'):
 
         yield {
             '_index': indexname,
-            '_type': doctype,
             '_id': doc_id,
             '_source': document
         }
@@ -127,12 +126,10 @@ def setup_indices(args, default_index, mappings):
 def create_index(indexname, extra_mappings=None):
     basic_body = {
         "mappings": {
-            "document": {
-                "properties": {
-                    "timestamp": {
-                        "type": "long"
-                    },
-                }
+            "properties": {
+                "timestamp": {
+                    "type": "long"
+                },
             }
         }
     }
@@ -141,7 +138,7 @@ def create_index(indexname, extra_mappings=None):
         body = extra_mappings
         if 'mappings' in body:
             body.get('mappings', {}) \
-                .get('document', {}).get('properties', {})['timestamp'] = {'type': 'long'}
+                .get('properties', {})['timestamp'] = {'type': 'long'}
         else:
             body.update(basic_body)
     else:
