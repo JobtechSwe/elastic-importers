@@ -13,7 +13,6 @@ ES_TAX_ARCHIVE_ALIAS = os.getenv("ES_TAX_ARCHIVE_ALIAS", "taxonomy-archive")
 
 TAXONOMY_INDEX_CONFIGURATION = {
     "mappings": {
-        "document": {
             "properties": {
                 "description": {
                     "type": "text",
@@ -44,7 +43,6 @@ TAXONOMY_INDEX_CONFIGURATION = {
                     "type": "keyword"
                 }
             }
-        }
     },
     "settings": {
         "index": {
