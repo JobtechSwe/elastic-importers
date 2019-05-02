@@ -200,7 +200,6 @@ auranest_mappings = {
         }
     },
     "mappings": {
-        "document": {
             "properties": {
                 "id": {
                     "type": "keyword"
@@ -273,6 +272,5 @@ auranest_mappings = {
                     }
                 },
             }
-        }
     }
 }
