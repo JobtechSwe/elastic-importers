@@ -286,18 +286,21 @@ def _add_keywords(annons):
     ]:
         field = list(key_dict.keys())[0]
         keywords = set()
+        values = []
         for key in list(key_dict.values())[0]:
-            values = _get_nested_value(key, annons)
-            if field == 'employer':
-                for value in _create_employer_name_keywords(values):
-                    keywords.add(value)
-            if field == 'location':
-                for value in values:
-                    keywords.add(_trim_location(value))
-            else:
-                for value in values:
-                    for kw in _extract_taxonomy_label(value):
-                        keywords.add(kw)
+            values += _get_nested_value(key, annons)
+        if field == 'employer':
+            for value in _create_employer_name_keywords(values):
+                keywords.add(value)
+        elif field == 'location':
+            for value in values:
+                trimmed = _trim_location(value)
+                if trimmed:
+                    keywords.add(trimmed)
+        else:
+            for value in values:
+                for kw in _extract_taxonomy_label(value):
+                    keywords.add(kw)
         annons['keywords']['extracted'][field] = list(keywords)
     return annons
 
@@ -315,7 +318,7 @@ def _create_employer_name_keywords(companynames):
         shortest = len(names[0])
         uniques = [names[0]]
         for i in range(1, len(names)):
-            if names[i][0:shortest] != names[0]:
+            if names[i][0:shortest] != names[0] and names[i]:
                 uniques.append(names[i])
 
         return uniques
@@ -339,7 +342,7 @@ def _trim_location(locationstring):
         # Magic regex
         valid_words = []
         for word in locationstring.lower().split():
-            if not re.match(regex, word) and word not in stopwords:
+            if word and not re.match(regex, word) and word not in stopwords:
                 valid_words.append(word)
         return ' '.join(valid_words)
     return locationstring
