@@ -1,5 +1,6 @@
 import logging
 import re
+from collections import OrderedDict
 from dateutil import parser
 from importers.repository import taxonomy
 
@@ -288,9 +289,8 @@ def _add_keywords(annons):
         for key in list(key_dict.values())[0]:
             values = _get_nested_value(key, annons)
             if field == 'employer':
-                for value in values:
-                    for kw_employer_name in create_employer_name_keywords(value):
-                        keywords.add(kw_employer_name)
+                for value in _create_employer_name_keywords(values):
+                    keywords.add(value)
             if field == 'location':
                 for value in values:
                     keywords.add(_trim_location(value))
@@ -302,22 +302,32 @@ def _add_keywords(annons):
     return annons
 
 
-def create_employer_name_keywords(companyname):
-    kw_list = []
-    if companyname:
+def _create_employer_name_keywords(companynames):
+    names = []
+    for companyname in companynames or []:
         converted_name = companyname.lower().strip()
-        converted_name = rightreplace(converted_name, ' ab', '')
-        converted_name = leftreplace(converted_name, 'ab ', '')
-        kw_list.append(converted_name)
+        converted_name = __rightreplace(converted_name, ' ab', '')
+        converted_name = __leftreplace(converted_name, 'ab ', '')
+        names.append(converted_name)
 
-    return kw_list
+    if names:
+        names.sort(key = lambda  s: len(s))
+        shortest = len(names[0])
+        uniques = [names[0]]
+        for i in range(1, len(names)):
+            if names[i][0:shortest] != names[0]:
+                uniques.append(names[i])
+
+        return uniques
+
+    return []
 
 
-def rightreplace(astring, pattern, sub):
+def __rightreplace(astring, pattern, sub):
     return sub.join(astring.rsplit(pattern, 1))
 
 
-def leftreplace(astring, pattern, sub):
+def __leftreplace(astring, pattern, sub):
     return sub.join(astring.split(pattern, 1))
 
 

@@ -43,3 +43,31 @@ def test_isodate(parsing_date, not_parsing_date):
 def test_trim_location(location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     assert converter._trim_location(location) == expected
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("employer, expected", [(["Logopedbyrån Dynamica AB",
+                                                  "Logopedbyrån Dynamica Stockholm AB"],
+                                                 ["logopedbyrån dynamica"]),
+                                                (["Logopedbyrån Dynamica Stockholm AB",
+                                                  "AB Logopedbyrån Dynamica"],
+                                                 ["logopedbyrån dynamica"]),
+                                                (["AB Foo", "Foo"], ["foo"]),
+                                                (["  AB Foo", "AB Foo"], ["foo"]),
+                                                (["Foo Bar AB", "Foo Bar"], ["foo bar"]),
+                                                ([" Foo Bar AB"], ["foo bar"]),
+                                                ([" Foo Bar AB "], ["foo bar"]),
+                                                (["Fazer AB", "Gateau"],
+                                                 ["fazer", "gateau"]),
+                                                (["Fazer Stockholm AB", "Gateau"],
+                                                 ["gateau", "fazer stockholm"]),
+                                                (["Fazer Stockholm AB", "Gateau", "Foo"],
+                                                 ["foo", "gateau", "fazer stockholm"]),
+                                                (["Fazer Stockholm AB", "Gateau",
+                                                  "Gateau"],
+                                                 ["gateau", "fazer stockholm"]),
+                                                (None, [])
+                                                ])
+def test_create_employer_name(employer, expected):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    assert converter._create_employer_name_keywords(employer) == expected
