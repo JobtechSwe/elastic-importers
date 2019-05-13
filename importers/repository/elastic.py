@@ -74,31 +74,31 @@ def get_glitch_jobtechjobs_ids(max_items=None):
     a deadline in the past.
     '''
     query = {
-        "query":{
-        "bool": {
-            "must_not": [
-                {
-                    "exists": {
-                        "field": "source.removedAt"
-                    }
-                }
-            ],
-            "must": [
-                {
-                    "exists": {
-                        "field": "application.deadline"
-                    }
-                },
-                {
-                    "range": {
-                        "application.deadline": {
-                            "lt": "now/m"
+        "query": {
+            "bool": {
+                "must_not": [
+                    {
+                        "exists": {
+                            "field": "source.removedAt"
                         }
                     }
-                }
-            ]
-        }
-    }}
+                ],
+                "must": [
+                    {
+                        "exists": {
+                            "field": "application.deadline"
+                        }
+                    },
+                    {
+                        "range": {
+                            "application.deadline": {
+                                "lt": "now/m"
+                            }
+                        }
+                    }
+                ]
+            }
+        }}
     doc_counter = 0
 
     ids = []
@@ -160,9 +160,7 @@ def setup_indices(args, default_index, mappings):
         log.info("Setting up alias %s for index %s" % (read_alias, es_index))
         put_alias([es_index], read_alias)
 
-        return write_alias
-
-    return es_index
+    return write_alias or es_index
 
 
 def create_index(indexname, extra_mappings=None):
