@@ -1,6 +1,7 @@
 import sys
 import time
 import logging
+import itertools
 from importers.repository import elastic, postgresql
 from importers import settings
 from importers import common
@@ -58,6 +59,56 @@ def start():
 
     elapsed_time = time.time() - start_time
     log.info("Indexed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+
+
+def glitchfix():
+    log.info('Starting glitchfix for %s with PG_BATCH_SIZE: %s'
+             % (IMPORTER_NAME, settings.PG_BATCH_SIZE))
+    start_time = time.time()
+
+    try:
+        es_index = elastic.setup_indices(sys.argv, settings.ES_AURANEST_PREFIX,
+                                         settings.auranest_mappings)
+    except Exception as e:
+        log.error("Failed to setup elastic: %s" % str(e))
+        sys.exit(1)
+
+    doc_counter = 0
+
+    glitch_ids = elastic.get_glitch_jobtechjobs_ids()
+    log.info("Found %s glitchfix ads in Elastic" % len(glitch_ids))
+
+    if len(glitch_ids) > 0:
+        log.info("Processing %s ads with a batchsize of %s" % (len(glitch_ids), settings.PG_BATCH_SIZE))
+
+        id_batches = grouper(int(settings.PG_BATCH_SIZE), glitch_ids)
+
+        for i, id_batch in enumerate(id_batches):
+            id_batch_ids = [id for id in id_batch]
+            postgres_glitch_ads = postgresql.read_docs_with_ids(settings.PG_AURANEST_TABLE, id_batch_ids)
+
+            glitch_ads = [ad for ad in postgres_glitch_ads if ad['source'] and ad['source']['removedAt']]
+            current_doc_count = len(glitch_ads)
+            doc_counter += current_doc_count
+            log.info('Found %s/%s glitchfix ads in postgres' % (current_doc_count, len(postgres_glitch_ads)))
+            if current_doc_count > 0:
+                try:
+                    trim_auranest_ids(glitch_ads)
+                    enriched_annonser = enr.enrich(glitch_ads,
+                                                   parallelism=settings.ENRICHER_PROCESSES)
+                    elastic.bulk_index(enriched_annonser, es_index)
+                    log.info("Indexed %d glitchfix docs so far." % doc_counter)
+                except Exception as e:
+                    log.error("Glitchfix import failed", e)
+                    sys.exit(1)
+
+    elapsed_time = time.time() - start_time
+    log.info("Glitchfix - indexed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+
+
+def grouper(n, iterable):
+    iterable = iter(iterable)
+    return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
 def trim_auranest_ids(annonser):

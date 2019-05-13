@@ -16,6 +16,7 @@ setup(
             'import-platsannonser = importers.platsannons.main:start',
             'import-taxonomy = importers.taxonomy.main:start',
             'import-auranest = importers.auranest.main:start',
+            'glitchfix-auranest = importers.auranest.main:glitchfix',
             'set-read-alias-platsannons = '
             'importers.indexmaint.main:set_platsannons_read_alias',
             'set-write-alias-platsannons = '
