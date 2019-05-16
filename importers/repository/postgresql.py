@@ -32,6 +32,22 @@ def query(sql, args):
     cur.close()
     return rows
 
+def read_docs_with_ids(tablename, ids, converter=None):
+    cur = pg_conn.cursor()
+
+    sql_str = "SELECT id, timestamp, doc FROM " + tablename + \
+              " WHERE " \
+              " id in %(incl_id)s"
+    cur.execute(sql_str,
+                {'incl_id': tuple(ids if len(ids) > 0 else ['this string needed for sql syntax'])})
+    rows = cur.fetchall()
+
+    documents = [dict(converter.convert_message(row[2]) if converter else dict(row[2]),
+                      **{'id': row[0].strip(), 'timestamp': row[1]})
+                 for row in rows]
+
+    return documents
+
 
 def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
     cur = pg_conn.cursor()

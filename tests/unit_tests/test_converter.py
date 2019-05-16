@@ -43,3 +43,78 @@ def test_isodate(parsing_date, not_parsing_date):
 def test_trim_location(location, expected):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     assert converter._trim_location(location) == expected
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("employer, expected", [(["Logopedbyrån Dynamica AB",
+                                                  "Logopedbyrån Dynamica Stockholm AB"],
+                                                 ["logopedbyrån dynamica"]),
+                                                (["Logopedbyrån Dynamica Stockholm AB",
+                                                  "AB Logopedbyrån Dynamica"],
+                                                 ["logopedbyrån dynamica"]),
+                                                (["AB Foo", "Foo"], ["foo"]),
+                                                (["  AB Foo", "AB Foo"], ["foo"]),
+                                                (["Foo Bar AB", "Foo Bar"], ["foo bar"]),
+                                                ([" Foo Bar AB"], ["foo bar"]),
+                                                ([" Foo Bar AB "], ["foo bar"]),
+                                                (["Fazer AB", "Gateau"],
+                                                 ["fazer", "gateau"]),
+                                                (["Fazer Stockholm AB", "Gateau"],
+                                                 ["gateau", "fazer stockholm"]),
+                                                (["Fazer Stockholm AB", "Gateau", "Foo"],
+                                                 ["foo", "gateau", "fazer stockholm"]),
+                                                (["Fazer Stockholm AB", "Gateau",
+                                                  "Gateau"],
+                                                 ["gateau", "fazer stockholm"]),
+                                                (None, [])
+                                                ])
+def test_create_employer_name(employer, expected):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    assert converter._create_employer_name_keywords(employer) == expected
+
+
+@pytest.mark.unit
+@pytest.mark.parametrize("fake_ad, expected_location_count, expected_locations, \
+                         expected_employer_count, expected_employers",
+                         [
+                             ({
+                                 "workplace_address": {
+                                     "city": "Stockholm",
+                                     "municipality": "Stockholm",
+                                     "region": "Stockholms län",
+                                     "country": "Sverige"
+                                 },
+                                 "employer": {
+                                     "name": "TestByrån Obfuscatica Stockholm AB",
+                                     "workplace": "TestByrån Obfuscatica AB"
+                                 }
+                             }, 3, ['stockholm', 'stockholms län', 'sverige'],
+                                 1, ['testbyrån obfuscatica']),
+                             ({
+                                 "workplace_address": {
+                                     "city": "",
+                                     "municipality": "Stockholm",
+                                     "region": "Stockholms län",
+                                     "country": "Sverige"
+                                 },
+                                 "employer": {
+                                     "name": "TestByrån Obfuscatica Stockholm AB",
+                                     "workplace": "AB TestByrån Obfuscatica"
+                                 }
+                             }, 3, ['stockholm', 'stockholms län', 'sverige'],
+                                 1, ['testbyrån obfuscatica']),
+                         ])
+def test_extract_keywords(fake_ad, expected_location_count, expected_locations,
+                          expected_employer_count, expected_employers):
+    print('==================', sys._getframe().f_code.co_name, '================== ')
+    enriched_ad = converter._add_keywords(fake_ad)
+
+    for location in expected_locations:
+        assert location in enriched_ad['keywords']['extracted']['location']
+    assert len(enriched_ad['keywords']['extracted']['location']) \
+        == expected_location_count
+
+    for employer in expected_employers:
+        assert employer in enriched_ad['keywords']['extracted']['employer']
+    assert len(enriched_ad['keywords']['extracted']['employer']) \
+        == expected_employer_count

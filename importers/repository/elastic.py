@@ -2,7 +2,7 @@ import logging
 import certifi
 import time
 from ssl import create_default_context
-from elasticsearch.helpers import bulk
+from elasticsearch.helpers import bulk, scan
 from elasticsearch import Elasticsearch
 from importers import settings
 
@@ -68,6 +68,48 @@ def get_ids_with_timestamp(ts, indexname):
     return [hit['_source']['id'] for hit in hits]
 
 
+def get_glitch_jobtechjobs_ids(max_items=None):
+    '''
+    Gets ids for ads that lacks "removedAt" but has
+    a deadline in the past.
+    '''
+    query = {
+        "query": {
+            "bool": {
+                "must_not": [
+                    {
+                        "exists": {
+                            "field": "source.removedAt"
+                        }
+                    }
+                ],
+                "must": [
+                    {
+                        "exists": {
+                            "field": "application.deadline"
+                        }
+                    },
+                    {
+                        "range": {
+                            "application.deadline": {
+                                "lt": "now/m"
+                            }
+                        }
+                    }
+                ]
+            }
+        }}
+    doc_counter = 0
+
+    ids = []
+    for doc in scan(es, query=query, index=settings.ES_AURANEST_INDEX, size=1000):
+        doc_counter += 1
+        if max_items and doc_counter > max_items:
+            break
+        ids.append(doc['_source']['id'])
+    return ids
+
+
 def index_exists(indexname):
     es_available = False
     fail_count = 0
@@ -118,9 +160,7 @@ def setup_indices(args, default_index, mappings):
         log.info("Setting up alias %s for index %s" % (read_alias, es_index))
         put_alias([es_index], read_alias)
 
-        return write_alias
-
-    return es_index
+    return write_alias or es_index
 
 
 def create_index(indexname, extra_mappings=None):
