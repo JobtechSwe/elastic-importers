@@ -1,6 +1,5 @@
 import logging
 import re
-from collections import OrderedDict
 from dateutil import parser
 from importers.repository import taxonomy
 
@@ -135,15 +134,19 @@ def convert_message(message_envelope):
             'region': lansnamn,
             'country_code': landskod,
             'country': land,
-            'street_address': message.get('besoksadress', {}).get('gatuadress'),
-            'postcode': message.get('postadress', {}).get('postnr'),
-            'city': message.get('postadress', {}).get('postort'),
+            # 'street_address': message.get('besoksadress', {}).get('gatuadress'),
+            'street_address': arbplatsmessage.get('gatuadress', ''),
+            # 'postcode': message.get('postadress', {}).get('postnr'),
+            'postcode': arbplatsmessage.get('postnr'),
+            # 'city': message.get('postadress', {}).get('postort'),
+            'city': arbplatsmessage.get('postort'),
             'coordinates': [longitud, latitud]
         }
 
         annons['must_have'] = {
             'skills': [
-                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'),
+                get_concept_as_annons_value_with_weight('kompetens',
+                                                        kompetens.get('varde'),
                                                         kompetens.get('vikt'))
                 for kompetens in message.get('kompetenser', [])
                 if get_null_safe_value(kompetens, 'vikt', 0) == MUST_HAVE_WEIGHT
@@ -232,7 +235,8 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
         weighted_concept['concept_id'] = concept.get('concept_id', None)
         weighted_concept['label'] = concept.get('label', None)
         weighted_concept['weight'] = weight
-        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id', None)
+        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id',
+                                                                 None)
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
     return weighted_concept
@@ -314,7 +318,7 @@ def _create_employer_name_keywords(companynames):
         names.append(converted_name)
 
     if names:
-        names.sort(key = lambda  s: len(s))
+        names.sort(key=lambda s: len(s))
         shortest = len(names[0])
         uniques = [names[0]]
         for i in range(1, len(names)):
