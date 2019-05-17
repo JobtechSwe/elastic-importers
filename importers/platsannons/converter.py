@@ -22,6 +22,18 @@ def _isodate(bad_date):
         return None
 
 
+def _get_default_scope_of_work(arbtidTyp):
+    default_max_omf = None
+    default_min_omf = None
+    if arbtidTyp == "1":
+        default_min_omf = 100
+        default_max_omf = 100
+    elif arbtidTyp == "2" or arbtidTyp == "3":
+        default_min_omf = 0
+        default_max_omf = 100
+    return (default_min_omf, default_max_omf)
+
+
 def convert_message(message_envelope):
     if 'version' in message_envelope:
         message = message_envelope
@@ -47,11 +59,13 @@ def convert_message(message_envelope):
                                                     'varaktighetTyp', message)
         annons['working_hours_type'] = _expand_taxonomy_value('arbetstidstyp',
                                                               'arbetstidTyp', message)
-        # If arbetstidstyp == 1 (heltid) then default omfattning == 100%
-        default_omf = 100 if message.get('arbetstidTyp', {}).get('varde') == "1" else None
+        (default_min_omf,
+         default_max_omf) = _get_default_scope_of_work(
+             message.get('arbetstidTyp', {}).get('varde')
+         )
         annons['scope_of_work'] = {
-            'min': message.get('arbetstidOmfattningFran', default_omf),
-            'max': message.get('arbetstidOmfattningTill', default_omf)
+            'min': message.get('arbetstidOmfattningFran', default_min_omf),
+            'max': message.get('arbetstidOmfattningTill', default_max_omf)
         }
         annons['access'] = message.get('tilltrade')
         annons['employer'] = {
