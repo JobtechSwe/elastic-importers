@@ -1,9 +1,7 @@
-FROM ubuntu:latest
-
-RUN apt-get update
+FROM ubuntu:18.10
 
 # Install packages to allow apt to use a repository over HTTPS:
-RUN apt-get install -yq --no-install-recommends --fix-missing \
+RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing \
     apt-transport-https \
     ca-certificates \
     python3.7 \
@@ -26,10 +24,11 @@ RUN apt-get install -yq --no-install-recommends --fix-missing \
 COPY . /app
 
 WORKDIR /app
-RUN python3 -m pip install -r requirements.txt
-RUN python3 setup.py install
+
 # runs unit tests with @pytest.mark.unit annotation only
-RUN python3 -m pytest -s -m unit tests/
+RUN python3 -m pip install -r requirements.txt && \
+    python3 setup.py install && \
+    python3 -m pytest -s -m unit tests/
 
 
 WORKDIR /
