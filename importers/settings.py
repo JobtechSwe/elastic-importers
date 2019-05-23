@@ -21,6 +21,17 @@ ENRICHER_PARAM_DOC_TEXT = 'doc_text'
 ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
 platsannons_mappings = {
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "simple_word_splitter": {
+                    "type": "custom",
+                    "tokenizer": "whitespace",
+                    "filter": ["lowercase"]
+                }
+            }
+        }
+    },
     "mappings": {
         "properties": {
             "id": {
@@ -28,6 +39,15 @@ platsannons_mappings = {
             },
             "external_id": {
                 "type": "keyword"
+            },
+            "headline": {
+                "type": "text",
+                "fields": {
+                    "words": {
+                        "type": "text",
+                        "analyzer": "whitespace"
+                    }
+                }
             },
             "keywords": {
                 "type": "object",
@@ -161,7 +181,7 @@ PG_DBNAME = os.getenv("PG_DBNAME")
 PG_USER = os.getenv("PG_USER")
 PG_PASSWORD = os.getenv("PG_PASSWORD")
 PG_BATCH_SIZE = os.getenv("PG_BATCH_SIZE", 1000)
-PG_PLATSANNONS_TABLE = os.getenv("PG_PLATSANNONS_TABLE", "platsannonser")
+PG_PLATSANNONS_TABLE = os.getenv("PG_PLATSANNONS_TABLE", "platsannons_la")
 PG_AURANEST_TABLE = os.getenv("PG_AURANEST_TABLE", "auranest")
 PG_SSLMODE = os.getenv("PG_SSLMODE", 'require')
 
