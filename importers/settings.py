@@ -141,6 +141,9 @@ platsannons_mappings = {
                     "municipality_code": {
                         "type": "keyword",
                     },
+                    "municipality_concept_id": {
+                        "type": "keyword",
+                    },
                     "region_code": {
                         "type": "keyword",
                         "fields": {
@@ -150,9 +153,15 @@ platsannons_mappings = {
                             }
                         }
                     },
+                    "region_concept_id": {
+                        "type": "keyword",
+                    },
                     "country_code": {
                         "type": "keyword",
                         "null_value": "199"  # Assume Sweden when not specified
+                    },
+                    "country_concept_id": {
+                        "type": "keyword",
                     },
                     "coordinates": {
                         "type": "geo_point",

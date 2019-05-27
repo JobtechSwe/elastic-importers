@@ -122,19 +122,30 @@ def convert_message(message_envelope):
         kommun = None
         lansnamn = None
         kommunkod = None
+        kommun_concept_id = None
         lanskod = None
+        lan_concept_id = None
         land = None
+        land_concept_id = None
         landskod = None
         longitud = None
         latitud = None
         if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
             kommunkod = arbplatsmessage.get('kommun', {}).get('varde', {})
+            kommun_concept_id = taxonomy.get_concept_by_legacy_id('kommun',
+                                                                  kommunkod)['concept_id']
             kommun = arbplatsmessage.get('kommun', {}).get('namn', {})
         if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
             lanskod = arbplatsmessage.get('lan', {}).get('varde', {})
+            lan_temp = taxonomy.get_concept_by_legacy_id('lan', lanskod)
+            if 'concept_id' in lan_temp:
+                lan_concept_id = lan_temp['concept_id']
             lansnamn = arbplatsmessage.get('lan', {}).get('namn', {})
         if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
             landskod = arbplatsmessage.get('land', {}).get('varde', {})
+            land_temp = taxonomy.get_concept_by_legacy_id('land', landskod)
+            if 'concept_id' in land_temp:
+                land_concept_id = land_temp['concept_id']
             land = arbplatsmessage.get('land', {}).get('namn', {})
         if 'longitud' in arbplatsmessage and arbplatsmessage.get('longitud'):
             longitud = float(arbplatsmessage.get('longitud'))
@@ -143,10 +154,13 @@ def convert_message(message_envelope):
 
         annons['workplace_address'] = {
             'municipality_code': kommunkod,
+            'municipality_concept_id': kommun_concept_id,
             'municipality': kommun,
             'region_code': lanskod,
+            'region_concept_id': lan_concept_id,
             'region': lansnamn,
             'country_code': landskod,
+            'country_concept_id': land_concept_id,
             'country': land,
             # 'street_address': message.get('besoksadress', {}).get('gatuadress'),
             'street_address': arbplatsmessage.get('gatuadress', ''),
