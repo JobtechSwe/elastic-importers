@@ -1,6 +1,5 @@
 import logging
 import re
-from collections import OrderedDict
 from dateutil import parser
 from importers.repository import taxonomy
 
@@ -21,6 +20,18 @@ def _isodate(bad_date):
     except ValueError as e:
         log.error('Failed to parse %s as a valid date' % bad_date, e)
         return None
+
+
+def _get_default_scope_of_work(arbtidTyp):
+    default_max_omf = None
+    default_min_omf = None
+    if arbtidTyp == "1":
+        default_min_omf = 100
+        default_max_omf = 100
+    elif arbtidTyp == "2" or arbtidTyp == "3":
+        default_min_omf = 0
+        default_max_omf = 100
+    return (default_min_omf, default_max_omf)
 
 
 def convert_message(message_envelope):
@@ -48,11 +59,13 @@ def convert_message(message_envelope):
                                                     'varaktighetTyp', message)
         annons['working_hours_type'] = _expand_taxonomy_value('arbetstidstyp',
                                                               'arbetstidTyp', message)
-        # If arbetstidstyp == 1 (heltid) then default omfattning == 100%
-        default_omf = 100 if message.get('arbetstidTyp', {}).get('varde') == "1" else None
+        (default_min_omf,
+         default_max_omf) = _get_default_scope_of_work(
+             message.get('arbetstidTyp', {}).get('varde')
+         )
         annons['scope_of_work'] = {
-            'min': message.get('arbetstidOmfattningFran', default_omf),
-            'max': message.get('arbetstidOmfattningTill', default_omf)
+            'min': message.get('arbetstidOmfattningFran', default_min_omf),
+            'max': message.get('arbetstidOmfattningTill', default_max_omf)
         }
         annons['access'] = message.get('tilltrade')
         annons['employer'] = {
@@ -109,19 +122,30 @@ def convert_message(message_envelope):
         kommun = None
         lansnamn = None
         kommunkod = None
+        kommun_concept_id = None
         lanskod = None
+        lan_concept_id = None
         land = None
+        land_concept_id = None
         landskod = None
         longitud = None
         latitud = None
         if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
             kommunkod = arbplatsmessage.get('kommun', {}).get('varde', {})
+            kommun_concept_id = taxonomy.get_concept_by_legacy_id('kommun',
+                                                                  kommunkod)['concept_id']
             kommun = arbplatsmessage.get('kommun', {}).get('namn', {})
         if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
             lanskod = arbplatsmessage.get('lan', {}).get('varde', {})
+            lan_temp = taxonomy.get_concept_by_legacy_id('lan', lanskod)
+            if 'concept_id' in lan_temp:
+                lan_concept_id = lan_temp['concept_id']
             lansnamn = arbplatsmessage.get('lan', {}).get('namn', {})
         if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
             landskod = arbplatsmessage.get('land', {}).get('varde', {})
+            land_temp = taxonomy.get_concept_by_legacy_id('land', landskod)
+            if 'concept_id' in land_temp:
+                land_concept_id = land_temp['concept_id']
             land = arbplatsmessage.get('land', {}).get('namn', {})
         if 'longitud' in arbplatsmessage and arbplatsmessage.get('longitud'):
             longitud = float(arbplatsmessage.get('longitud'))
@@ -130,20 +154,27 @@ def convert_message(message_envelope):
 
         annons['workplace_address'] = {
             'municipality_code': kommunkod,
+            'municipality_concept_id': kommun_concept_id,
             'municipality': kommun,
             'region_code': lanskod,
+            'region_concept_id': lan_concept_id,
             'region': lansnamn,
             'country_code': landskod,
+            'country_concept_id': land_concept_id,
             'country': land,
-            'street_address': message.get('besoksadress', {}).get('gatuadress'),
-            'postcode': message.get('postadress', {}).get('postnr'),
-            'city': message.get('postadress', {}).get('postort'),
+            # 'street_address': message.get('besoksadress', {}).get('gatuadress'),
+            'street_address': arbplatsmessage.get('gatuadress', ''),
+            # 'postcode': message.get('postadress', {}).get('postnr'),
+            'postcode': arbplatsmessage.get('postnr'),
+            # 'city': message.get('postadress', {}).get('postort'),
+            'city': arbplatsmessage.get('postort'),
             'coordinates': [longitud, latitud]
         }
 
         annons['must_have'] = {
             'skills': [
-                get_concept_as_annons_value_with_weight('kompetens', kompetens.get('varde'),
+                get_concept_as_annons_value_with_weight('kompetens',
+                                                        kompetens.get('varde'),
                                                         kompetens.get('vikt'))
                 for kompetens in message.get('kompetenser', [])
                 if get_null_safe_value(kompetens, 'vikt', 0) == MUST_HAVE_WEIGHT
@@ -232,7 +263,8 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
         weighted_concept['concept_id'] = concept.get('concept_id', None)
         weighted_concept['label'] = concept.get('label', None)
         weighted_concept['weight'] = weight
-        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id', None)
+        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id',
+                                                                 None)
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
     return weighted_concept
@@ -314,7 +346,7 @@ def _create_employer_name_keywords(companynames):
         names.append(converted_name)
 
     if names:
-        names.sort(key = lambda  s: len(s))
+        names.sort(key=lambda s: len(s))
         shortest = len(names[0])
         uniques = [names[0]]
         for i in range(1, len(names)):

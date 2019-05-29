@@ -16,7 +16,8 @@ IMPORTER_NAME = 'af-platsannons'
 
 
 def start():
-    log.info('Starting importer %s with PG_BATCH_SIZE: %s' % (IMPORTER_NAME, settings.PG_BATCH_SIZE))
+    log.info('Starting importer %s with PG_BATCH_SIZE: %s' % (IMPORTER_NAME,
+                                                              settings.PG_BATCH_SIZE))
 
     start_time = time.time()
     try:
@@ -44,7 +45,8 @@ def start():
 
         if platsannonser:
             try:
-                enriched_platsannonser = enricher_mt_rest_multiple.enrich(platsannonser, parallelism=settings.ENRICHER_PROCESSES)
+                enriched_platsannonser = enricher_mt_rest_multiple.enrich(platsannonser,
+                                                                          parallelism=settings.ENRICHER_PROCESSES)
                 elastic.bulk_index(enriched_platsannonser, es_index)
                 log.info("Indexed %d docs so far." % doc_counter)
             except Exception as e:
