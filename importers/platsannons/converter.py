@@ -50,7 +50,6 @@ def convert_message(message_envelope):
             'requirements': message.get('beskrivningKrav'),
             'conditions': message.get('villkorsbeskrivning'),
         }
-        annons['workplace_id'] = message.get('arbetsplatsId')
         annons['employment_type'] = _expand_taxonomy_value('anstallningstyp',
                                                            'anstallningTyp',
                                                            message)
@@ -69,7 +68,6 @@ def convert_message(message_envelope):
         }
         annons['access'] = message.get('tilltrade')
         annons['employer'] = {
-            'id': message.get('arbetsgivareId'),
             'phone_number': message.get('telefonnummer'),
             'email': message.get('epost'),
             'url': message.get('webbadress'),
@@ -223,7 +221,6 @@ def convert_message(message_envelope):
         annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
         annons['removed'] = message.get('avpublicerad')
         annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
-        annons['source_type'] = message.get('kallaTyp')
         # Extract labels as keywords for easier searching
         return _add_keywords(annons)
     else:
