@@ -68,7 +68,7 @@ def start(es_index=None):
 
 
 def start_daily_index():
-    new_index_name = "platsannons-%s" % datetime.now().strftime('%Y%m%d-%H%M')
+    new_index_name = "platsannons-%s" % datetime.now().strftime('%Y%m%d-%H')
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)
