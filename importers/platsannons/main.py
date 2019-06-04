@@ -6,7 +6,9 @@ from importers.repository import elastic, postgresql
 from importers.platsannons import converter
 from importers import settings
 from importers import common
-from importers.platsannons import enricher_mt_rest_multiple
+from importers.platsannons import enricher_mt_rest_multiple as enricher
+from importers.indexmaint.main import (set_platsannons_read_alias,
+                                       set_platsannons_write_alias)
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -15,14 +17,16 @@ log = logging.getLogger(__name__)
 IMPORTER_NAME = 'af-platsannons'
 
 
-def start():
-    log.info('Starting importer %s with PG_BATCH_SIZE: %s' % (IMPORTER_NAME,
-                                                              settings.PG_BATCH_SIZE))
+def start(es_index=None):
+    if len(sys.argv) > 1:
+        es_index = sys.argv[1]
 
     start_time = time.time()
     try:
-        es_index = elastic.setup_indices(sys.argv, settings.ES_ANNONS_PREFIX,
+        es_index = elastic.setup_indices(es_index, settings.ES_ANNONS_PREFIX,
                                          settings.platsannons_mappings)
+        log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
+                 % (IMPORTER_NAME, settings.PG_BATCH_SIZE, es_index))
         last_timestamp = elastic.get_last_timestamp(es_index)
         log.info("Last timestamp: %d (%s)" % (last_timestamp,
                                               datetime.fromtimestamp(
@@ -45,9 +49,9 @@ def start():
 
         if platsannonser:
             try:
-                enriched_platsannonser = enricher_mt_rest_multiple.enrich(platsannonser,
-                                                                          parallelism=settings.ENRICHER_PROCESSES)
-                elastic.bulk_index(enriched_platsannonser, es_index)
+                enriched_ads = enricher.enrich(platsannonser,
+                                               parallelism=settings.ENRICHER_PROCESSES)
+                elastic.bulk_index(enriched_ads, es_index)
                 log.info("Indexed %d docs so far." % doc_counter)
             except Exception as e:
                 log.error("Import failed", e)
@@ -61,6 +65,13 @@ def start():
     elapsed_time = time.time() - start_time
 
     log.info("Indexed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+
+
+def start_daily_index():
+    new_index_name = "platsannons-%s" % datetime.now().strftime('%Y%m%d-%H%M')
+    start(new_index_name)
+    set_platsannons_read_alias(new_index_name)
+    set_platsannons_write_alias(new_index_name)
 
 
 if __name__ == '__main__':

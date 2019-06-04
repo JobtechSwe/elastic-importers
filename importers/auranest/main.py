@@ -15,12 +15,14 @@ log = logging.getLogger(__name__)
 IMPORTER_NAME = 'auranest'
 
 
-def start():
+def start(es_index=None):
     log.info('Starting importer %s with PG_BATCH_SIZE: %s'
              % (IMPORTER_NAME, settings.PG_BATCH_SIZE))
     start_time = time.time()
+    if len(sys.argv) > 1:
+        es_index = sys.argv[1]
     try:
-        es_index = elastic.setup_indices(sys.argv, settings.ES_AURANEST_PREFIX,
+        es_index = elastic.setup_indices(es_index, settings.ES_AURANEST_PREFIX,
                                          settings.auranest_mappings)
         last_timestamp = elastic.get_last_timestamp(es_index)
         log.debug("Last timestamp: %d" % last_timestamp)
@@ -65,9 +67,13 @@ def glitchfix():
     log.info('Starting glitchfix for %s with PG_BATCH_SIZE: %s'
              % (IMPORTER_NAME, settings.PG_BATCH_SIZE))
     start_time = time.time()
+    if len(sys.argv) > 1:
+        es_index = sys.argv[1]
+    else:
+        es_index = None
 
     try:
-        es_index = elastic.setup_indices(sys.argv, settings.ES_AURANEST_PREFIX,
+        es_index = elastic.setup_indices(es_index, settings.ES_AURANEST_PREFIX,
                                          settings.auranest_mappings)
     except Exception as e:
         log.error("Failed to setup elastic: %s" % str(e))
@@ -79,24 +85,29 @@ def glitchfix():
     log.info("Found %s glitchfix ads in Elastic" % len(glitch_ids))
 
     if len(glitch_ids) > 0:
-        log.info("Processing %s ads with a batchsize of %s" % (len(glitch_ids), settings.PG_BATCH_SIZE))
+        log.info("Processing %s ads with a batchsize of %s" % (len(glitch_ids),
+                                                               settings.PG_BATCH_SIZE))
 
         id_batches = grouper(int(settings.PG_BATCH_SIZE), glitch_ids)
 
         for i, id_batch in enumerate(id_batches):
             id_batch_ids = [id for id in id_batch]
-            postgres_glitch_ads = postgresql.read_docs_with_ids(settings.PG_AURANEST_TABLE, id_batch_ids)
+            postgres_glitch_ads = postgresql.read_docs_with_ids(
+                settings.PG_AURANEST_TABLE, id_batch_ids
+            )
 
-            glitch_ads = [ad for ad in postgres_glitch_ads if ad['source'] and ad['source']['removedAt']]
+            glitch_ads = [ad for ad in postgres_glitch_ads
+                          if ad['source'] and ad['source']['removedAt']]
             current_doc_count = len(glitch_ads)
             doc_counter += current_doc_count
-            log.info('Found %s/%s glitchfix ads in postgres' % (current_doc_count, len(postgres_glitch_ads)))
+            log.info('Found %s/%s glitchfix ads in postgres' % (current_doc_count,
+                                                                len(postgres_glitch_ads)))
             if current_doc_count > 0:
                 try:
                     trim_auranest_ids(glitch_ads)
-                    enriched_annonser = enr.enrich(glitch_ads,
-                                                   parallelism=settings.ENRICHER_PROCESSES)
-                    elastic.bulk_index(enriched_annonser, es_index)
+                    enriched_ads = enr.enrich(glitch_ads,
+                                              parallelism=settings.ENRICHER_PROCESSES)
+                    elastic.bulk_index(enriched_ads, es_index)
                     log.info("Indexed %d glitchfix docs so far." % doc_counter)
                 except Exception as e:
                     log.error("Glitchfix import failed", e)
