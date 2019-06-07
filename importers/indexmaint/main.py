@@ -7,22 +7,24 @@ WRITE_SUFFIX = '-write'
 READ_SUFFIX = '-read'
 
 
-def set_platsannons_read_alias():
-    if len(sys.argv) < 1:
+def set_platsannons_read_alias(idxname=None):
+    if len(sys.argv) > 1:
+        idxname = sys.argv[1]
+    if not idxname:
         print("Must provide name of index to alias against.")
         sys.exit(1)
 
-    idxname = sys.argv[1]
     aliasname = "%s%s" % (settings.ES_ANNONS_PREFIX, READ_SUFFIX)
     change_alias(idxname, aliasname)
 
 
-def set_platsannons_write_alias():
-    if len(sys.argv) < 1:
+def set_platsannons_write_alias(idxname=None):
+    if len(sys.argv) > 1:
+        idxname = sys.argv[1]
+    if not idxname:
         print("Must provide name of index to alias against.")
         sys.exit(1)
 
-    idxname = sys.argv[1]
     change_alias(idxname, settings.ES_ANNONS_INDEX)
 
 

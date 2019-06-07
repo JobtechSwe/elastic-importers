@@ -14,6 +14,7 @@ setup(
     entry_points={
         'console_scripts': [
             'import-platsannonser = importers.platsannons.main:start',
+            'import-platsannonser-daily = importers.platsannons.main:start_daily_index',
             'import-taxonomy = importers.taxonomy.main:start',
             'import-auranest = importers.auranest.main:start',
             'glitchfix-auranest = importers.auranest.main:glitchfix',

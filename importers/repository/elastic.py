@@ -141,12 +141,10 @@ def put_alias(indexlist, aliasname):
     return es.indices.put_alias(index=indexlist, name=aliasname)
 
 
-def setup_indices(args, default_index, mappings):
+def setup_indices(es_index, default_index, mappings):
     write_alias = None
     read_alias = None
-    if len(args) > 1:
-        es_index = args[1]
-    else:
+    if not es_index:
         es_index = default_index
         write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
         read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
