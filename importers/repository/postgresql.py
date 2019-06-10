@@ -56,12 +56,14 @@ def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
     sql_last_ids = [str(id) for id in last_ids]
 
     sql_str = "SELECT id, timestamp, doc FROM " + tablename + \
-              " WHERE timestamp >= %(ts)s AND (expires IS NULL OR expires > %(exp)s)" \
+              " WHERE timestamp >= %(ts)s AND (expires IS NULL OR expires > %(expires)s)" \
+              " AND expired = %(expired)s" \
               " AND id not in %(excl_id)s" \
               " ORDER BY timestamp ASC LIMIT %(limit)s"
     cur.execute(sql_str,
                 {'ts':timestamp,
-                 'exp': ts_today,
+                 'expires': ts_today,
+                 'expired': False,
                  'excl_id': tuple(sql_last_ids if len(sql_last_ids) > 0 else ['this string needed for sql syntax']),
                  'limit': settings.PG_BATCH_SIZE})
     rows = cur.fetchall()
