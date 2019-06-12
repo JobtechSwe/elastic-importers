@@ -221,6 +221,7 @@ def convert_message(message_envelope):
         annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
         annons['removed'] = message.get('avpublicerad')
         annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
+        annons['source_type'] = message.get('kallaTyp')
         # Extract labels as keywords for easier searching
         return _add_keywords(annons)
     else:
