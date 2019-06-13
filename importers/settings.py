@@ -45,7 +45,7 @@ platsannons_mappings = {
                 "fields": {
                     "words": {
                         "type": "text",
-                        "analyzer": "whitespace"
+                        "analyzer": "simple_word_splitter"
                     }
                 }
             },
