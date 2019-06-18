@@ -27,7 +27,13 @@ platsannons_mappings = {
                 "simple_word_splitter": {
                     "type": "custom",
                     "tokenizer": "whitespace",
-                    "filter": ["lowercase"]
+                    "filter": ["lowercase", "light_swe_stemmer"]
+                }
+            },
+            "filter": {
+                "light_swe_stemmer": {
+                    "type": "stemmer",
+                    "name": "light_swedish"
                 }
             }
         }
@@ -44,6 +50,15 @@ platsannons_mappings = {
                 "type": "text",
                 "fields": {
                     "words": {
+                        "type": "text",
+                        "analyzer": "simple_word_splitter"
+                    }
+                }
+            },
+            "description": {
+                "type": "object",
+                "properties": {
+                    "text": {
                         "type": "text",
                         "analyzer": "simple_word_splitter"
                     }
