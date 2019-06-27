@@ -45,6 +45,7 @@ def convert_message(message_envelope):
         annons['number_of_vacancies'] = message.get('antalPlatser')
         annons['description'] = {
             'text': message.get('annonstext'),
+            'text_formatted': message.get('annonstextFormaterad'),
             'company_information': message.get('ftgInfo'),
             'needs': message.get('beskrivningBehov'),
             'requirements': message.get('beskrivningKrav'),
