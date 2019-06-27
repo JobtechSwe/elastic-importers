@@ -33,7 +33,7 @@ def enrich(annonser, parallelism=1):
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
         doc_headline = get_doc_headline_input(annons)
-        doc_text = annons.get('description', {}).get('text', '')
+        doc_text = annons.get('description', {}).get('text_formatted', '')
         if doc_id == '':
             raise ValueError('Document has no id, enrichment is not possible, headline: '
                              % (doc_headline))
@@ -91,7 +91,8 @@ def get_doc_headline_input(annons):
 
 
 def get_enrich_result(batch_indata, timeout):
-    headers = {'Content-Type': 'application/json', 'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
+    headers = {'Content-Type': 'application/json',
+               'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
     r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE,
                       headers=headers, json=batch_indata, timeout=timeout)
     r.raise_for_status()
@@ -129,7 +130,6 @@ def execute_calls(batch_indatas, parallelism):
 def enrich_doc(annons, enriched_output):
     if 'keywords' not in annons:
         annons['keywords'] = {}
-
 
     if 'enriched' not in annons['keywords']:
         annons['keywords']['enriched'] = {}
