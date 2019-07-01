@@ -8,7 +8,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'valuestore', 'psycopg2-binary', 'elasticsearch', 'zeep',
-        'python-dateutil', 'flashtext'
+        'python-dateutil', 'flashtext', 'jobtech-common'
     ],
     package_data={'': ['**/resources/*']},
     entry_points={
