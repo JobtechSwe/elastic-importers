@@ -11,7 +11,7 @@ from importers.platsannons import enricher_mt_rest_multiple as enricher
 from importers.indexmaint.main import (set_platsannons_read_alias,
                                        set_platsannons_write_alias)
 
-configure_logging()
+configure_logging([__name__.split('.')[0], 'jobtech'])
 
 log = logging.getLogger(__name__)
 IMPORTER_NAME = 'af-platsannons'
