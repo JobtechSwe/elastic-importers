@@ -8,7 +8,7 @@ from importers import settings
 from importers import common
 from importers.auranest import enricher_mt_rest_multiple as enr
 
-configure_logging()
+configure_logging([__name__.split('.')[0], 'jobtech'])
 
 log = logging.getLogger(__name__)
 

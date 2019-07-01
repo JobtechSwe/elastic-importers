@@ -1,12 +1,11 @@
 import logging
+from jobtech.common.customlogging import configure_logging
 from importers.taxonomy import settings, taxonomy_service
 from importers.repository import elastic
 import pickle
-import os
 
 
-logging.basicConfig()
-logging.getLogger(__name__).setLevel(logging.INFO)
+configure_logging([__name__.split('.')[0], 'jobtech'])
 log = logging.getLogger(__name__)
 
 
