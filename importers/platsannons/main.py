@@ -2,6 +2,7 @@ import sys
 import logging
 import time
 from datetime import datetime
+from jobtech.common.customlogging import configure_logging
 from importers.repository import elastic, postgresql
 from importers.platsannons import converter
 from importers import settings
@@ -10,8 +11,7 @@ from importers.platsannons import enricher_mt_rest_multiple as enricher
 from importers.indexmaint.main import (set_platsannons_read_alias,
                                        set_platsannons_write_alias)
 
-logging.basicConfig()
-logging.getLogger(__name__).setLevel(logging.INFO)
+configure_logging([__name__.split('.')[0], 'jobtech'])
 
 log = logging.getLogger(__name__)
 IMPORTER_NAME = 'af-platsannons'

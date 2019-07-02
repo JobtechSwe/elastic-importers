@@ -2,13 +2,13 @@ import sys
 import time
 import logging
 import itertools
+from jobtech.common.customlogging import configure_logging
 from importers.repository import elastic, postgresql
 from importers import settings
 from importers import common
 from importers.auranest import enricher_mt_rest_multiple as enr
 
-logging.basicConfig()
-logging.getLogger(__name__).setLevel(logging.INFO)
+configure_logging([__name__.split('.')[0], 'jobtech'])
 
 log = logging.getLogger(__name__)
 

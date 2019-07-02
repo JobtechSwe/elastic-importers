@@ -43,7 +43,8 @@ platsannons_mappings = {
                     "mappings": [
                         ". => ",
                         ", => ",
-                        ": => "
+                        ": => ",
+                        "! => "
                     ]
                 }
             }
