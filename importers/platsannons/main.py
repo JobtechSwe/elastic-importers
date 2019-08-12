@@ -8,6 +8,7 @@ from importers.platsannons import converter
 from importers import settings
 from importers import common
 from importers.platsannons import enricher_mt_rest_multiple as enricher
+from importers.platsannons import enricher_company_logo
 from importers.indexmaint.main import (set_platsannons_read_alias,
                                        set_platsannons_write_alias)
 
@@ -49,6 +50,7 @@ def start(es_index=None):
 
         if platsannonser:
             try:
+                platsannonser = enricher_company_logo.enrich(platsannonser)
                 enriched_ads = enricher.enrich(platsannonser,
                                                parallelism=settings.ENRICHER_PROCESSES)
                 elastic.bulk_index(enriched_ads, es_index)
