@@ -1,4 +1,3 @@
-import json
 from importers.repository import elastic
 from valuestore.taxonomy import get_term as gt, get_entity as ge, find_concept_by_legacy_ams_taxonomy_id as fcbla
 
@@ -21,7 +20,7 @@ def get_entity(taxtype, taxid, not_found_response=None):
 
 
 def get_concept_by_legacy_id(taxtype, legacy_id, not_found_response=None):
-    key = "concept-%s-%s-%s" % (taxtype, legacy_id, str(not_found_response))
+    key = "concept-%s-%s-%s" % (str(taxtype), legacy_id, str(not_found_response))
     if key not in tax_value_cache:
         value = fcbla(elastic.es, taxtype, legacy_id, not_found_response)
         if value:
