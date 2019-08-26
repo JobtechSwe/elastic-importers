@@ -64,7 +64,8 @@ def convert_message(message_envelope):
             'url': message.get('webbadress'),
             'organization_number': message.get('organisationsnummer'),
             'name': message.get('arbetsgivareNamn'),
-            'workplace': message.get('arbetsplatsNamn')
+            'workplace': message.get('arbetsplatsNamn'),
+            'workplace_id': message.get('arbetsplatsId')
         }
         annons['application_details'] = {
             'information': message.get('informationAnsokningssatt'),
