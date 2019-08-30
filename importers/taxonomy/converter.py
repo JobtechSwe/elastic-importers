@@ -1,6 +1,6 @@
 import logging
 from collections import OrderedDict
-from valuestore.taxonomy import tax_type, DEPRECATED_EDUCATION_FIELD, DEPRECATED_EDUCATION_LEVEL, JobtechTaxonomy as jt
+from valuestore.taxonomy import JobtechTaxonomy as jt
 
 
 logging.basicConfig()
@@ -207,8 +207,9 @@ def create_valuestore_education_fields(taxonomy_education_field_SUN1, taxonomy_e
 
     return (education_field_SUN1, education_field_SUN2, education_field_SUN3)
 
-def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_education_levels_SUN2, taxonomy_education_levels_SUN3):
 
+def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_education_levels_SUN2,
+                                       taxonomy_education_levels_SUN3):
     education_levels_SUN1 = {
         field['SUNLevel1ID']:
             OrderedDict([('legacy_ams_taxonomy_id', str(field['SUNLevel1Code'])),

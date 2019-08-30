@@ -27,7 +27,7 @@ platsannons_mappings = {
                 "simple_word_splitter": {
                     "type": "custom",
                     "tokenizer": "whitespace",
-                    "filter": ["lowercase", "light_swe_stemmer"],
+                    "filter": ["lowercase", "custom_stems", "light_swe_stemmer"],
                     "char_filter": ["punctuation_filter"]
                 }
             },
@@ -35,6 +35,14 @@ platsannons_mappings = {
                 "light_swe_stemmer": {
                     "type": "stemmer",
                     "name": "light_swedish"
+                },
+                "custom_stems": {
+                    "type": "stemmer_override",
+                    "rules": [
+                        "sala => sala",
+                        "sale => sale",
+                        "sales => sale"
+                    ]
                 }
             },
             "char_filter": {

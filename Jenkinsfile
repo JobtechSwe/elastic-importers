@@ -31,7 +31,6 @@ pipeline {
             steps{
                 sh "oc patch cronjobs/import-taxonomy --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/${openshiftProject}/${buildName}:${buildTag}\"}]' -n ${openshiftProject}"
                 sh "oc patch cronjobs/import-platsannonser --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/${openshiftProject}/${buildName}:${buildTag}\"}]' -n ${openshiftProject}"
-                sh "oc patch cronjobs/import-jobtechjobs --type=json -p='[{\"op\":\"replace\", \"path\": \"/spec/jobTemplate/spec/template/spec/containers/0/image\", \"value\":\"docker-registry.default.svc:5000/${openshiftProject}/${buildName}:${buildTag}\"}]' -n ${openshiftProject}"
             }
         }
     }

@@ -2,6 +2,7 @@ import logging
 import re
 from dateutil import parser
 from importers.repository import taxonomy
+from elasticsearch.exceptions import RequestError
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -20,18 +21,6 @@ def _isodate(bad_date):
     except ValueError as e:
         log.error('Failed to parse %s as a valid date' % bad_date, e)
         return None
-
-
-def _get_default_scope_of_work(arbtidTyp):
-    default_max_omf = None
-    default_min_omf = None
-    if arbtidTyp == "1":
-        default_min_omf = 100
-        default_max_omf = 100
-    elif arbtidTyp == "2" or arbtidTyp == "3":
-        default_min_omf = 0
-        default_max_omf = 100
-    return (default_min_omf, default_max_omf)
 
 
 def convert_message(message_envelope):
@@ -55,6 +44,7 @@ def convert_message(message_envelope):
                                                            'anstallningTyp',
                                                            message)
         annons['salary_type'] = _expand_taxonomy_value('lonetyp', 'lonTyp', message)
+        annons['salary_description'] = message.get('lonebeskrivning')
         annons['duration'] = _expand_taxonomy_value('varaktighet',
                                                     'varaktighetTyp', message)
         annons['working_hours_type'] = _expand_taxonomy_value('arbetstidstyp',
@@ -74,7 +64,8 @@ def convert_message(message_envelope):
             'url': message.get('webbadress'),
             'organization_number': message.get('organisationsnummer'),
             'name': message.get('arbetsgivareNamn'),
-            'workplace': message.get('arbetsplatsNamn')
+            'workplace': message.get('arbetsplatsNamn'),
+            'workplace_id': message.get('arbetsplatsId')
         }
         annons['application_details'] = {
             'information': message.get('informationAnsokningssatt'),
@@ -91,84 +82,10 @@ def convert_message(message_envelope):
             annons['driving_license'] = parse_driving_licence(message)
         else:
             annons['driving_license_required'] = False
-        if 'yrkesroll' in message:
-            # jafhk fixa parsning för dessa med get_concept_by_legacy_id
-            yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll',
-                                                          message.get('yrkesroll',
-                                                                      {}).get('varde'))
-            if yrkesroll and 'parent' in yrkesroll:
-                yrkesgrupp = yrkesroll.get('parent')
-                yrkesomrade = yrkesgrupp.get('parent')
-                annons['occupation'] = {'concept_id': yrkesroll['concept_id'],
-                                        'label': yrkesroll['label'],
-                                        'legacy_ams_taxonomy_id':
-                                            yrkesroll['legacy_ams_taxonomy_id']}
-                annons['occupation_group'] = {'concept_id': yrkesgrupp['concept_id'],
-                                              'label': yrkesgrupp['label'],
-                                              'legacy_ams_taxonomy_id':
-                                                  yrkesgrupp['legacy_ams_taxonomy_id']}
-                annons['occupation_field'] = {'concept_id': yrkesomrade['concept_id'],
-                                              'label': yrkesomrade['label'],
-                                              'legacy_ams_taxonomy_id':
-                                                  yrkesomrade['legacy_ams_taxonomy_id']}
-            elif not yrkesroll:
-                log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
-                            % message['yrkesroll'])
-            else:  # yrkesroll is not None and 'parent' not in yrkesroll
-                log.warning('Parent not found for yrkesroll %s (%s)'
-                            % (message['yrkesroll'], yrkesroll))
-        arbplatsmessage = message.get('arbetsplatsadress', {})
-        kommun = None
-        lansnamn = None
-        kommunkod = None
-        kommun_concept_id = None
-        lanskod = None
-        lan_concept_id = None
-        land = None
-        land_concept_id = None
-        landskod = None
-        longitud = None
-        latitud = None
-        if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
-            kommunkod = arbplatsmessage.get('kommun', {}).get('varde', {})
-            kommun_concept_id = taxonomy.get_concept_by_legacy_id('kommun',
-                                                                  kommunkod)['concept_id']
-            kommun = arbplatsmessage.get('kommun', {}).get('namn', {})
-        if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
-            lanskod = arbplatsmessage.get('lan', {}).get('varde', {})
-            lan_temp = taxonomy.get_concept_by_legacy_id('lan', lanskod)
-            if 'concept_id' in lan_temp:
-                lan_concept_id = lan_temp['concept_id']
-            lansnamn = arbplatsmessage.get('lan', {}).get('namn', {})
-        if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
-            landskod = arbplatsmessage.get('land', {}).get('varde', {})
-            land_temp = taxonomy.get_concept_by_legacy_id('land', landskod)
-            if 'concept_id' in land_temp:
-                land_concept_id = land_temp['concept_id']
-            land = arbplatsmessage.get('land', {}).get('namn', {})
-        if 'longitud' in arbplatsmessage and arbplatsmessage.get('longitud'):
-            longitud = float(arbplatsmessage.get('longitud'))
-        if 'latitud' in arbplatsmessage and arbplatsmessage.get('latitud'):
-            latitud = float(arbplatsmessage.get('latitud'))
 
-        annons['workplace_address'] = {
-            'municipality_code': kommunkod,
-            'municipality_concept_id': kommun_concept_id,
-            'municipality': kommun,
-            'region_code': lanskod,
-            'region_concept_id': lan_concept_id,
-            'region': lansnamn,
-            'country_code': landskod,
-            'country_concept_id': land_concept_id,
-            'country': land,
-            # 'street_address': message.get('besoksadress', {}).get('gatuadress'),
-            'street_address': arbplatsmessage.get('gatuadress', ''),
-            # 'postcode': message.get('postadress', {}).get('postnr'),
-            'postcode': arbplatsmessage.get('postnr'),
-            # 'city': message.get('postadress', {}).get('postort'),
-            'city': arbplatsmessage.get('postort'),
-            'coordinates': [longitud, latitud]
-        }
+        _set_occupations(annons, message)
+
+        annons['workplace_address'] = _build_wp_address(message.get('arbetsplatsadress', {}))
 
         annons['must_have'] = {
             'skills': [
@@ -176,21 +93,23 @@ def convert_message(message_envelope):
                                                         kompetens.get('varde'),
                                                         kompetens.get('vikt'))
                 for kompetens in message.get('kompetenser', [])
-                if get_null_safe_value(kompetens, 'vikt', 0) == MUST_HAVE_WEIGHT
+                if get_null_safe_value(kompetens, 'vikt', 0) >= MUST_HAVE_WEIGHT
             ],
             'languages': [
                 get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'),
                                                         sprak.get('vikt'))
                 for sprak in message.get('sprak', [])
-                if get_null_safe_value(sprak, 'vikt', 0) == MUST_HAVE_WEIGHT
+                if get_null_safe_value(sprak, 'vikt', 0) >= MUST_HAVE_WEIGHT
             ],
             'work_experiences': [
                 get_concept_as_annons_value_with_weight('yrkesroll',
                                                         yrkerf.get('varde'),
                                                         yrkerf.get('vikt'))
                 for yrkerf in message.get('yrkeserfarenheter', [])
-                if get_null_safe_value(yrkerf, 'vikt', 0) == MUST_HAVE_WEIGHT
-            ]
+                if get_null_safe_value(yrkerf, 'vikt', 0) >= MUST_HAVE_WEIGHT
+            ],
+            'education': [],
+            'education_level': [],
         }
 
         annons['nice_to_have'] = {
@@ -198,26 +117,50 @@ def convert_message(message_envelope):
                 get_concept_as_annons_value_with_weight('kompetens',
                                                         kompetens.get('varde'),
                                                         kompetens.get('vikt'))
-                for kompetens in
-                message.get('kompetenser', [])
-                if get_null_safe_value(kompetens, 'vikt', 0) < MUST_HAVE_WEIGHT
+                for kompetens in message.get('kompetenser', [])
+                if get_null_safe_value(kompetens, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
             ],
             'languages': [
                 get_concept_as_annons_value_with_weight('sprak',
                                                         sprak.get('varde'),
                                                         sprak.get('vikt'))
                 for sprak in message.get('sprak', [])
-                if get_null_safe_value(sprak, 'vikt', 0) < MUST_HAVE_WEIGHT
+                if get_null_safe_value(sprak, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
             ],
             'work_experiences': [
                 get_concept_as_annons_value_with_weight('yrkesroll',
                                                         yrkerf.get('varde'),
                                                         yrkerf.get('vikt'))
-                for yrkerf in
-                message.get('yrkeserfarenheter', [])
-                if get_null_safe_value(yrkerf, 'vikt', 0) < MUST_HAVE_WEIGHT
-            ]
+                for yrkerf in message.get('yrkeserfarenheter', [])
+                if get_null_safe_value(yrkerf, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+            ],
+            'education': [],
+            'education_level': [],
         }
+
+        if message.get('utbildningsinriktning', {}).get('vikt', 0) >= MUST_HAVE_WEIGHT:
+            annons['must_have']['education'] = [
+                get_concept_as_annons_value_with_weight(
+                    ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                    message.get('utbildningsinriktning', {}).get('varde'),
+                    message.get('utbildningsinriktning', {}).get('vikt'))]
+            annons['must_have']['education_level'] = [
+                get_concept_as_annons_value_with_weight(
+                    ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                    message.get('utbildningsniva', {}).get('varde'),
+                    message.get('utbildningsniva', {}).get('vikt'))]
+        elif message.get('utbildningsinriktning', {}).get('vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT:
+            annons['nice_to_have']['education'] = [
+                get_concept_as_annons_value_with_weight(
+                    ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                    message.get('utbildningsinriktning', {}).get('varde'),
+                    message.get('utbildningsinriktning', {}).get('vikt'))]
+            annons['nice_to_have']['education_level'] = [
+                get_concept_as_annons_value_with_weight(
+                    ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                    message.get('utbildningsniva', {}).get('varde'),
+                    message.get('utbildningsniva', {}).get('vikt'))]
+
         annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
         annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
         annons['removed'] = message.get('avpublicerad')
@@ -228,6 +171,101 @@ def convert_message(message_envelope):
     else:
         # Message is already in correct format
         return message_envelope
+
+
+def _get_default_scope_of_work(arbtid_typ):
+    default_max_omf = None
+    default_min_omf = None
+    if arbtid_typ == "1":
+        default_min_omf = 100
+        default_max_omf = 100
+    elif arbtid_typ == "2" or arbtid_typ == "3":
+        default_min_omf = 0
+        default_max_omf = 100
+    return default_min_omf, default_max_omf
+
+
+def _set_occupations(annons, message):
+    if 'yrkesroll' in message:
+        # jafhk fixa parsning för dessa med get_concept_by_legacy_id
+        yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll',
+                                                      message.get('yrkesroll',
+                                                                  {}).get('varde'))
+        if yrkesroll and 'parent' in yrkesroll:
+            yrkesgrupp = yrkesroll.get('parent')
+            yrkesomrade = yrkesgrupp.get('parent')
+            annons['occupation'] = {'concept_id': yrkesroll['concept_id'],
+                                    'label': yrkesroll['label'],
+                                    'legacy_ams_taxonomy_id':
+                                        yrkesroll['legacy_ams_taxonomy_id']}
+            annons['occupation_group'] = {'concept_id': yrkesgrupp['concept_id'],
+                                          'label': yrkesgrupp['label'],
+                                          'legacy_ams_taxonomy_id':
+                                              yrkesgrupp['legacy_ams_taxonomy_id']}
+            annons['occupation_field'] = {'concept_id': yrkesomrade['concept_id'],
+                                          'label': yrkesomrade['label'],
+                                          'legacy_ams_taxonomy_id':
+                                              yrkesomrade['legacy_ams_taxonomy_id']}
+        elif not yrkesroll:
+            log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
+                        % message['yrkesroll'])
+        else:  # yrkesroll is not None and 'parent' not in yrkesroll
+            log.warning('Parent not found for yrkesroll %s (%s)' %
+                        (message['yrkesroll'], yrkesroll))
+
+
+def _build_wp_address(arbplatsmessage):
+    kommun = None
+    lansnamn = None
+    kommunkod = None
+    kommun_concept_id = None
+    lanskod = None
+    lan_concept_id = None
+    land = None
+    land_concept_id = None
+    landskod = None
+    longitud = None
+    latitud = None
+    if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
+        kommunkod = arbplatsmessage.get('kommun', {}).get('varde', {})
+        kommun_concept_id = taxonomy.get_concept_by_legacy_id('kommun',
+                                                              kommunkod)['concept_id']
+        kommun = arbplatsmessage.get('kommun', {}).get('namn', {})
+    if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
+        lanskod = arbplatsmessage.get('lan', {}).get('varde', {})
+        lan_temp = taxonomy.get_concept_by_legacy_id('lan', lanskod)
+        if 'concept_id' in lan_temp:
+            lan_concept_id = lan_temp['concept_id']
+        lansnamn = arbplatsmessage.get('lan', {}).get('namn', {})
+    if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
+        landskod = arbplatsmessage.get('land', {}).get('varde', {})
+        land_temp = taxonomy.get_concept_by_legacy_id('land', landskod)
+        if 'concept_id' in land_temp:
+            land_concept_id = land_temp['concept_id']
+        land = arbplatsmessage.get('land', {}).get('namn', {})
+    if 'longitud' in arbplatsmessage and arbplatsmessage.get('longitud'):
+        longitud = float(arbplatsmessage.get('longitud'))
+    if 'latitud' in arbplatsmessage and arbplatsmessage.get('latitud'):
+        latitud = float(arbplatsmessage.get('latitud'))
+
+    return {
+        'municipality_code': kommunkod,
+        'municipality_concept_id': kommun_concept_id,
+        'municipality': kommun,
+        'region_code': lanskod,
+        'region_concept_id': lan_concept_id,
+        'region': lansnamn,
+        'country_code': landskod,
+        'country_concept_id': land_concept_id,
+        'country': land,
+        # 'street_address': message.get('besoksadress', {}).get('gatuadress'),
+        'street_address': arbplatsmessage.get('gatuadress', ''),
+        # 'postcode': message.get('postadress', {}).get('postnr'),
+        'postcode': arbplatsmessage.get('postnr'),
+        # 'city': message.get('postadress', {}).get('postort'),
+        'city': arbplatsmessage.get('postort'),
+        'coordinates': [longitud, latitud]
+    }
 
 
 def get_null_safe_value(element, key, replacement_val):
@@ -250,8 +288,7 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
     return None
 
 
-def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
-    concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
+def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight=None):
     weighted_concept = {
         'concept_id': None,
         'label': None,
@@ -259,6 +296,7 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
         'legacy_ams_taxonomy_id': None
     }
     try:
+        concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
         weighted_concept['concept_id'] = concept.get('concept_id', None)
         weighted_concept['label'] = concept.get('label', None)
         weighted_concept['weight'] = weight
@@ -266,19 +304,21 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
                                                                  None)
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
+    except RequestError:
+        log.warning(f'Taxonomy request failed with arguments type: {taxtype} and legacy_id: {legacy_id}')
     return weighted_concept
 
 
 def parse_driving_licence(message):
-    taxkorkortList = []
+    taxkorkort_list = []
     for kkort in message.get('korkort'):
         taxkortkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
         if taxkortkort:
-            taxkorkortList.append({
+            taxkorkort_list.append({
                 "concept_id": taxkortkort['concept_id'],
                 "label": taxkortkort['label']
             })
-    return taxkorkortList
+    return taxkorkort_list
 
 
 def _add_keywords(annons):
@@ -389,7 +429,8 @@ def _get_nested_value(path, data):
             break
         if isinstance(element, list):
             for item in element:
-                values.append(item.get(keypath[i + 1]))
+                if item:
+                    values.append(item.get(keypath[i + 1]))
             break
         if isinstance(element, dict):
             data = element
