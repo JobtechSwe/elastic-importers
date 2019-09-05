@@ -4,7 +4,7 @@ import itertools
 import math
 from jobtech.common.customlogging import configure_logging
 from importers import settings
-from importers.platsannons import loader_platsannonser
+from importers.platsannons.old import loader_platsannonser
 from importers.repository import postgresql
 
 configure_logging([__name__.split('.')[0], 'jobtech'])

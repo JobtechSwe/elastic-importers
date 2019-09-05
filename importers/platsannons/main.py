@@ -1,145 +1,113 @@
-import sys
-import logging
 import time
+import logging
+import sys
+import math
+import itertools
 from datetime import datetime
-from jobtech.common.customlogging import configure_logging
-from importers.repository import elastic, postgresql
-from importers.platsannons import converter
 from importers import settings
-from importers import common
-from importers.platsannons import enricher_mt_rest_multiple as enricher
+from importers.platsannons import loader, converter, enricher_mt_rest_multiple as enricher
+from importers.repository import elastic, postgresql
 from importers.indexmaint.main import (set_platsannons_read_alias,
                                        set_platsannons_write_alias)
-from importers.platsannons import loader_platsannonser
-
-
-configure_logging([__name__.split('.')[0], 'jobtech'])
-
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
-IMPORTER_NAME = 'af-platsannons'
+
+
+def _setup_index(es_index):
+    if len(sys.argv) > 1:
+        es_index = sys.argv[1]
+
+    try:
+        es_index = elastic.setup_indices(es_index, settings.ES_ANNONS_PREFIX,
+                                         settings.platsannons_mappings)
+        log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
+                 % ('af-platsannons', settings.PG_BATCH_SIZE, es_index))
+    except Exception as e:
+        log.error("Elastic operations failed: %s" % str(e))
+        sys.exit(1)
+    return es_index
+
+
+def _check_last_timestamp(es_index):
+    last_timestamp = elastic.get_last_timestamp(es_index)
+    log.info("Last timestamp: %d (%s)" % (last_timestamp,
+                                          datetime.fromtimestamp(
+                                              (last_timestamp + 1) / 1000)
+                                          ))
+    # last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
+    #                                                   es_index)
+    return last_timestamp
 
 
 def start(es_index=None):
-    if len(sys.argv) > 1:
-        es_index = sys.argv[1]
-
     start_time = time.time()
-    try:
-        es_index = elastic.setup_indices(es_index, settings.ES_ANNONS_PREFIX,
-                                         settings.platsannons_mappings)
-        log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
-                 % (IMPORTER_NAME, settings.PG_BATCH_SIZE, es_index))
-        last_timestamp = elastic.get_last_timestamp(es_index)
-        log.info("Last timestamp: %d (%s)" % (last_timestamp,
-                                              datetime.fromtimestamp(
-                                                  (last_timestamp+1)/1000)
-                                              ))
-        last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
-                                                          es_index)
-    except Exception as e:
-        log.error("Elastic operations failed: %s" % str(e))
-        sys.exit(1)
-
+    # Get, set and create elastic index
+    es_index = _setup_index(es_index)
+    print("ES_IDNEX", es_index)
+    last_timestamp = _check_last_timestamp(es_index)
     doc_counter = 0
+    # Check psql table existance
+    # Load list of updated ad ids
+    ad_ids = loader.load_list_of_updated_ids(last_timestamp)
+    # Partition list into manageable chunks
 
-    updated_ad_ids = loader_platsannonser.fetch_updated_ads(last_timestamp, last_identifiers)
-    log.info('Found %s updated ad ids to handle...', len(updated_ad_ids))
-    while len(updated_ad_ids) > 0:
-        _update_removed_ads(updated_ad_ids)
+    log.info('Fetching details for %s ads...' % len(ad_ids))
+    nr_of_items_per_batch = int(settings.PG_BATCH_SIZE)
+    nr_of_items_per_batch = min(nr_of_items_per_batch, len(ad_ids))
+    nr_of_batches = math.ceil(len(ad_ids) / nr_of_items_per_batch)
 
-        updated_published_ad_ids = [ad for ad in updated_ad_ids
-                                    if ad['avpublicerad'] is False]
+    ad_batches = iter(lambda: list(itertools.islice(iter(ad_ids),
+                                                    nr_of_items_per_batch)), [])
+    processed_ads_total = 0
+    failed_ads = []
+    for i, ad_batch in enumerate(ad_batches):
+        log.info('Processing batch %s/%s' % (i + 1, nr_of_batches))
 
-        if len(updated_published_ad_ids) > 0:
-            log.info('Found %s updated published ads' % len(updated_published_ad_ids))
-            # Save published ads
-            fetch_details_and_save(updated_published_ad_ids)
+        # Fetch ads from LA to raw-list
+        ad_details, failed_ads = loader.bulk_fetch_ad_details(ad_batch)
+        doc_counter += (len(ad_details) - len(failed_ads))
 
-        # Check if there are more ads to fetch and save
-        last_ids_temp, last_ts_temp = get_system_status_platsannonser()
-        if set(last_ids) == set(last_ids_temp) and last_ts == last_ts_temp:
-            log.info("Same ids and timestamps as last try, aborting.")
-            updated_ad_ids = []
-        else:
-            last_ts = last_ts_temp
-            last_ids = last_ids_temp.copy()
-            updated_ad_ids = loader_platsannonser.fetch_updated_ads(last_ts, last_ids)
-            log.info('Found %s updated ad ids to handle...', len(updated_ad_ids))
+        for failed_ad in failed_ads.copy():
+            # On fail, check for ad in postgresql
+            failed_id = failed_ad['annonsId']
+            pgsql_ad = postgresql.fetch_ad(failed_id, settings.PG_PLATSANNONS_TABLE)
+            if pgsql_ad:
+                ad_details[failed_id] = pgsql_ad
+                failed_ads.remove(failed_ad)
+            # On fail, ad ID to failed-list
 
+        raw_ads = list(ad_details.values())
+        # Save raw-list to postgresql
+        postgresql.bulk(raw_ads, settings.PG_PLATSANNONS_TABLE)
 
-def _update_removed_ads(updated_ad_ids):
-    removed_ad_ids = [ad for ad in updated_ad_ids if ad['avpublicerad'] is True]
-    if len(removed_ad_ids) > 0:
-        log.info('Found %s removed ads' % len(removed_ad_ids))
-        for removed_ad_id in removed_ad_ids:
-            ad_id = removed_ad_id['annonsId']
-            ad_timestamp = removed_ad_id['uppdateradTid']
-            ad_to_update = postgresql.fetch_ad(ad_id, settings.PG_PLATSANNONS_TABLE)
+        # Loop over raw-list, convert and enrich into cooked-list
+        converted_ads = [converter.convert_ad(raw_ad) for raw_ad in raw_ads]
+        enriched_ads = enricher.enrich(converted_ads)
+        # Bulk save cooked-list to elastic
+        elastic.bulk_index(enriched_ads, es_index)
+        processed_ads_total = processed_ads_total + len(ad_batch)
 
-            if ad_to_update:
-                doc = ad_to_update[1]
-                doc['avpublicerad'] = True
-                get_and_set_removed_date(ad_id, ad_timestamp, doc)
+        log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
 
-                log.info('Updating removed ad id %s (timestamp: %s) in postgres'
-                         % (ad_id, ad_timestamp))
-                postgresql.update_ad(ad_id, doc, ad_timestamp,
-                                     settings.PG_PLATSANNONS_TABLE)
-            else:
-                log.info('Could not find removed ad id %s (timestamp: %s) '
-                         'in postgres, skipping update' % (
-                             ad_id, ad_timestamp))
+    # Iterate over failed-list, trying to find in LA, postgresql
+    log.info("Last pass, trying to load failed ads from LA")
+    recovered_ads = []
+    for failed_ad in failed_ads.copy():
+        recovered_ad = loader.load_details_from_la(failed_ad)
+        if recovered_ad:
+            recovered_ads.append(recovered_ad)
+            failed_ads.remove(failed_ad)
 
-
-
-def old_start(es_index=None):
-    if len(sys.argv) > 1:
-        es_index = sys.argv[1]
-
-    start_time = time.time()
-    try:
-        es_index = elastic.setup_indices(es_index, settings.ES_ANNONS_PREFIX,
-                                         settings.platsannons_mappings)
-        log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
-                 % (IMPORTER_NAME, settings.PG_BATCH_SIZE, es_index))
-        last_timestamp = elastic.get_last_timestamp(es_index)
-        log.info("Last timestamp: %d (%s)" % (last_timestamp,
-                                              datetime.fromtimestamp(
-                                                  (last_timestamp+1)/1000)
-                                              ))
-        last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
-                                                          es_index)
-    except Exception as e:
-        log.error("Elastic operations failed: %s" % str(e))
-        sys.exit(1)
-
-    doc_counter = 0
-
-    while True:
-        (last_identifiers, last_timestamp, platsannonser) = \
-            postgresql.read_from_pg_since(last_identifiers, last_timestamp,
-                                          settings.PG_PLATSANNONS_TABLE, converter)
-        current_doc_count = len(platsannonser)
-        doc_counter += current_doc_count
-
-        if platsannonser:
-            try:
-                enriched_ads = enricher.enrich(platsannonser,
-                                               parallelism=settings.ENRICHER_PROCESSES)
-                elastic.bulk_index(enriched_ads, es_index)
-                log.info("Indexed %d docs so far." % doc_counter)
-            except Exception as e:
-                log.error("Import failed", e)
-                sys.exit(1)
-            common.log_import_metrics(log, IMPORTER_NAME, current_doc_count)
-            # if doc_counter >= 9900:
-            #     break
-        else:
-            break
+    # Save any recovered ads
+    converted_ads = [converter.convert_ad(recovered_ad) for recovered_ad in recovered_ads]
+    enriched_ads = enricher.enrich(converted_ads)
+    elastic.bulk_index(enriched_ads, es_index)
+    if failed_ads:
+        log.warning("There are %d ads reported from stream that can't be download.",
+                    len(failed_ads))
 
     elapsed_time = time.time() - start_time
-
-    log.info("Indexed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+    log.info("Processed %d docs in: %s seconds." % (doc_counter, elapsed_time))
 
 
 def start_daily_index():

@@ -27,11 +27,18 @@ def _bulk_generator(documents, indexname, idkey):
                                for key in idkey]) \
                 if isinstance(idkey, list) else document[idkey]
 
-        yield {
-            '_index': indexname,
-            '_id': doc_id,
-            '_source': document
-        }
+        if document.get('removed', False):
+            yield {
+                '_index': indexname,
+                '_id': doc_id,
+                '_op_type': 'delete'
+            }
+        else:
+            yield {
+                '_index': indexname,
+                '_id': doc_id,
+                '_source': document
+            }
 
 
 def bulk_index(documents, indexname, idkey='id'):

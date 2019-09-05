@@ -33,6 +33,9 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
         doc_id = str(annons.get('id', ''))
         doc_headline = get_doc_headline_input(annons)
         doc_text = annons.get('description', {}).get('text_formatted', '')
+        if not doc_text:
+            log.info("No document data to enrich, moving on to the next one.")
+            continue
         if doc_id == '':
             raise ValueError('Document has no id, enrichment is not possible, headline: '
                              % (doc_headline))
@@ -67,9 +70,9 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
 
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
-        enriched_output = enrich_results_data[doc_id]
-
-        enrich_doc(annons, enriched_output)
+        if doc_id in enrich_results_data:
+            enriched_output = enrich_results_data[doc_id]
+            enrich_doc(annons, enriched_output)
 
     return annonser
 
