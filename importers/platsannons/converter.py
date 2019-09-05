@@ -2,6 +2,7 @@ import logging
 import re
 from dateutil import parser
 from importers.repository import taxonomy
+from elasticsearch.exceptions import RequestError
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -63,7 +64,8 @@ def convert_ad(message_envelope):
             'url': message.get('webbadress'),
             'organization_number': message.get('organisationsnummer'),
             'name': message.get('arbetsgivareNamn'),
-            'workplace': message.get('arbetsplatsNamn')
+            'workplace': message.get('arbetsplatsNamn'),
+            'workplace_id': message.get('arbetsplatsId')
         }
         annons['application_details'] = {
             'information': message.get('informationAnsokningssatt'),
@@ -286,8 +288,7 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
     return None
 
 
-def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
-    concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
+def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight=None):
     weighted_concept = {
         'concept_id': None,
         'label': None,
@@ -295,6 +296,7 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
         'legacy_ams_taxonomy_id': None
     }
     try:
+        concept = taxonomy.get_concept_by_legacy_id(taxtype, legacy_id)
         weighted_concept['concept_id'] = concept.get('concept_id', None)
         weighted_concept['label'] = concept.get('label', None)
         weighted_concept['weight'] = weight
@@ -302,6 +304,8 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight):
                                                                  None)
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
+    except RequestError:
+        log.warning(f'Taxonomy request failed with arguments type: {taxtype} and legacy_id: {legacy_id}')
     return weighted_concept
 
 
