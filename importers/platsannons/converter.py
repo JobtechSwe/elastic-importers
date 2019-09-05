@@ -22,7 +22,7 @@ def _isodate(bad_date):
         return None
 
 
-def convert_message(message_envelope):
+def convert_ad(message_envelope):
     if 'version' in message_envelope:
         message = message_envelope
         annons = dict()

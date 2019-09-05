@@ -8,14 +8,18 @@ import concurrent.futures
 from datetime import datetime
 from multiprocessing import Value
 from importers import settings
+from importers.platsannons import converter, enricher_mt_rest_multiple as enricher
 from importers.repository import elastic, postgresql
 
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 
 def _setup_index(args):
     if len(args) > 1:
         es_index = args[1]
+    else:
+        es_index = None
 
     try:
         es_index = elastic.setup_indices(es_index, settings.ES_ANNONS_PREFIX,
@@ -56,26 +60,50 @@ def reload():
 
     ad_batches = iter(lambda: list(itertools.islice(iter(ad_ids),
                                                     nr_of_items_per_batch)), [])
-    details_url = settings.LA_DETAILS_URL
     processed_ads_total = 0
-    error_ids_total = []
     for i, ad_batch in enumerate(ad_batches):
         log.info('Processing batch %s/%s' % (i + 1, nr_of_batches))
 
         # Fetch ads from LA to raw-list
-        ad_details, failed_ids = _bulk_fetch_ad_details(ad_batch)
-        for failed_id in failed_ids:
-            pgsql_ad = postgresql.load_ad(failed_id)
+        ad_details, failed_ads = _bulk_fetch_ad_details(ad_batch)
+        for failed_ad in failed_ads.copy():
+            # On fail, check for ad in postgresql
+            failed_id = failed_ad['annonsId']
+            pgsql_ad = postgresql.fetch_ad(failed_id, settings.PG_PLATSANNONS_TABLE)
             if pgsql_ad:
                 ad_details[failed_id] = pgsql_ad
-                failed_ids.remove(failed_id)
-
-            # On fail, check for ad in postgresql
+                failed_ads.remove(failed_ad)
             # On fail, ad ID to failed-list
-    # Save raw-list to postgresql
-    # Loop over raw-list, convert and enrich into cooked-list
-    # Bulk save cooked-list to elastic
+
+        raw_ads = list(ad_details.values())
+        # Save raw-list to postgresql
+        postgresql.bulk(raw_ads, settings.PG_PLATSANNONS_TABLE)
+
+        # Loop over raw-list, convert and enrich into cooked-list
+        converted_ads = [converter.convert_ad(raw_ad) for raw_ad in raw_ads]
+        enriched_ads = enricher.enrich(converted_ads)
+        # Bulk save cooked-list to elastic
+        elastic.bulk_index(enriched_ads, es_index)
+        processed_ads_total = processed_ads_total + len(ad_batch)
+
+        log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
+
     # Iterate over failed-list, trying to find in LA, postgresql
+    log.info("Last pass, trying to load failed ads from LA")
+    recovered_ads = []
+    for failed_ad in failed_ads.copy():
+        recovered_ad = _load_details_from_la(failed_ad)
+        if recovered_ad:
+            recovered_ads.append(recovered_ad)
+            failed_ads.remove(failed_ad)
+
+    # Save any recovered ads
+    converted_ads = [converter.convert_ad(recovered_ad) for recovered_ad in recovered_ads]
+    enriched_ads = enricher.enrich(converted_ads)
+    elastic.bulk_index(enriched_ads, es_index)
+    if failed_ads:
+        log.warning("There are %d ads reported from stream that can't be download.",
+                    len(failed_ads))
 
 
 counter = None
@@ -93,8 +121,8 @@ def _bulk_fetch_ad_details(ad_batch):
     with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
         # Start the load operations
         future_to_fetch_result = {
-            executor.submit(_load_details_from_la, ad_data['annonsId'],
-                            ad_data['uppdateradTid'], ): ad_data for ad_data in ad_batch
+            executor.submit(_load_details_from_la, ad_data): ad_data
+            for ad_data in ad_batch
         }
         for future in concurrent.futures.as_completed(future_to_fetch_result):
             input_data = future_to_fetch_result[future]
@@ -113,18 +141,19 @@ def _bulk_fetch_ad_details(ad_batch):
                 error_message = 'Fetch ad details call generated an exception: %s' % \
                     (str(exc))
                 log.error(error_message)
-                failed_ids.append(input_data['annonsId'])
+                failed_ids.append(input_data)
             except Exception as exc:
                 error_message = 'Fetch ad details call generated an exception: %s' % \
                     (str(exc))
                 log.error(error_message)
-                failed_ids.append(input_data['annonsId'])
+                failed_ids.append(input_data)
     return result_output, failed_ids
 
 
-def _load_details_from_la(ad_id, timestamp):
+def _load_details_from_la(ad_meta):
     fail_count = 0
     fail_max = 10
+    ad_id = ad_meta['annonsId']
     detail_url = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:
@@ -133,7 +162,7 @@ def _load_details_from_la(ad_id, timestamp):
             ad = r.json()
             if ad:
                 ad['id'] = str(ad['annonsId'])
-                ad['updatedAt'] = timestamp
+                ad['updatedAt'] = ad_meta['uppdateradTid']
                 ad['expiresAt'] = ad['sistaPubliceringsdatum']
                 if 'kontaktpersoner' in ad:
                     del ad['kontaktpersoner']
@@ -179,7 +208,7 @@ def _load_list_of_updated_ids(timestamp = 0):
         r = requests.get(feed_url)
         r.raise_for_status()
         json_result = r.json()
-        items = [{v['annonsId']: v} for v in json_result.get('idLista', [])]
+        items = json_result.get('idLista', [])
 
     except requests.exceptions.RequestException as e:
         log.error("Failed to read from %s" % feed_url, e)

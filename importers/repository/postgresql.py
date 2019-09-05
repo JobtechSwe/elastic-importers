@@ -8,37 +8,26 @@ from importers import settings
 
 log = logging.getLogger(__name__)
 
+pg_conn = None
 
-if not settings.PG_DBNAME or not settings.PG_USER:
-    log.error("You must set environment variables for PostgresSQL (i.e. "
-              "PG_HOST, PG_DBNAME, PG_USER and PG_PASSWORD.)")
-    sys.exit(1)
-
-try:
-    if not settings.PG_HOST:
-        log.info("PG_HOST not set, assuming local socket")
-        pg_conn = psycopg2.connect(dbname=settings.PG_DBNAME,
-                                   user=settings.PG_USER)
-    else:
-        pg_conn = psycopg2.connect(host=settings.PG_HOST,
-                                   port=settings.PG_PORT,
-                                   dbname=settings.PG_DBNAME,
-                                   user=settings.PG_USER,
-                                   password=settings.PG_PASSWORD,
-                                   sslmode=settings.PG_SSLMODE)
-except psycopg2.OperationalError as e:
-    log.error("Failed to connect to PostgreSQL on %s:%s" % (settings.PG_HOST,
-                                                            settings.PG_PORT))
-    log.error("Reason for PostgreSQL failure: %s" % str(e))
-    sys.exit(1)
-
-
-def query(sql, args):
-    cur = pg_conn.cursor()
-    cur.execute(sql, args)
-    rows = cur.fetchall()
-    cur.close()
-    return rows
+if settings.PG_DBNAME and settings.PG_USER:
+    try:
+        if not settings.PG_HOST:
+            log.info("PG_HOST not set, assuming local socket")
+            pg_conn = psycopg2.connect(dbname=settings.PG_DBNAME,
+                                       user=settings.PG_USER)
+        else:
+            pg_conn = psycopg2.connect(host=settings.PG_HOST,
+                                       port=settings.PG_PORT,
+                                       dbname=settings.PG_DBNAME,
+                                       user=settings.PG_USER,
+                                       password=settings.PG_PASSWORD,
+                                       sslmode=settings.PG_SSLMODE)
+    except psycopg2.OperationalError as e:
+        log.error("Failed to connect to PostgreSQL on %s:%s" % (settings.PG_HOST,
+                                                                settings.PG_PORT))
+        log.error("Reason for PostgreSQL failure: %s" % str(e))
+        sys.exit(1)
 
 
 def read_docs_with_ids(tablename, ids, converter=None):
@@ -121,6 +110,8 @@ def table_exists(table):
 
 
 def create_default_table(table):
+    if not pg_conn:
+        return
     statements = (
         "CREATE TABLE {table} (id VARCHAR(64) PRIMARY KEY, doc JSONB, "
         "timestamp BIGINT, expires BIGINT, "
@@ -139,6 +130,8 @@ def create_default_table(table):
 
 
 def system_status(table):
+    if not pg_conn:
+        return None
     if not table_exists(table):
         create_default_table(table)
     cur = pg_conn.cursor()
@@ -156,6 +149,8 @@ def system_status(table):
 
 
 def fetch_ad(ad_id, table):
+    if not pg_conn:
+        return None
     cur = pg_conn.cursor()
     cur.execute("SELECT * FROM " + table + " WHERE TRIM(id) = %s", [str(ad_id)])
     result = cur.fetchone()
@@ -247,6 +242,9 @@ def system_status_platsannonser(table):
 
 
 def bulk(items, table):
+    if not pg_conn:
+        log.warning('No database configured for this session.')
+        return
     start_time = time.time()
     if not table_exists(table):
         create_default_table(table)

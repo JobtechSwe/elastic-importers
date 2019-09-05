@@ -127,7 +127,7 @@ def test_corrupt_platsannons():
     message_envelope['version'] = 1
     message_envelope['timestamp'] = 1539958052330
     # pprint(message_envelope)
-    conv_ad = converter.convert_message(message_envelope)
+    conv_ad = converter.convert_ad(message_envelope)
     pprint(conv_ad)
 
     assert len(conv_ad['must_have']['languages']) == 0
