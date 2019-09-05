@@ -2,11 +2,10 @@ import logging
 from multiprocessing import Value
 import requests
 import math
-# from concurrent.futures import ThreadPoolExecutor
 import concurrent.futures
-# from requests_futures.sessions import FuturesSession
 from importers import settings
 from importers.common import grouper
+from importers.platsannons.converter import get_null_safe_value
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -59,7 +58,7 @@ def enrich(annonser, parallelism=1):
     for i, annons_batch in enumerate(annons_batches):
         annons_batch_indatas = [annons_indata for annons_indata in annons_batch]
         batch_indata = {
-                "documents_input": annons_batch_indatas
+            "documents_input": annons_batch_indatas
         }
         batch_indatas.append(batch_indata)
 
@@ -76,18 +75,27 @@ def enrich(annonser, parallelism=1):
 
 
 def get_doc_headline_input(annons):
+    SEP = ' | '
     # Add occupation from structured data in headline.
-    doc_headline1 = annons.get('occupation', {}).get('label', '')
-    if(doc_headline1 is None):
-        doc_headline1 = ''
+    doc_headline_occupation = annons.get('occupation', {}).get('label', '')
+    if (doc_headline_occupation is None):
+        doc_headline_occupation = ''
 
-    doc_headline2 = annons.get('headline', '')
-    if doc_headline1 != '' and doc_headline1 != doc_headline2:
-        doc_headline = doc_headline1 + ' ' + doc_headline2
-    else:
-        doc_headline = doc_headline2
+    # workplace_address
+    wp_address_node = annons.get('workplace_address', {})
+    wp_address_input = ''
+    if wp_address_node:
+        wp_city = get_null_safe_value(wp_address_node, 'city', '')
+        wp_municipality = get_null_safe_value(wp_address_node, 'municipality', '')
+        wp_region = get_null_safe_value(wp_address_node, 'region', '')
+        wp_country = get_null_safe_value(wp_address_node, 'country', '')
+        wp_address_input = wp_city + SEP + wp_municipality + SEP + wp_region + SEP + wp_country
 
-    return doc_headline
+    doc_headline = get_null_safe_value(annons, 'headline', '')
+
+    doc_headline_input = wp_address_input + SEP + doc_headline_occupation + SEP + doc_headline
+
+    return doc_headline_input
 
 
 def get_enrich_result(batch_indata, timeout):
@@ -135,15 +143,26 @@ def enrich_doc(annons, enriched_output):
         annons['keywords']['enriched'] = {}
 
     enriched_candidates = enriched_output['enriched_candidates']
-    new_occupations = [candidate['concept_label'].lower()
-                       for candidate in enriched_candidates['occupations']]
     enriched_node = annons['keywords']['enriched']
-    enriched_node['occupation'] = new_occupations
-    new_skills = [candidate['concept_label'].lower()
-                  for candidate in enriched_candidates['competencies']]
-    enriched_node['skill'] = new_skills
-    new_traits = [candidate['concept_label'].lower()
-                  for candidate in enriched_candidates['traits']]
-    enriched_node['trait'] = new_traits
+
+    enriched_node['occupation'] = [candidate['concept_label'].lower()
+                                   for candidate in enriched_candidates['occupations']]
+
+    enriched_node['skill'] = [candidate['concept_label'].lower()
+                              for candidate in enriched_candidates['competencies']]
+
+    enriched_node['trait'] = [candidate['concept_label'].lower()
+                              for candidate in enriched_candidates['traits']]
+
+    wp_address_node = annons.get('workplace_address', {})
+    wp_region = ''
+    if wp_address_node:
+        wp_region = get_null_safe_value(wp_address_node, 'region', '')
+
+    if wp_region.lower() == 'ospecificerad arbetsort':
+        enriched_node['location'] = [wp_region.lower()]
+    else:
+        enriched_node['location'] = [candidate['concept_label'].lower()
+                                     for candidate in enriched_candidates['geos']]
 
     return annons
