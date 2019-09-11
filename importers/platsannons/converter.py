@@ -138,28 +138,11 @@ def convert_message(message_envelope):
             'education_level': [],
         }
 
-        if message.get('utbildningsinriktning', {}).get('vikt', 0) >= MUST_HAVE_WEIGHT:
-            annons['must_have']['education'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
-                    message.get('utbildningsinriktning', {}).get('varde'),
-                    message.get('utbildningsinriktning', {}).get('vikt'))]
-            annons['must_have']['education_level'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
-                    message.get('utbildningsniva', {}).get('varde'),
-                    message.get('utbildningsniva', {}).get('vikt'))]
-        elif message.get('utbildningsinriktning', {}).get('vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT:
-            annons['nice_to_have']['education'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
-                    message.get('utbildningsinriktning', {}).get('varde'),
-                    message.get('utbildningsinriktning', {}).get('vikt'))]
-            annons['nice_to_have']['education_level'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
-                    message.get('utbildningsniva', {}).get('varde'),
-                    message.get('utbildningsniva', {}).get('vikt'))]
+        if message.get('utbildningsinriktning'):
+            try:
+                _set_education(annons, message)
+            except TypeError:
+                log.warning(f"Skipping education fields on ad {annons['id']} due to TypeError")
 
         annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
         annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
@@ -171,6 +154,31 @@ def convert_message(message_envelope):
     else:
         # Message is already in correct format
         return message_envelope
+
+
+def _set_education(annons, message):
+    if get_null_safe_value(message.get('utbildningsinriktning'), 'vikt', 0) >= MUST_HAVE_WEIGHT:
+        annons['must_have']['education'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                message.get('utbildningsinriktning', {}).get('varde'),
+                message.get('utbildningsinriktning', {}).get('vikt'))]
+        annons['must_have']['education_level'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                message.get('utbildningsniva', {}).get('varde'),
+                message.get('utbildningsniva', {}).get('vikt'))]
+    else:
+        annons['nice_to_have']['education'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                message.get('utbildningsinriktning', {}).get('varde'),
+                message.get('utbildningsinriktning', {}).get('vikt'))]
+        annons['nice_to_have']['education_level'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                message.get('utbildningsniva', {}).get('varde'),
+                message.get('utbildningsniva', {}).get('vikt'))]
 
 
 def _get_default_scope_of_work(arbtid_typ):
