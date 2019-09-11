@@ -71,7 +71,7 @@ platsannons_mappings = {
                 "fields": {
                     "words": {
                         "type": "text",
-                        "analyzer": "simple_word_splitter"
+                        "analyzer": "standard"
                     }
                 }
             },
@@ -80,7 +80,7 @@ platsannons_mappings = {
                 "properties": {
                     "text": {
                         "type": "text",
-                        "analyzer": "simple_word_splitter"
+                        "analyzer": "standard"
                     }
                 }
             },
