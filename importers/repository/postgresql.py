@@ -59,7 +59,7 @@ def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
               " AND id not in %(excl_id)s" \
               " ORDER BY timestamp ASC LIMIT %(limit)s"
     cur.execute(sql_str,
-                {'ts':timestamp,
+                {'ts': timestamp,
                  'expires': ts_today,
                  'expired': False,
                  'excl_id': tuple(sql_last_ids if len(sql_last_ids) > 0 else ['this string needed for sql syntax']),

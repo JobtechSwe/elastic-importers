@@ -136,7 +136,23 @@ def convert_ad(message):
         'education_level': [],
     }
 
-    if message.get('utbildningsinriktning', {}).get('vikt', 0) >= MUST_HAVE_WEIGHT:
+    if message.get('utbildningsinriktning'):
+        try:
+            _set_education(annons, message)
+        except TypeError:
+            log.warning(f"Skipping education fields on ad {annons['id']} due to TypeError")
+
+    annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
+    annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
+    annons['removed'] = message.get('avpublicerad')
+    annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
+    annons['source_type'] = message.get('kallaTyp')
+    # Extract labels as keywords for easier searching
+    return _add_keywords(annons)
+
+
+def _set_education(annons, message):
+    if get_null_safe_value(message.get('utbildningsinriktning'), 'vikt', 0) >= MUST_HAVE_WEIGHT:
         annons['must_have']['education'] = [
             get_concept_as_annons_value_with_weight(
                 ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
@@ -147,7 +163,7 @@ def convert_ad(message):
                 ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
                 message.get('utbildningsniva', {}).get('varde'),
                 message.get('utbildningsniva', {}).get('vikt'))]
-    elif message.get('utbildningsinriktning', {}).get('vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT:
+    else:
         annons['nice_to_have']['education'] = [
             get_concept_as_annons_value_with_weight(
                 ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
@@ -158,15 +174,6 @@ def convert_ad(message):
                 ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
                 message.get('utbildningsniva', {}).get('varde'),
                 message.get('utbildningsniva', {}).get('vikt'))]
-
-    annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
-    annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
-    annons['removed'] = message.get('avpublicerad')
-    annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
-    annons['source_type'] = message.get('kallaTyp')
-    annons['timestamp'] = message.get('updatedAt')
-    # Extract labels as keywords for easier searching
-    return _add_keywords(annons)
 
 
 def _get_default_scope_of_work(arbtid_typ):

@@ -96,7 +96,7 @@ platsannons_mappings = {
                 "fields": {
                     "words": {
                         "type": "text",
-                        "analyzer": "simple_word_splitter"
+                        "analyzer": "standard"
                     }
                 }
             },
@@ -105,7 +105,7 @@ platsannons_mappings = {
                 "properties": {
                     "text": {
                         "type": "text",
-                        "analyzer": "simple_word_splitter"
+                        "analyzer": "standard"
                     }
                 }
             },
@@ -134,6 +134,15 @@ platsannons_mappings = {
                                 }
                             },
                             "trait": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "location": {
                                 "type": "text",
                                 "fields": {
                                     "raw": {
