@@ -43,12 +43,12 @@ def start(es_index=None):
     start_time = time.time()
     # Get, set and create elastic index
     es_index = _setup_index(es_index)
-    print("ES_IDNEX", es_index)
+    print("ES_INDEX", es_index)
     last_timestamp = _check_last_timestamp(es_index)
     doc_counter = 0
     # Check psql table existance
     # Load list of updated ad ids
-    ad_ids = loader.load_list_of_updated_ids(last_timestamp)
+    ad_ids = loader.load_list_of_updated_ads(last_timestamp)
     # Partition list into manageable chunks
 
     log.info('Fetching details for %s ads...' % len(ad_ids))
@@ -74,7 +74,7 @@ def start(es_index=None):
             if pgsql_ad:
                 ad_details[failed_id] = pgsql_ad
                 failed_ads.remove(failed_ad)
-            # On fail, ad ID to failed-list
+            # On fail, keep ID in failed-list
 
         raw_ads = list(ad_details.values())
         # Save raw-list to postgresql

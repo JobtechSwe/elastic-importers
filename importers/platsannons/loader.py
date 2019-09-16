@@ -17,7 +17,7 @@ def bulk_fetch_ad_details(ad_batch):
     global counter
     counter = Value('i', 0)
     result_output = {}
-    failed_ids = []
+    failed_ads = []
     # with statement to ensure threads are cleaned up promptly
     with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
         # Start the load operations
@@ -42,14 +42,14 @@ def bulk_fetch_ad_details(ad_batch):
                 error_message = 'Fetch ad details call generated an exception: %s' % \
                     (str(exc))
                 log.error(error_message)
-                failed_ids.append(input_data)
+                failed_ads.append(input_data)
             except Exception as exc:
                 error_message = 'Fetch ad details call generated an exception: %s' % \
                     (str(exc))
                 log.error(error_message)
-                failed_ids.append(input_data)
+                failed_ads.append(input_data)
 
-    return result_output, failed_ids
+    return result_output, failed_ads
 
 
 def load_details_from_la(ad_meta):
@@ -105,7 +105,7 @@ def load_details_from_la(ad_meta):
                 raise e
 
 
-def load_list_of_updated_ids(timestamp=0):
+def load_list_of_updated_ads(timestamp=0):
     items = []
     feed_url = settings.LA_BOOTSTRAP_FEED_URL \
         if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)

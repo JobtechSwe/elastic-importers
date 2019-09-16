@@ -12,11 +12,7 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 
 timeout_enrich_api = 90
-
-
-def init_process(args):
-    global counter
-    counter = args
+counter = None
 
 
 def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
@@ -38,7 +34,7 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
             continue
         if doc_id == '':
             raise ValueError('Document has no id, enrichment is not possible, headline: '
-                             % (doc_headline))
+                             % doc_headline)
 
         input_doc_params = {
             settings.ENRICHER_PARAM_DOC_ID: doc_id,
@@ -78,10 +74,10 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
 
 
 def get_doc_headline_input(annons):
-    SEP = ' | '
+    sep = ' | '
     # Add occupation from structured data in headline.
     doc_headline_occupation = annons.get('occupation', {}).get('label', '')
-    if (doc_headline_occupation is None):
+    if doc_headline_occupation is None:
         doc_headline_occupation = ''
 
     # workplace_address
@@ -92,11 +88,11 @@ def get_doc_headline_input(annons):
         wp_municipality = get_null_safe_value(wp_address_node, 'municipality', '')
         wp_region = get_null_safe_value(wp_address_node, 'region', '')
         wp_country = get_null_safe_value(wp_address_node, 'country', '')
-        wp_address_input = wp_city + SEP + wp_municipality + SEP + wp_region + SEP + wp_country
+        wp_address_input = wp_city + sep + wp_municipality + sep + wp_region + sep + wp_country
 
     doc_headline = get_null_safe_value(annons, 'headline', '')
 
-    doc_headline_input = wp_address_input + SEP + doc_headline_occupation + SEP + doc_headline
+    doc_headline_input = wp_address_input + sep + doc_headline_occupation + sep + doc_headline
 
     return doc_headline_input
 
