@@ -147,6 +147,7 @@ def convert_ad(message):
     annons['removed'] = message.get('avpublicerad')
     annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
     annons['source_type'] = message.get('kallaTyp')
+    annons['timestamp'] = message.get('updatedAt')
     # Extract labels as keywords for easier searching
     return _add_keywords(annons)
 

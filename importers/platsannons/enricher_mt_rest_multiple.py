@@ -7,8 +7,6 @@ from importers import settings
 from importers.common import grouper
 from importers.platsannons.converter import get_null_safe_value
 
-logging.basicConfig()
-logging.getLogger(__name__).setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 
 timeout_enrich_api = 90

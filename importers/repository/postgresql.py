@@ -217,6 +217,8 @@ def set_all_expired(table):
 
 
 def set_expired_for_ids(table, ad_ids, expired=True):
+    if not pg_conn:
+        return
     cur = pg_conn.cursor()
     for ad_id in ad_ids:
         cur.execute("UPDATE " + table + " SET expired = %s WHERE id = %s", [expired, str(ad_id)])
