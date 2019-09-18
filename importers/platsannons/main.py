@@ -66,7 +66,6 @@ def start(es_index=None):
         log.info('Processing batch %s/%s' % (i + 1, nr_of_batches))
 
         # Fetch ads from LA to raw-list
-        log.info("Loading ad details.")
         ad_details, batch_failed_ads = loader.bulk_fetch_ad_details(ad_batch)
 
         doc_counter += (len(ad_details) - len(batch_failed_ads))
@@ -83,16 +82,16 @@ def start(es_index=None):
 
         failed_ads.extend(batch_failed_ads)
         raw_ads = [raw_ad for raw_ad in list(ad_details.values())
-                   if not raw_ad.get('avpublicerad', False)]
+                   if not raw_ad.get('removed', False)]
         deleted_ids = [raw_ad['annonsId'] for raw_ad in list(ad_details.values())
-                       if raw_ad.get('avpublicerad', False)]
+                       if raw_ad.get('removed', False)]
         # Save raw-list to postgresql
         postgresql.bulk(raw_ads, settings.PG_PLATSANNONS_TABLE)
         # Set expired on all removed ads
         postgresql.set_expired_for_ids(settings.PG_PLATSANNONS_TABLE, deleted_ids)
 
         # Loop over raw-list, convert and enrich into cooked-list
-        converted_ads = [converter.convert_ad(raw_ad) for raw_ad in raw_ads]
+        converted_ads = [converter.convert_ad(ad) for ad in ad_details.values()]
         enriched_ads = enricher.enrich(converted_ads)
         # Bulk save cooked-list to elastic
         log.debug("Indexing %d documents into %s" % (len(enriched_ads), es_index))
@@ -102,13 +101,16 @@ def start(es_index=None):
         log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
 
     # Iterate over failed-list, trying to find in LA, postgresql
-    log.info("Last pass, trying to load failed ads from LA")
     recovered_ads = []
-    for failed_ad in failed_ads.copy():
-        recovered_ad = loader.load_details_from_la(failed_ad)
-        if recovered_ad:
-            recovered_ads.append(recovered_ad)
-            failed_ads.remove(failed_ad)
+    if failed_ads:
+        log.info("Last pass, trying to load failed ads from LA")
+        for failed_ad in failed_ads.copy():
+            recovered_ad = loader.load_details_from_la(failed_ad)
+            if recovered_ad:
+                log.info("Successfully downloaded previously failed ad %s form LA" %
+                         recovered_ad['id'])
+                recovered_ads.append(recovered_ad)
+                failed_ads.remove(failed_ad)
 
     # Save any recovered ads
     if recovered_ads:
@@ -116,6 +118,7 @@ def start(es_index=None):
                          for recovered_ad in recovered_ads]
         enriched_ads = enricher.enrich(converted_ads)
         elastic.bulk_index(enriched_ads, es_index)
+        log.info("Indexed %d recovered ads." % len(enriched_ads))
     if failed_ads:
         log.warning("There are %d ads reported from stream that can't be downloaded.",
                     len(failed_ads))

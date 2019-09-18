@@ -29,9 +29,10 @@ def _bulk_generator(documents, indexname, idkey):
 
         if document.get('removed', False):
             yield {
+                '_op_type': 'delete',
                 '_index': indexname,
                 '_id': doc_id,
-                '_op_type': 'delete'
+                '_source': False
             }
         else:
             yield {
@@ -42,7 +43,8 @@ def _bulk_generator(documents, indexname, idkey):
 
 
 def bulk_index(documents, indexname, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30)
+    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30,
+         raise_on_error=False)
 
 
 def get_last_timestamp(indexname):

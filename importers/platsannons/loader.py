@@ -1,11 +1,13 @@
 import concurrent.futures
 import sys
+import logging
 import time
 from multiprocessing import Value
 
 import requests
 from importers import settings
-from importers.platsannons.main import log
+
+log = logging.getLogger(__name__)
 
 counter = None
 
@@ -57,8 +59,8 @@ def load_details_from_la(ad_meta):
     fail_max = 10
     ad_id = ad_meta['annonsId']
     if ad_meta.get('avpublicerad', False):
-        log.info("Ad %s is removed, preparing to delete" % ad_id)
-        return {'annonsId': ad_id, 'id': ad_id, 'removed': True}
+        log.debug("Ad %s is removed, preparing to delete" % ad_id)
+        return {'annonsId': ad_id, 'id': ad_id, 'removed': True, 'avpublicerad': True}
     detail_url = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:
