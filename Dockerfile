@@ -1,7 +1,4 @@
 FROM ubuntu:18.10
-ENV TZ=Europe/Stockholm
-RUN timedatectl set-timezone Europe/Stockholm
-RUN timedatectl
 
 # Install packages to allow apt to use a repository over HTTPS:
 RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing \
@@ -17,6 +14,9 @@ RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing 
     git \
     curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN sudo timedatectl set-timezone Europe/Stockholm
+RUN sudo timedatectl
 
 # Add Docker’s official GPG key:
 # RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
