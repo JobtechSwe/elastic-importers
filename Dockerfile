@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing 
     curl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN sudo timedatectl set-timezone Europe/Stockholm
-RUN sudo timedatectl
+RUN timedatectl set-timezone Europe/Stockholm
+RUN timedatectl
 
 # Add Docker’s official GPG key:
 # RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
