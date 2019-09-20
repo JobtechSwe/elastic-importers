@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing 
     libxslt-dev \
     git \
     curl \
+    tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN timedatectl set-timezone Europe/Stockholm
-RUN timedatectl
+ENV TZ=Europe/Stockholm
 
 # Add Docker’s official GPG key:
 # RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
