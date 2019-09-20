@@ -52,22 +52,8 @@ platsannons_mappings = {
                 "simple_word_splitter": {
                     "type": "custom",
                     "tokenizer": "whitespace",
-                    "filter": ["lowercase", "custom_stems", "light_swe_stemmer"],
+                    "filter": ["lowercase"],
                     "char_filter": ["punctuation_filter"]
-                }
-            },
-            "filter": {
-                "light_swe_stemmer": {
-                    "type": "stemmer",
-                    "name": "light_swedish"
-                },
-                "custom_stems": {
-                    "type": "stemmer_override",
-                    "rules": [
-                        "sala => sala",
-                        "sale => sale",
-                        "sales => sale"
-                    ]
                 }
             },
             "char_filter": {
@@ -96,7 +82,7 @@ platsannons_mappings = {
                 "fields": {
                     "words": {
                         "type": "text",
-                        "analyzer": "standard"
+                        "analyzer": "simple_word_splitter"
                     }
                 }
             },
@@ -105,7 +91,7 @@ platsannons_mappings = {
                 "properties": {
                     "text": {
                         "type": "text",
-                        "analyzer": "standard"
+                        "analyzer": "simple_word_splitter"
                     }
                 }
             },
