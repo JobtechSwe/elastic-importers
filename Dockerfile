@@ -1,6 +1,7 @@
 FROM ubuntu:18.10
 
 ENV TZ=Europe/Stockholm
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install packages to allow apt to use a repository over HTTPS:
 RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing \
