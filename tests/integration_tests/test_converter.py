@@ -31,7 +31,7 @@ def test_convert_message(msg):
     # see msg fixture in conftest.py
     print('============================', sys._getframe().f_code.co_name, '============================ ')
     print(msg)
-    annons = converter.convert_message(msg)
+    annons = converter.convert_ad(msg)
     print(annons)
     if 'annons' in msg and 'version' in msg:
         print("Message is not in correct format, going to be formatted...")

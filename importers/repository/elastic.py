@@ -27,15 +27,24 @@ def _bulk_generator(documents, indexname, idkey):
                                for key in idkey]) \
                 if isinstance(idkey, list) else document[idkey]
 
-        yield {
-            '_index': indexname,
-            '_id': doc_id,
-            '_source': document
-        }
+        if document.get('removed', False):
+            yield {
+                '_op_type': 'delete',
+                '_index': indexname,
+                '_id': doc_id,
+                '_source': False
+            }
+        else:
+            yield {
+                '_index': indexname,
+                '_id': doc_id,
+                '_source': document
+            }
 
 
 def bulk_index(documents, indexname, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30)
+    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30,
+         raise_on_error=False)
 
 
 def get_last_timestamp(indexname):

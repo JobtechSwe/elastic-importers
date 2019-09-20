@@ -1,5 +1,8 @@
 FROM ubuntu:18.10
 
+ENV TZ=Europe/Stockholm
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Install packages to allow apt to use a repository over HTTPS:
 RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing \
     apt-transport-https \
@@ -13,7 +16,10 @@ RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing 
     libxslt-dev \
     git \
     curl \
+    tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Add Docker’s official GPG key:
 # RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -

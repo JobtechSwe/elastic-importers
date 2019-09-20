@@ -23,154 +23,158 @@ def _isodate(bad_date):
         return None
 
 
-def convert_message(message_envelope):
-    if 'version' in message_envelope:
-        message = message_envelope
-        annons = dict()
-        annons['id'] = message.get('annonsId')
-        annons['external_id'] = message.get('externtAnnonsId')
-        annons['headline'] = message.get('annonsrubrik')
-        annons['application_deadline'] = _isodate(message.get('sistaAnsokningsdatum'))
-        annons['number_of_vacancies'] = message.get('antalPlatser')
-        annons['description'] = {
-            'text': message.get('annonstext'),
-            'text_formatted': message.get('annonstextFormaterad'),
-            'company_information': message.get('ftgInfo'),
-            'needs': message.get('beskrivningBehov'),
-            'requirements': message.get('beskrivningKrav'),
-            'conditions': message.get('villkorsbeskrivning'),
-        }
-        annons['employment_type'] = _expand_taxonomy_value('anstallningstyp',
-                                                           'anstallningTyp',
-                                                           message)
-        annons['salary_type'] = _expand_taxonomy_value('lonetyp', 'lonTyp', message)
-        annons['salary_description'] = message.get('lonebeskrivning')
-        annons['duration'] = _expand_taxonomy_value('varaktighet',
-                                                    'varaktighetTyp', message)
-        annons['working_hours_type'] = _expand_taxonomy_value('arbetstidstyp',
-                                                              'arbetstidTyp', message)
-        (default_min_omf,
-         default_max_omf) = _get_default_scope_of_work(
-             message.get('arbetstidTyp', {}).get('varde')
-         )
-        annons['scope_of_work'] = {
-            'min': message.get('arbetstidOmfattningFran', default_min_omf),
-            'max': message.get('arbetstidOmfattningTill', default_max_omf)
-        }
-        annons['access'] = message.get('tilltrade')
-        annons['employer'] = {
-            'phone_number': message.get('telefonnummer'),
-            'email': message.get('epost'),
-            'url': message.get('webbadress'),
-            'organization_number': message.get('organisationsnummer'),
-            'name': message.get('arbetsgivareNamn'),
-            'workplace': message.get('arbetsplatsNamn'),
-            'workplace_id': message.get('arbetsplatsId')
-        }
-        annons['application_details'] = {
-            'information': message.get('informationAnsokningssatt'),
-            'reference': message.get('referens'),
-            'email': message.get('ansokningssattEpost'),
-            'via_af': message.get('ansokningssattViaAF'),
-            'url': message.get('ansokningssattWebbadress'),
-            'other': message.get('ansokningssattAnnatSatt')
-        }
-        annons['experience_required'] = not message.get('ingenErfarenhetKravs', False)
-        annons['access_to_own_car'] = message.get('tillgangTillEgenBil', False)
-        if message.get('korkort', []):
-            annons['driving_license_required'] = True
-            annons['driving_license'] = parse_driving_licence(message)
-        else:
-            annons['driving_license_required'] = False
-
-        _set_occupations(annons, message)
-
-        annons['workplace_address'] = _build_wp_address(message.get('arbetsplatsadress', {}))
-
-        annons['must_have'] = {
-            'skills': [
-                get_concept_as_annons_value_with_weight('kompetens',
-                                                        kompetens.get('varde'),
-                                                        kompetens.get('vikt'))
-                for kompetens in message.get('kompetenser', [])
-                if get_null_safe_value(kompetens, 'vikt', 0) >= MUST_HAVE_WEIGHT
-            ],
-            'languages': [
-                get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'),
-                                                        sprak.get('vikt'))
-                for sprak in message.get('sprak', [])
-                if get_null_safe_value(sprak, 'vikt', 0) >= MUST_HAVE_WEIGHT
-            ],
-            'work_experiences': [
-                get_concept_as_annons_value_with_weight('yrkesroll',
-                                                        yrkerf.get('varde'),
-                                                        yrkerf.get('vikt'))
-                for yrkerf in message.get('yrkeserfarenheter', [])
-                if get_null_safe_value(yrkerf, 'vikt', 0) >= MUST_HAVE_WEIGHT
-            ],
-            'education': [],
-            'education_level': [],
-        }
-
-        annons['nice_to_have'] = {
-            'skills': [
-                get_concept_as_annons_value_with_weight('kompetens',
-                                                        kompetens.get('varde'),
-                                                        kompetens.get('vikt'))
-                for kompetens in message.get('kompetenser', [])
-                if get_null_safe_value(kompetens, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
-            ],
-            'languages': [
-                get_concept_as_annons_value_with_weight('sprak',
-                                                        sprak.get('varde'),
-                                                        sprak.get('vikt'))
-                for sprak in message.get('sprak', [])
-                if get_null_safe_value(sprak, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
-            ],
-            'work_experiences': [
-                get_concept_as_annons_value_with_weight('yrkesroll',
-                                                        yrkerf.get('varde'),
-                                                        yrkerf.get('vikt'))
-                for yrkerf in message.get('yrkeserfarenheter', [])
-                if get_null_safe_value(yrkerf, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
-            ],
-            'education': [],
-            'education_level': [],
-        }
-
-        if message.get('utbildningsinriktning', {}).get('vikt', 0) >= MUST_HAVE_WEIGHT:
-            annons['must_have']['education'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
-                    message.get('utbildningsinriktning', {}).get('varde'),
-                    message.get('utbildningsinriktning', {}).get('vikt'))]
-            annons['must_have']['education_level'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
-                    message.get('utbildningsniva', {}).get('varde'),
-                    message.get('utbildningsniva', {}).get('vikt'))]
-        elif message.get('utbildningsinriktning', {}).get('vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT:
-            annons['nice_to_have']['education'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
-                    message.get('utbildningsinriktning', {}).get('varde'),
-                    message.get('utbildningsinriktning', {}).get('vikt'))]
-            annons['nice_to_have']['education_level'] = [
-                get_concept_as_annons_value_with_weight(
-                    ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
-                    message.get('utbildningsniva', {}).get('varde'),
-                    message.get('utbildningsniva', {}).get('vikt'))]
-
-        annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
-        annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
-        annons['removed'] = message.get('avpublicerad')
-        annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
-        annons['source_type'] = message.get('kallaTyp')
-        # Extract labels as keywords for easier searching
-        return _add_keywords(annons)
+def convert_ad(message):
+    annons = dict()
+    annons['id'] = message.get('annonsId')
+    annons['external_id'] = message.get('externtAnnonsId')
+    annons['headline'] = message.get('annonsrubrik')
+    annons['application_deadline'] = _isodate(message.get('sistaAnsokningsdatum'))
+    annons['number_of_vacancies'] = message.get('antalPlatser')
+    annons['description'] = {
+        'text': message.get('annonstext'),
+        'text_formatted': message.get('annonstextFormaterad'),
+        'company_information': message.get('ftgInfo'),
+        'needs': message.get('beskrivningBehov'),
+        'requirements': message.get('beskrivningKrav'),
+        'conditions': message.get('villkorsbeskrivning'),
+    }
+    annons['employment_type'] = _expand_taxonomy_value('anstallningstyp',
+                                                       'anstallningTyp',
+                                                       message)
+    annons['salary_type'] = _expand_taxonomy_value('lonetyp', 'lonTyp', message)
+    annons['salary_description'] = message.get('lonebeskrivning')
+    annons['duration'] = _expand_taxonomy_value('varaktighet',
+                                                'varaktighetTyp', message)
+    annons['working_hours_type'] = _expand_taxonomy_value('arbetstidstyp',
+                                                          'arbetstidTyp', message)
+    (default_min_omf,
+     default_max_omf) = _get_default_scope_of_work(
+         message.get('arbetstidTyp', {}).get('varde')
+     )
+    annons['scope_of_work'] = {
+        'min': message.get('arbetstidOmfattningFran', default_min_omf),
+        'max': message.get('arbetstidOmfattningTill', default_max_omf)
+    }
+    annons['access'] = message.get('tilltrade')
+    annons['employer'] = {
+        'phone_number': message.get('telefonnummer'),
+        'email': message.get('epost'),
+        'url': message.get('webbadress'),
+        'organization_number': message.get('organisationsnummer'),
+        'name': message.get('arbetsgivareNamn'),
+        'workplace': message.get('arbetsplatsNamn'),
+        'workplace_id': message.get('arbetsplatsId')
+    }
+    annons['application_details'] = {
+        'information': message.get('informationAnsokningssatt'),
+        'reference': message.get('referens'),
+        'email': message.get('ansokningssattEpost'),
+        'via_af': message.get('ansokningssattViaAF'),
+        'url': message.get('ansokningssattWebbadress'),
+        'other': message.get('ansokningssattAnnatSatt')
+    }
+    annons['experience_required'] = not message.get('ingenErfarenhetKravs', False)
+    annons['access_to_own_car'] = message.get('tillgangTillEgenBil', False)
+    if message.get('korkort', []):
+        annons['driving_license_required'] = True
+        annons['driving_license'] = parse_driving_licence(message)
     else:
-        # Message is already in correct format
-        return message_envelope
+        annons['driving_license_required'] = False
+
+    _set_occupations(annons, message)
+
+    annons['workplace_address'] = _build_wp_address(message.get('arbetsplatsadress', {}))
+
+    annons['must_have'] = {
+        'skills': [
+            get_concept_as_annons_value_with_weight('kompetens',
+                                                    kompetens.get('varde'),
+                                                    kompetens.get('vikt'))
+            for kompetens in message.get('kompetenser', [])
+            if get_null_safe_value(kompetens, 'vikt', 0) >= MUST_HAVE_WEIGHT
+        ],
+        'languages': [
+            get_concept_as_annons_value_with_weight('sprak', sprak.get('varde'),
+                                                    sprak.get('vikt'))
+            for sprak in message.get('sprak', [])
+            if get_null_safe_value(sprak, 'vikt', 0) >= MUST_HAVE_WEIGHT
+        ],
+        'work_experiences': [
+            get_concept_as_annons_value_with_weight('yrkesroll',
+                                                    yrkerf.get('varde'),
+                                                    yrkerf.get('vikt'))
+            for yrkerf in message.get('yrkeserfarenheter', [])
+            if get_null_safe_value(yrkerf, 'vikt', 0) >= MUST_HAVE_WEIGHT
+        ],
+        'education': [],
+        'education_level': [],
+    }
+
+    annons['nice_to_have'] = {
+        'skills': [
+            get_concept_as_annons_value_with_weight('kompetens',
+                                                    kompetens.get('varde'),
+                                                    kompetens.get('vikt'))
+            for kompetens in message.get('kompetenser', [])
+            if get_null_safe_value(kompetens, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+        ],
+        'languages': [
+            get_concept_as_annons_value_with_weight('sprak',
+                                                    sprak.get('varde'),
+                                                    sprak.get('vikt'))
+            for sprak in message.get('sprak', [])
+            if get_null_safe_value(sprak, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+        ],
+        'work_experiences': [
+            get_concept_as_annons_value_with_weight('yrkesroll',
+                                                    yrkerf.get('varde'),
+                                                    yrkerf.get('vikt'))
+            for yrkerf in message.get('yrkeserfarenheter', [])
+            if get_null_safe_value(yrkerf, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+        ],
+        'education': [],
+        'education_level': [],
+    }
+
+    if message.get('utbildningsinriktning'):
+        try:
+            _set_education(annons, message)
+        except TypeError:
+            log.warning(f"Skipping education fields on ad {annons['id']} due to TypeError")
+
+    annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
+    annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
+    annons['removed'] = message.get('avpublicerad')
+    annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
+    annons['source_type'] = message.get('kallaTyp')
+    annons['timestamp'] = message.get('updatedAt')
+    # Extract labels as keywords for easier searching
+    return _add_keywords(annons)
+
+
+def _set_education(annons, message):
+    if get_null_safe_value(message.get('utbildningsinriktning'), 'vikt', 0) >= MUST_HAVE_WEIGHT:
+        annons['must_have']['education'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                message.get('utbildningsinriktning', {}).get('varde'),
+                message.get('utbildningsinriktning', {}).get('vikt'))]
+        annons['must_have']['education_level'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                message.get('utbildningsniva', {}).get('varde'),
+                message.get('utbildningsniva', {}).get('vikt'))]
+    else:
+        annons['nice_to_have']['education'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                message.get('utbildningsinriktning', {}).get('varde'),
+                message.get('utbildningsinriktning', {}).get('vikt'))]
+        annons['nice_to_have']['education_level'] = [
+            get_concept_as_annons_value_with_weight(
+                ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                message.get('utbildningsniva', {}).get('varde'),
+                message.get('utbildningsniva', {}).get('vikt'))]
 
 
 def _get_default_scope_of_work(arbtid_typ):
