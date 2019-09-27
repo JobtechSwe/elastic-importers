@@ -77,8 +77,12 @@ def load_details_from_la(ad_meta):
                         len(ad.get('organisationsnummer', '').strip()) > 9:
                     orgnr = ad['organisationsnummer']
                     significate_number_position = 4 if len(orgnr) == 12 else 2
-                    if int(orgnr[significate_number_position]) < 2:
+                    try:
+                        if int(orgnr[significate_number_position]) < 2:
+                            ad['organisationsnummer'] = None
+                    except ValueError:
                         ad['organisationsnummer'] = None
+                        log.error(f"Valueerror in loader for orgnummer, ad {detail_url}. Replacing with None.")
                 clean_ad = _cleanup_stringvalues(ad)
                 return clean_ad
         # On fail, try again 10 times with 0.3 second delay
