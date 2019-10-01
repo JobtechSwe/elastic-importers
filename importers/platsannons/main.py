@@ -33,9 +33,8 @@ def _setup_index(es_index):
 def _check_last_timestamp(es_index):
     last_timestamp = elastic.get_last_timestamp(es_index)
     log.info("Last timestamp: %d (%s)" % (last_timestamp,
-                                          datetime.fromtimestamp(
-                                              (last_timestamp + 1) / 1000)
-                                          ))
+                                          datetime.fromtimestamp(last_timestamp
+                                                                 / 1000)))
     # last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
     #                                                   es_index)
     return last_timestamp
@@ -59,7 +58,7 @@ def start(es_index=None):
     nr_of_batches = math.ceil(len(ad_ids) / nr_of_items_per_batch)
 
     ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
-    
+
     processed_ads_total = 0
     failed_ads = []
     for i, ad_batch in enumerate(ad_batches):
@@ -87,6 +86,8 @@ def start(es_index=None):
                        if raw_ad.get('removed', False)]
         # Save raw-list to postgresql
         postgresql.bulk(raw_ads, settings.PG_PLATSANNONS_TABLE)
+        log.debug(f'Postgresql bulked ads (id, updatedAt): '
+                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
         # Set expired on all removed ads
         postgresql.set_expired_for_ids(settings.PG_PLATSANNONS_TABLE, deleted_ids)
 

@@ -64,7 +64,7 @@ def load_details_from_la(ad_meta):
     detail_url = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:
-            r = requests.get(detail_url, timeout=60)
+            r = requests.get(detail_url, timeout=10)
             r.raise_for_status()
             ad = r.json()
             if ad:
@@ -82,32 +82,32 @@ def load_details_from_la(ad_meta):
                             ad['organisationsnummer'] = None
                     except ValueError:
                         ad['organisationsnummer'] = None
-                        log.error(f"Valueerror in loader for orgnummer, ad {detail_url}. Replacing with None.")
+                        log.error(f"Value error in loader for orgnummer, ad {detail_url}. Replacing with None.")
                 clean_ad = _cleanup_stringvalues(ad)
                 return clean_ad
         # On fail, try again 10 times with 0.3 second delay
         except requests.exceptions.ConnectionError as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning("Unable to load data from %s - Connection error" % detail_url)
+            log.warning("Unable to load data from %s - Connection error, try %d" % (detail_url, fail_count))
             if fail_count >= fail_max:
-                log.error("Unable to continue loading data from %s - Connection" %
+                log.error("Failed to continue loading data from %s - Connection error" %
                           detail_url, e)
                 sys.exit(1)
         except requests.exceptions.Timeout as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning("Unable to load data from %s - Timeout" % detail_url)
+            log.warning("Unable to load data from %s - Timeout, try %d" % (detail_url, fail_count))
             if fail_count >= fail_max:
-                log.error("Unable to continue loading data from %s - Timeout" %
+                log.error("Failed to continue loading data from %s - Timeout" %
                           detail_url, e)
                 sys.exit(1)
         except requests.exceptions.RequestException as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning(e)
+            log.warning("Unable to fetch data at %s - ambiguous exception, try %d" % (detail_url, fail_count))
             if fail_count >= fail_max:
-                log.error("Failed to fetch data at %s, skipping" % detail_url, e)
+                log.error("Failed to fetch data at %s - ambiguous exception, skipping" % detail_url, e)
                 raise e
 
 
