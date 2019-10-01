@@ -200,7 +200,7 @@ def update_ad(ad_id, doc, timestamp, table):
                 table +
                 " SET doc = %s, timestamp = %s WHERE TRIM(id) = %s",
                 (json.dumps(doc),
-                 convert_to_timestamp(timestamp),
+                 convert_to_timestamp(timestamp, ad_id),
                  str(ad_id)))
     pg_conn.commit()
     cur.close()
@@ -251,11 +251,11 @@ def bulk(items, table):
     if not table_exists(table):
         create_default_table(table)
     adapted_items = [(str(item['id']).strip(),
-                      convert_to_timestamp(item['updatedAt']),
-                      convert_to_timestamp(item.get('expiresAt')),
+                      convert_to_timestamp(item['updatedAt'], item['id']),
+                      convert_to_timestamp(item.get('expiresAt'), item['id']),
                       json.dumps(item),
-                      convert_to_timestamp(item['updatedAt']),
-                      convert_to_timestamp(item.get('expiresAt')),
+                      convert_to_timestamp(item['updatedAt'], item['id']),
+                      convert_to_timestamp(item.get('expiresAt'), item['id']),
                       json.dumps(item), False) for item in items if item]
     try:
         bulk_conn = get_new_pg_conn()
@@ -280,7 +280,7 @@ def bulk(items, table):
     log.info("Bulk inserted %d docs in: %s seconds." % (len(adapted_items), elapsed_time))
 
 
-def convert_to_timestamp(date):
+def convert_to_timestamp(date, document_id=None):
     if not date:
         return None
     if type(date) == int and date > 0:
@@ -305,7 +305,7 @@ def convert_to_timestamp(date):
             conversion_failure = True
 
     if conversion_failure:
-        log.debug("Failed to convert date %s" % date)
+        log.debug("Failed to convert date %s for document %s " % (date, document_id))
 
     return int(ts)
 
