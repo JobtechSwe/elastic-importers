@@ -151,15 +151,7 @@ def enrich_doc(annons, enriched_output):
     enriched_node['trait'] = [candidate['concept_label'].lower()
                               for candidate in enriched_candidates['traits']]
 
-    wp_address_node = annons.get('workplace_address', {})
-    wp_region = ''
-    if wp_address_node:
-        wp_region = get_null_safe_value(wp_address_node, 'region', '')
-
-    if wp_region.lower() == 'ospecificerad arbetsort':
-        enriched_node['location'] = [wp_region.lower()]
-    else:
-        enriched_node['location'] = [candidate['concept_label'].lower()
-                                     for candidate in enriched_candidates['geos']]
+    enriched_node['location'] = [candidate['concept_label'].lower()
+                                 for candidate in enriched_candidates['geos']]
 
     return annons
