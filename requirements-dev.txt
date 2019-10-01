@@ -7,4 +7,5 @@ python-dateutil
 pytest
 pytest-runner
 pytest-envfiles
+git+https://github.com/JobtechSwe/valuestore-module.git@develop
 flashtext
