@@ -60,7 +60,17 @@ def load_details_from_la(ad_meta):
     ad_id = ad_meta['annonsId']
     if ad_meta.get('avpublicerad', False):
         log.debug("Ad %s is removed, preparing to delete" % ad_id)
-        return {'annonsId': ad_id, 'id': ad_id, 'removed': True, 'avpublicerad': True}
+        removed_date = ad_meta.get('avpubliceringsdatum') or \
+            time.strftime("%Y-%m-%dT%H:%M:%S",
+                          time.localtime(ad_meta.get('uppdateradTid') / 1000))
+
+        return {'annonsId': ad_id, 'id': ad_id, 'removed': True,
+                'avpublicerad': True,
+                'avpubliceringsdatum': removed_date,
+                'removed_date': removed_date,
+                'uppdateradTid': ad_meta.get('uppdateradTid'),
+                'updatedAt': ad_meta.get('uppdateradTid'),
+                'timestamp': ad_meta.get('uppdateradTid')}
     detail_url = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:

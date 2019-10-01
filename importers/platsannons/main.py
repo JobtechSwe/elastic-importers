@@ -20,14 +20,15 @@ def _setup_index(es_index):
         es_index = sys.argv[1]
 
     try:
-        es_index = elastic.setup_indices(es_index, settings.ES_ANNONS_PREFIX,
-                                         settings.platsannons_mappings)
+        es_index, delete_index = elastic.setup_indices(es_index,
+                                                       settings.ES_ANNONS_PREFIX,
+                                                       settings.platsannons_mappings)
         log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
                  % ('af-platsannons', settings.PG_BATCH_SIZE, es_index))
     except Exception as e:
         log.error("Elastic operations failed: %s" % str(e))
         sys.exit(1)
-    return es_index
+    return es_index, delete_index
 
 
 def _check_last_timestamp(es_index):
@@ -43,7 +44,7 @@ def _check_last_timestamp(es_index):
 def start(es_index=None):
     start_time = time.time()
     # Get, set and create elastic index
-    es_index = _setup_index(es_index)
+    es_index, es_index_deleted = _setup_index(es_index)
     log.info("Starting ad import into index: %s" % es_index)
     last_timestamp = _check_last_timestamp(es_index)
     doc_counter = 0
@@ -96,7 +97,7 @@ def start(es_index=None):
         enriched_ads = enricher.enrich(converted_ads)
         # Bulk save cooked-list to elastic
         log.debug("Indexing %d documents into %s" % (len(enriched_ads), es_index))
-        elastic.bulk_index(enriched_ads, es_index)
+        elastic.bulk_index(enriched_ads, es_index, es_index_deleted)
         processed_ads_total = processed_ads_total + len(ad_batch)
 
         log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))

@@ -18,7 +18,7 @@ else:
     es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
 
 
-def _bulk_generator(documents, indexname, idkey):
+def _bulk_generator(documents, indexname, idkey, deleted_index):
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
@@ -28,12 +28,27 @@ def _bulk_generator(documents, indexname, idkey):
                 if isinstance(idkey, list) else document[idkey]
 
         if document.get('removed', False):
-            yield {
+            remove_statement = {
                 '_op_type': 'delete',
                 '_index': indexname,
                 '_id': doc_id,
                 '_source': False
             }
+            if deleted_index:
+                tombstone = {
+                    'id': doc_id,
+                    'removed': True,
+                    'removed_date':  document.get('removed_date'),
+                    'timestamp': document.get('timestamp'),
+                }
+                yield remove_statement
+                yield {
+                        '_index': deleted_index,
+                        '_id': doc_id,
+                        '_source': tombstone,
+                    }
+            else:
+                yield remove_statement
         else:
             yield {
                 '_index': indexname,
@@ -42,9 +57,9 @@ def _bulk_generator(documents, indexname, idkey):
             }
 
 
-def bulk_index(documents, indexname, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30,
-         raise_on_error=False)
+def bulk_index(documents, indexname, deleted_index=None, idkey='id'):
+    bulk(es, _bulk_generator(documents, indexname, idkey, deleted_index),
+         request_timeout=30, raise_on_error=False)
 
 
 def get_last_timestamp(indexname):
@@ -153,10 +168,15 @@ def put_alias(indexlist, aliasname):
 def setup_indices(es_index, default_index, mappings):
     write_alias = None
     read_alias = None
+    deleted_index = "%s-deleted" % es_index
     if not es_index:
         es_index = default_index
+        deleted_index = "%s-deleted" % settings.ES_ANNONS_PREFIX
         write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
         read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
+    if not index_exists(deleted_index):
+        log.info("Creating index %s" % deleted_index)
+        create_index(deleted_index, mappings)
     if not index_exists(es_index):
         log.info("Creating index %s" % es_index)
         create_index(es_index, mappings)
@@ -167,7 +187,8 @@ def setup_indices(es_index, default_index, mappings):
         log.info("Setting up alias %s for index %s" % (read_alias, es_index))
         put_alias([es_index], read_alias)
 
-    return write_alias or es_index
+    current_index = write_alias or es_index
+    return current_index, deleted_index
 
 
 def create_index(indexname, extra_mappings=None):
