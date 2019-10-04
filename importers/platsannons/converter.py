@@ -32,14 +32,18 @@ def convert_ad(message):
     annons['headline'] = message.get('annonsrubrik')
     annons['application_deadline'] = _isodate(message.get('sistaAnsokningsdatum'))
     annons['number_of_vacancies'] = message.get('antalPlatser')
-    annons['description'] = {
-        'text': clean_html(message.get('annonstextFormaterad')),
-        'text_formatted': message.get('annonstextFormaterad'),
-        'company_information': message.get('ftgInfo'),
-        'needs': message.get('beskrivningBehov'),
-        'requirements': message.get('beskrivningKrav'),
-        'conditions': message.get('villkorsbeskrivning'),
-    }
+    try:
+        annons['description'] = {
+            'text': clean_html(message.get('annonstextFormaterad')),
+            'text_formatted': message.get('annonstextFormaterad'),
+            'company_information': message.get('ftgInfo'),
+            'needs': message.get('beskrivningBehov'),
+            'requirements': message.get('beskrivningKrav'),
+            'conditions': message.get('villkorsbeskrivning'),
+        }
+    except TypeError as e:
+        log.error(f'TypeError with ad: {annons["id"]}')
+        raise e
     annons['employment_type'] = _expand_taxonomy_value('anstallningstyp',
                                                        'anstallningTyp',
                                                        message)
