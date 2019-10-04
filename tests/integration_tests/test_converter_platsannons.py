@@ -36,11 +36,11 @@ def get_target_ads_from_file():
         # pprint(result)
         return result['hits']['hits']
 
-@pytest.mark.skip(reason="Temporarily disabled")
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_platsannons_conversion():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
-    from importers.platsannons import converter
+
     source_ads = get_source_ads_from_file()
     target_ads = get_target_ads_from_file()
 
@@ -49,11 +49,12 @@ def test_platsannons_conversion():
     source_ad = get_source_ad(annons_id, source_ads)
 
     annons_id = source_ad['annonsId']
-    assert_ad_properties(annons_id, source_ads, target_ads, converter)
+    assert_ad_properties(annons_id, source_ads, target_ads)
 
 
 
-def assert_ad_properties(annons_id, source_ads, target_ads, converter):
+def assert_ad_properties(annons_id, source_ads, target_ads):
+    from importers.platsannons import converter
     print('Testing convert_message for id: %s' % annons_id)
     source_ad = get_source_ad(annons_id, source_ads)
     # pprint(source_ad)
@@ -67,14 +68,14 @@ def assert_ad_properties(annons_id, source_ads, target_ads, converter):
     message_envelope['version'] = 1
     message_envelope['timestamp'] = target_ad['timestamp']
     # pprint(message_envelope)
-    conv_ad = converter.convert_message(message_envelope)
-    pprint(conv_ad)
+    conv_ad = converter.convert_ad(message_envelope)
+    # pprint(conv_ad)
     # pprint(target_ad)
     for key, val in target_ad.items():
         # print(key)
         # if key not in ['publiceringskanaler', 'status', 'timestamp', 'keywords_enriched_binary', 'keywords']:
         # if key not in ['avpublicerad']:
-        if key not in ['keywords', 'timestamp']:
+        if key not in ['keywords', 'timestamp', 'employer']:
             # print(key)
             assert key in conv_ad.keys()
             assert type(val) == type(conv_ad[key])
@@ -87,6 +88,17 @@ def assert_ad_properties(annons_id, source_ads, target_ads, converter):
             assert 'gateau' in company_node
             assert 'fazer food services ab' not in company_node
             assert 'gateau ab' not in company_node
+        elif key == 'employer':
+            employer_node = conv_ad['employer']
+
+            employer_node_keys = employer_node.keys()
+            assert 'phone_number' in employer_node_keys
+            assert 'email' in employer_node_keys
+            assert 'url' in employer_node_keys
+            assert 'organization_number' in employer_node_keys
+            assert 'name' in employer_node_keys
+            assert 'workplace' in employer_node_keys
+            assert 'workplace_id' in employer_node_keys
 
     #########################
     # Borttagna attribut
@@ -110,13 +122,12 @@ def assert_ad_properties(annons_id, source_ads, target_ads, converter):
         assert conv_ad[removed_date_key] is None
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_corrupt_platsannons():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
     from importers.platsannons import converter
     source_ads = get_source_ads_from_file()
-    target_ads = get_target_ads_from_file()
 
     annons_id = '20159374'
     source_ad = get_source_ad(annons_id, source_ads)
@@ -128,15 +139,15 @@ def test_corrupt_platsannons():
     message_envelope['timestamp'] = 1539958052330
     # pprint(message_envelope)
     conv_ad = converter.convert_ad(message_envelope)
-    pprint(conv_ad)
+    # pprint(conv_ad)
 
     assert len(conv_ad['must_have']['languages']) == 0
     assert len(conv_ad['must_have']['skills']) == 0
     assert len(conv_ad['must_have']['work_experiences']) == 0
 
-    assert len(conv_ad['nice_to_have']['languages']) > 0
-    assert len(conv_ad['nice_to_have']['skills']) > 0
-    assert len(conv_ad['nice_to_have']['work_experiences']) > 0
+    assert len(conv_ad['nice_to_have']['languages']) == 2
+    assert len(conv_ad['nice_to_have']['skills']) == 2
+    assert len(conv_ad['nice_to_have']['work_experiences']) == 2
 
 
 
