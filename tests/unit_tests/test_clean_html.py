@@ -140,7 +140,7 @@ def test_clean_html_double_p_tags():
 
 
 def get_source_ads_from_file():
-    with open(currentdir + 'test_resources/platsannonser_source_test_import.json') as f:
+    with open(currentdir + 'test_resources/platsannonser_source_test_import.json', encoding='utf-8') as f:
         result = json.load(f)
         # pprint(result)
         return result['testannonser']
