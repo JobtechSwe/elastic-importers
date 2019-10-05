@@ -19,23 +19,25 @@ def grouper(n, iterable):
 tags_display_block = ['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 
 def clean_html(text):
-    soup = BeautifulSoup(text, 'html.parser')
-    log.debug('Before (clean_html):', soup.prettify())
+    if text is None:
+        cleaned_text = ''
+    else:
+        soup = BeautifulSoup(text, 'html.parser')
+        log.debug('Before (clean_html):', soup.prettify())
 
-    # Remove all script-tags
-    [s.extract() for s in soup('script')]
+        # Remove all script-tags
+        [s.extract() for s in soup('script')]
 
+        for tag_name in tags_display_block:
+            _add_linebreak_for_tag_name(tag_name, '\n', '\n', soup)
 
-    for tag_name in tags_display_block:
-        _add_linebreak_for_tag_name(tag_name, '\n', '\n', soup)
+        _add_linebreak_for_tag_name('li', '', '\n', soup)
+        _add_linebreak_for_tag_name('br', '', '\n', soup)
 
-    _add_linebreak_for_tag_name('li', '', '\n', soup)
-    _add_linebreak_for_tag_name('br', '', '\n', soup)
+        cleaned_text = soup.get_text()
 
-    cleaned_text = soup.get_text()
-
-    cleaned_text = cleaned_text.strip()
-    log.debug('After (clean_html):',  cleaned_text)
+        cleaned_text = cleaned_text.strip()
+        log.debug('After (clean_html):',  cleaned_text)
 
     return cleaned_text
 
