@@ -107,6 +107,36 @@ def test_clean_html_from_description():
     assert '</p>' not in cleaned_ad_text
     assert '\n' in cleaned_ad_text
 
+
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.unit
+def test_clean_html_from_description2():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
+    source_ads = get_source_ads_from_file()
+
+    annons_id = '8428019'
+    source_ad = get_source_ad(annons_id, source_ads)
+    # pprint(source_ad)
+    ad_html_text = source_ad['annonstextFormaterad']
+    # print(ad_html_text)
+    cleaned_ad_text = clean_html(ad_html_text)
+    # print(cleaned_ad_text)
+
+    assert '</p>' not in cleaned_ad_text
+    assert '\n' in cleaned_ad_text
+
+
+
+# @pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.unit
+def test_clean_html_type_none_input():
+    print('============================', sys._getframe().f_code.co_name, '============================ ')
+    cleaned_ad_text = clean_html(None)
+    # print(cleaned_ad_text)
+    assert cleaned_ad_text == ''
+
+
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.unit
 def test_clean_html_p_tags():
