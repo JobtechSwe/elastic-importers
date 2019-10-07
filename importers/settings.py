@@ -8,6 +8,8 @@ ES_PWD = os.getenv("ES_PWD")
 # For platsannonser
 WRITE_INDEX_SUFFIX = '-write'
 READ_INDEX_SUFFIX = '-read'
+DELETED_INDEX_SUFFIX = '-deleted'
+STREAM_INDEX_SUFFIX = '-stream'
 ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX',
                              os.getenv('ES_ANNONS', 'platsannons'))
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
