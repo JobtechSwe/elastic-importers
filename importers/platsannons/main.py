@@ -22,7 +22,8 @@ def _setup_index(es_index):
     try:
         es_index, delete_index = elastic.setup_indices(es_index,
                                                        settings.ES_ANNONS_PREFIX,
-                                                       settings.platsannons_mappings)
+                                                       settings.platsannons_mappings,
+                                                       settings.platsannons_deleted_mappings)
         log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
                  % ('af-platsannons', settings.PG_BATCH_SIZE, es_index))
     except Exception as e:
@@ -36,8 +37,6 @@ def _check_last_timestamp(es_index):
     log.info("Last timestamp: %d (%s)" % (last_timestamp,
                                           datetime.fromtimestamp(last_timestamp
                                                                  / 1000)))
-    # last_identifiers = elastic.get_ids_with_timestamp(last_timestamp,
-    #                                                   es_index)
     return last_timestamp
 
 
@@ -48,16 +47,23 @@ def start(es_index=None):
     log.info("Starting ad import into index: %s" % es_index)
     last_timestamp = _check_last_timestamp(es_index)
     doc_counter = 0
-    # Check psql table existance
+
+    if not settings.LA_FEED_URL:
+        # Try to load cached ads from database
+        if not settings.PG_DBNAME:
+            raise Exception('No configuration found for pgsql not for rest feed.')
+        _load_from_postgresql(last_timestamp, es_index)
+        return
+
     # Load list of updated ad ids
+    log.info("Loading updates from REST endpoint.")
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)
-    # Partition list into manageable chunks
 
     log.info('Fetching details for %s ads...' % len(ad_ids))
     nr_of_items_per_batch = int(settings.PG_BATCH_SIZE)
     nr_of_items_per_batch = min(nr_of_items_per_batch, len(ad_ids))
     nr_of_batches = math.ceil(len(ad_ids) / nr_of_items_per_batch)
-
+    # Partition list into manageable chunks
     ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
 
     processed_ads_total = 0
@@ -92,12 +98,7 @@ def start(es_index=None):
         # Set expired on all removed ads
         postgresql.set_expired_for_ids(settings.PG_PLATSANNONS_TABLE, deleted_ids)
 
-        # Loop over raw-list, convert and enrich into cooked-list
-        converted_ads = [converter.convert_ad(ad) for ad in ad_details.values()]
-        enriched_ads = enricher.enrich(converted_ads)
-        # Bulk save cooked-list to elastic
-        log.debug("Indexing %d documents into %s" % (len(enriched_ads), es_index))
-        elastic.bulk_index(enriched_ads, es_index, es_index_deleted)
+        _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted)
         processed_ads_total = processed_ads_total + len(ad_batch)
 
         log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
@@ -116,17 +117,46 @@ def start(es_index=None):
 
     # Save any recovered ads
     if recovered_ads:
-        converted_ads = [converter.convert_ad(recovered_ad)
-                         for recovered_ad in recovered_ads]
-        enriched_ads = enricher.enrich(converted_ads)
-        elastic.bulk_index(enriched_ads, es_index)
-        log.info("Indexed %d recovered ads." % len(enriched_ads))
+        num_idxd_ads = _convert_and_save_to_elastic(recovered_ads, es_index,
+                                                    es_index_deleted)
+        log.info("Indexed %d recovered ads." % num_idxd_ads)
     if failed_ads:
         log.warning("There are %d ads reported from stream that can't be downloaded.",
                     len(failed_ads))
 
     elapsed_time = time.time() - start_time
     log.info("Processed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+
+
+def _load_from_postgresql(last_timestamp, es_index):
+    log.info("No feed configuration detected, using database as source.")
+    doc_counter = 0
+    last_identifiers = elastic.get_ids_with_timestamp(last_timestamp, es_index)
+
+    while True:
+        (last_identifiers, last_timestamp, platsannonser) = \
+            postgresql.read_from_pg_since(last_identifiers, last_timestamp,
+                                          settings.PG_PLATSANNONS_TABLE)
+        current_doc_count = len(platsannonser)
+        doc_counter += current_doc_count
+
+        if platsannonser:
+            log.info("Still working ... %d ads indexed so far." % doc_counter)
+            _convert_and_save_to_elastic(platsannonser, es_index, None)
+        else:
+            log.info("Indexed %d ads into elastic" % doc_counter)
+            break
+
+
+def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
+    # Loop over raw-list, convert and enrich into cooked-list
+    converted_ads = [converter.convert_ad(raw_ad)
+                     for raw_ad in raw_ads]
+    enriched_ads = enricher.enrich(converted_ads)
+    log.debug("Indexing %d documents into %s" % (len(enriched_ads), es_index))
+    # Bulk save cooked-list to elastic
+    elastic.bulk_index(enriched_ads, es_index, deleted_index)
+    return len(enriched_ads)
 
 
 def _grouper(n, iterable):

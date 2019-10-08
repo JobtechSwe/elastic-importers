@@ -48,10 +48,13 @@ def read_docs_with_ids(tablename, ids, converter=None):
 
 
 def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
+    if not pg_conn:
+        return
+
     cur = pg_conn.cursor()
     ts_today = int(round(time.time() * 1000))  # Get current timestamp
 
-    sql_last_ids = [str(id) for id in last_ids]
+    sql_last_ids = [str(ad_id) for ad_id in last_ids]
 
     sql_str = "SELECT id, timestamp, doc FROM " + tablename + \
               " WHERE timestamp >= %(ts)s AND (expires IS NULL OR expires > %(expires)s)" \

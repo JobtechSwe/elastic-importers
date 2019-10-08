@@ -47,6 +47,21 @@ LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
 LA_DETAILS_PARALLELISM = os.getenv('LA_DETAILS_PARALLELISM', 8)
 # End from loaders
 
+platsannons_deleted_mappings = {
+    "mappings": {
+        "properties": {
+            "publication_date": {
+                "type": "date",
+                "null_value": "1970-01-01"
+            },
+            "last_publication_date": {
+                "type": "date",
+                "null_value": "2100-12-31"
+            },
+        }
+    }
+}
+
 platsannons_mappings = {
     "settings": {
         "analysis": {

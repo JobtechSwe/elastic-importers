@@ -40,6 +40,8 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'removed': True,
                     'removed_date':  document.get('removed_date'),
                     'timestamp': document.get('timestamp'),
+                    'publication_date': None,
+                    'last_publication_date': None,
                 }
                 yield remove_statement
                 yield {
@@ -165,7 +167,7 @@ def put_alias(indexlist, aliasname):
     return es.indices.put_alias(index=indexlist, name=aliasname)
 
 
-def setup_indices(es_index, default_index, mappings):
+def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
     write_alias = None
     read_alias = None
     stream_alias = None
@@ -178,7 +180,7 @@ def setup_indices(es_index, default_index, mappings):
         stream_alias = "%s%s" % (es_index, settings.STREAM_INDEX_SUFFIX)
     if not index_exists(deleted_index):
         log.info("Creating index %s" % deleted_index)
-        create_index(deleted_index, mappings)
+        create_index(deleted_index, mappings_deleted)
     if not index_exists(es_index):
         log.info("Creating index %s" % es_index)
         create_index(es_index, mappings)
