@@ -3,6 +3,7 @@ import re
 from dateutil import parser
 from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
+from importers.common import clean_html
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -10,6 +11,7 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 
 MUST_HAVE_WEIGHT = 10
+NICE_TO_HAVE_WEIGHT = 5
 
 
 def _isodate(bad_date):
@@ -30,8 +32,13 @@ def convert_ad(message):
     annons['headline'] = message.get('annonsrubrik')
     annons['application_deadline'] = _isodate(message.get('sistaAnsokningsdatum'))
     annons['number_of_vacancies'] = message.get('antalPlatser')
+
+    cleaned_description_text = clean_html(message.get('annonstextFormaterad'))
+    if cleaned_description_text == '':
+        log.warning('description.text is empty for ad id: %s' % annons['id'])
+
     annons['description'] = {
-        'text': message.get('annonstext'),
+        'text': cleaned_description_text,
         'text_formatted': message.get('annonstextFormaterad'),
         'company_information': message.get('ftgInfo'),
         'needs': message.get('beskrivningBehov'),
@@ -116,21 +123,21 @@ def convert_ad(message):
                                                     kompetens.get('varde'),
                                                     kompetens.get('vikt'))
             for kompetens in message.get('kompetenser', [])
-            if get_null_safe_value(kompetens, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+            if get_null_safe_value(kompetens, 'vikt', NICE_TO_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
         ],
         'languages': [
             get_concept_as_annons_value_with_weight('sprak',
                                                     sprak.get('varde'),
                                                     sprak.get('vikt'))
             for sprak in message.get('sprak', [])
-            if get_null_safe_value(sprak, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+            if get_null_safe_value(sprak, 'vikt', NICE_TO_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
         ],
         'work_experiences': [
             get_concept_as_annons_value_with_weight('yrkesroll',
                                                     yrkerf.get('varde'),
                                                     yrkerf.get('vikt'))
             for yrkerf in message.get('yrkeserfarenheter', [])
-            if get_null_safe_value(yrkerf, 'vikt', MUST_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+            if get_null_safe_value(yrkerf, 'vikt', NICE_TO_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
         ],
         'education': [],
         'education_level': [],
