@@ -48,10 +48,13 @@ def read_docs_with_ids(tablename, ids, converter=None):
 
 
 def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
+    if not pg_conn:
+        return
+
     cur = pg_conn.cursor()
     ts_today = int(round(time.time() * 1000))  # Get current timestamp
 
-    sql_last_ids = [str(id) for id in last_ids]
+    sql_last_ids = [str(ad_id) for ad_id in last_ids]
 
     sql_str = "SELECT id, timestamp, doc FROM " + tablename + \
               " WHERE timestamp >= %(ts)s AND (expires IS NULL OR expires > %(expires)s)" \
@@ -200,7 +203,7 @@ def update_ad(ad_id, doc, timestamp, table):
                 table +
                 " SET doc = %s, timestamp = %s WHERE TRIM(id) = %s",
                 (json.dumps(doc),
-                 convert_to_timestamp(timestamp),
+                 convert_to_timestamp(timestamp, ad_id),
                  str(ad_id)))
     pg_conn.commit()
     cur.close()
@@ -251,11 +254,11 @@ def bulk(items, table):
     if not table_exists(table):
         create_default_table(table)
     adapted_items = [(str(item['id']).strip(),
-                      convert_to_timestamp(item['updatedAt']),
-                      convert_to_timestamp(item.get('expiresAt')),
+                      convert_to_timestamp(item['updatedAt'], item['id']),
+                      convert_to_timestamp(item.get('expiresAt'), item['id']),
                       json.dumps(item),
-                      convert_to_timestamp(item['updatedAt']),
-                      convert_to_timestamp(item.get('expiresAt')),
+                      convert_to_timestamp(item['updatedAt'], item['id']),
+                      convert_to_timestamp(item.get('expiresAt'), item['id']),
                       json.dumps(item), False) for item in items if item]
     try:
         bulk_conn = get_new_pg_conn()
@@ -280,7 +283,7 @@ def bulk(items, table):
     log.info("Bulk inserted %d docs in: %s seconds." % (len(adapted_items), elapsed_time))
 
 
-def convert_to_timestamp(date):
+def convert_to_timestamp(date, document_id=None):
     if not date:
         return None
     if type(date) == int and date > 0:
@@ -299,9 +302,13 @@ def convert_to_timestamp(date):
         try:
             ts = time.mktime(time.strptime(date, dateformat)) * 1000
             log.debug("Converted date %s to %d" % (date, ts))
+            conversion_failure = False
             break
         except ValueError:
-            log.debug("Failed to convert date %s" % date)
+            conversion_failure = True
+
+    if conversion_failure:
+        log.debug("Failed to convert date %s for document %s " % (date, document_id))
 
     return int(ts)
 

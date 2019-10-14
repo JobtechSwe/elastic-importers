@@ -78,19 +78,22 @@ def get_doc_headline_input(annons):
     if doc_headline_occupation is None:
         doc_headline_occupation = ''
 
+    #TODO: Activate when textdoc-enrichments is updated regarding GEO
     # workplace_address
-    wp_address_node = annons.get('workplace_address', {})
-    wp_address_input = ''
-    if wp_address_node:
-        wp_city = get_null_safe_value(wp_address_node, 'city', '')
-        wp_municipality = get_null_safe_value(wp_address_node, 'municipality', '')
-        wp_region = get_null_safe_value(wp_address_node, 'region', '')
-        wp_country = get_null_safe_value(wp_address_node, 'country', '')
-        wp_address_input = wp_city + sep + wp_municipality + sep + wp_region + sep + wp_country
+    # wp_address_node = annons.get('workplace_address', {})
+    # wp_address_input = ''
+    # if wp_address_node:
+    #     wp_city = get_null_safe_value(wp_address_node, 'city', '')
+    #     wp_municipality = get_null_safe_value(wp_address_node, 'municipality', '')
+    #     wp_region = get_null_safe_value(wp_address_node, 'region', '')
+    #     wp_country = get_null_safe_value(wp_address_node, 'country', '')
+    #     wp_address_input = wp_city + sep + wp_municipality + sep + wp_region + sep + wp_country
 
     doc_headline = get_null_safe_value(annons, 'headline', '')
 
-    doc_headline_input = wp_address_input + sep + doc_headline_occupation + sep + doc_headline
+    #TODO: Activate when textdoc-enrichments is updated regarding GEO
+    # doc_headline_input = wp_address_input + sep + doc_headline_occupation + sep + doc_headline
+    doc_headline_input = doc_headline_occupation + sep + doc_headline
 
     return doc_headline_input
 
@@ -151,15 +154,9 @@ def enrich_doc(annons, enriched_output):
     enriched_node['trait'] = [candidate['concept_label'].lower()
                               for candidate in enriched_candidates['traits']]
 
-    wp_address_node = annons.get('workplace_address', {})
-    wp_region = ''
-    if wp_address_node:
-        wp_region = get_null_safe_value(wp_address_node, 'region', '')
-
-    if wp_region.lower() == 'ospecificerad arbetsort':
-        enriched_node['location'] = [wp_region.lower()]
-    else:
-        enriched_node['location'] = [candidate['concept_label'].lower()
-                                     for candidate in enriched_candidates['geos']]
+    #TODO: Activate when textdoc-enrichments is updated regarding GEO
+    # enriched_node['location'] = [candidate['concept_label'].lower()
+    #                              for candidate in enriched_candidates['geos']]
+    enriched_node['location'] = []
 
     return annons

@@ -46,13 +46,13 @@ def update_search_engine_valuestore(indexname, indexexists, values):
     # Create and/or assign index to taxonomy alias and
     # assign old index to archive alias
     try:
-        if (elastic.alias_exists(settings.ES_TAX_INDEX_ALIAS)):
+        if elastic.alias_exists(settings.ES_TAX_INDEX_ALIAS):
             log.info("updating alias {}".format(settings.ES_TAX_INDEX_ALIAS))
             alias = elastic.get_alias(settings.ES_TAX_INDEX_ALIAS)
             elastic.update_alias(
-                indexname, list(alias.keys()), settings.ES_TAX_INDEX_ALIAS)
-            if (not indexexists):
-                if (elastic.alias_exists(settings.ES_TAX_ARCHIVE_ALIAS)):
+                [indexname], list(alias.keys()), settings.ES_TAX_INDEX_ALIAS)
+            if not indexexists:
+                if elastic.alias_exists(settings.ES_TAX_ARCHIVE_ALIAS):
                     log.info("Adding index {} to archive alias {}".format(indexname, settings.ES_TAX_ARCHIVE_ALIAS))
                     elastic.add_indices_to_alias(list(alias.keys()),
                                                  settings.ES_TAX_ARCHIVE_ALIAS)

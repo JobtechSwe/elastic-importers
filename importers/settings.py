@@ -8,6 +8,8 @@ ES_PWD = os.getenv("ES_PWD")
 # For platsannonser
 WRITE_INDEX_SUFFIX = '-write'
 READ_INDEX_SUFFIX = '-read'
+DELETED_INDEX_SUFFIX = '-deleted'
+STREAM_INDEX_SUFFIX = '-stream'
 ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX',
                              os.getenv('ES_ANNONS', 'platsannons'))
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
@@ -44,6 +46,21 @@ LA_BOOTSTRAP_FEED_URL = os.getenv('LA_BOOTSTRAP_FEED_URL')
 LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
 LA_DETAILS_PARALLELISM = os.getenv('LA_DETAILS_PARALLELISM', 8)
 # End from loaders
+
+platsannons_deleted_mappings = {
+    "mappings": {
+        "properties": {
+            "publication_date": {
+                "type": "date",
+                "null_value": "1970-01-01"
+            },
+            "last_publication_date": {
+                "type": "date",
+                "null_value": "2100-12-31"
+            },
+        }
+    }
+}
 
 platsannons_mappings = {
     "settings": {

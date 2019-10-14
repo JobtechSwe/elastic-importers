@@ -18,7 +18,7 @@ else:
     es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
 
 
-def _bulk_generator(documents, indexname, idkey):
+def _bulk_generator(documents, indexname, idkey, deleted_index):
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
@@ -28,12 +28,29 @@ def _bulk_generator(documents, indexname, idkey):
                 if isinstance(idkey, list) else document[idkey]
 
         if document.get('removed', False):
-            yield {
+            remove_statement = {
                 '_op_type': 'delete',
                 '_index': indexname,
                 '_id': doc_id,
                 '_source': False
             }
+            if deleted_index:
+                tombstone = {
+                    'id': doc_id,
+                    'removed': True,
+                    'removed_date':  document.get('removed_date'),
+                    'timestamp': document.get('timestamp'),
+                    'publication_date': None,
+                    'last_publication_date': None,
+                }
+                yield remove_statement
+                yield {
+                        '_index': deleted_index,
+                        '_id': doc_id,
+                        '_source': tombstone,
+                    }
+            else:
+                yield remove_statement
         else:
             yield {
                 '_index': indexname,
@@ -42,9 +59,9 @@ def _bulk_generator(documents, indexname, idkey):
             }
 
 
-def bulk_index(documents, indexname, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey), request_timeout=30,
-         raise_on_error=False)
+def bulk_index(documents, indexname, deleted_index=None, idkey='id'):
+    bulk(es, _bulk_generator(documents, indexname, idkey, deleted_index),
+         request_timeout=30, raise_on_error=False)
 
 
 def get_last_timestamp(indexname):
@@ -150,13 +167,20 @@ def put_alias(indexlist, aliasname):
     return es.indices.put_alias(index=indexlist, name=aliasname)
 
 
-def setup_indices(es_index, default_index, mappings):
+def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
     write_alias = None
     read_alias = None
+    stream_alias = None
+    deleted_index = "%s%s" % (settings.ES_ANNONS_PREFIX,
+                              settings.DELETED_INDEX_SUFFIX)
     if not es_index:
         es_index = default_index
         write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
         read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
+        stream_alias = "%s%s" % (es_index, settings.STREAM_INDEX_SUFFIX)
+    if not index_exists(deleted_index):
+        log.info("Creating index %s" % deleted_index)
+        create_index(deleted_index, mappings_deleted)
     if not index_exists(es_index):
         log.info("Creating index %s" % es_index)
         create_index(es_index, mappings)
@@ -166,8 +190,12 @@ def setup_indices(es_index, default_index, mappings):
     if read_alias and not alias_exists(read_alias):
         log.info("Setting up alias %s for index %s" % (read_alias, es_index))
         put_alias([es_index], read_alias)
+    if stream_alias and not alias_exists(stream_alias):
+        log.info("Setting up alias %s for indices %s" % (stream_alias, (es_index, deleted_index)))
+        put_alias([es_index, deleted_index], stream_alias)
 
-    return write_alias or es_index
+    current_index = write_alias or es_index
+    return current_index, deleted_index
 
 
 def create_index(indexname, extra_mappings=None):
@@ -206,7 +234,7 @@ def add_indices_to_alias(indexlist, aliasname):
     return response
 
 
-def update_alias(indexname, old_indexlist, aliasname):
+def update_alias(indexnames, old_indexlist, aliasname):
     actions = {
         "actions": [
         ]
@@ -214,5 +242,6 @@ def update_alias(indexname, old_indexlist, aliasname):
     for index in old_indexlist:
         actions["actions"].append({"remove": {"index": index,
                                               "alias": aliasname}})
-        actions["actions"].append({"add": {"index": indexname, "alias": aliasname}})
+
+    actions["actions"].append({"add": {"indices": indexnames, "alias": aliasname}})
     es.indices.update_aliases(body=actions)
