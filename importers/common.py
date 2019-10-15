@@ -25,8 +25,6 @@ def clean_html(text):
         cleaned_text = ''
     else:
         soup = BeautifulSoup(text, 'html.parser')
-        log.debug('Before (clean_html):', soup.prettify())
-
         # Remove all script-tags
         [s.extract() for s in soup('script')]
 
@@ -39,13 +37,12 @@ def clean_html(text):
         cleaned_text = soup.get_text()
 
         cleaned_text = cleaned_text.strip()
-        log.debug('After (clean_html):',  cleaned_text)
 
     return cleaned_text
 
 def _add_linebreak_for_tag_name(tag_name, replacement_before, replacement_after, soup):
     parent_tags = soup.find_all(tag_name, recursive=True)
-    log.debug('Found %s tags for tag_name: %s' % (len(parent_tags), tag_name))
+
     for tag in parent_tags:
         if replacement_before:
             previous_sibling = tag.find_previous_sibling()
