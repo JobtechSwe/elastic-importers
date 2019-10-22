@@ -55,7 +55,8 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     for i, annons_batch in enumerate(annons_batches):
         annons_batch_indatas = [annons_indata for annons_indata in annons_batch]
         batch_indata = {
-            "documents_input": annons_batch_indatas
+            "documents_input": annons_batch_indatas,
+            settings.ENRICHER_PARAM_INC_SYNONYMS: True
         }
         batch_indatas.append(batch_indata)
 
@@ -135,22 +136,42 @@ def enrich_doc(annons, enriched_output):
     if 'keywords' not in annons:
         annons['keywords'] = {}
 
-    if 'enriched' not in annons['keywords']:
-        annons['keywords']['enriched'] = {}
-
-    enriched_candidates = enriched_output['enriched_candidates']
-    enriched_node = annons['keywords']['enriched']
-
-    enriched_node['occupation'] = [candidate['concept_label'].lower()
-                                   for candidate in enriched_candidates['occupations']]
-
-    enriched_node['skill'] = [candidate['concept_label'].lower()
-                              for candidate in enriched_candidates['competencies']]
-
-    enriched_node['trait'] = [candidate['concept_label'].lower()
-                              for candidate in enriched_candidates['traits']]
-
-    enriched_node['location'] = [candidate['concept_label'].lower()
-                                 for candidate in enriched_candidates['geos']]
+    process_enriched_candidates(annons, enriched_output)
+    process_enriched_candidates_synonyms(annons, enriched_output)
 
     return annons
+
+
+def process_enriched_candidates(annons, enriched_output):
+    enriched_candidates = enriched_output['enriched_candidates']
+    fieldname = 'enriched'
+
+    candidate_prop_name = 'concept_label'
+    if fieldname not in annons['keywords']:
+        annons['keywords'][fieldname] = {}
+
+    set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_name)
+
+
+def process_enriched_candidates_synonyms(annons, enriched_output):
+    if 'enriched_candidates_synonyms' in enriched_output:
+        enriched_candidates = enriched_output['enriched_candidates_synonyms']
+        fieldname = 'enriched_synonyms'
+
+        candidate_prop_name = 'term'
+        if fieldname not in annons['keywords']:
+            annons['keywords'][fieldname] = {}
+
+        set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_name)
+
+
+def set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_name):
+    enriched_node = annons['keywords'][fieldname]
+    enriched_node['occupation'] = [candidate[candidate_prop_name].lower()
+                                   for candidate in enriched_candidates['occupations']]
+    enriched_node['skill'] = [candidate[candidate_prop_name].lower()
+                              for candidate in enriched_candidates['competencies']]
+    enriched_node['trait'] = [candidate[candidate_prop_name].lower()
+                              for candidate in enriched_candidates['traits']]
+    enriched_node['location'] = [candidate[candidate_prop_name].lower()
+                                 for candidate in enriched_candidates['geos']]

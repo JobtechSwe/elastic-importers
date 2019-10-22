@@ -14,8 +14,8 @@ def test_get_and_enrich_ad_details():
     from importers import settings
     from importers.platsannons import converter, enricher_mt_rest_multiple as enricher
 
-    annons_id = 23529614
-    ad_meta = {'annonsId': annons_id, 'avpublicerad': False, 'uppdateradTid': 1568729839176}
+    annons_id = 23594609
+    ad_meta = {'annonsId': annons_id, 'avpublicerad': False, 'uppdateradTid': 1571311180445}
 
     ad_detail = load_details_from_la(ad_meta=ad_meta)
     pprint(ad_detail)
@@ -31,7 +31,12 @@ def test_get_and_enrich_ad_details():
     enriched_ad = enriched_ads[0]
     geos = enriched_ad['keywords']['enriched']['location']
 
-    assert 'kallhäll' in geos
+    assert 'sundsvall' in geos
+
+    assert 'enriched_synonyms' in enriched_ad['keywords']
+    assert 'occupation' in enriched_ad['keywords']['enriched_synonyms']
+    occupation_synonyms = enriched_ad['keywords']['enriched_synonyms']['occupation']
+    assert len(occupation_synonyms) > 0
 
 
 if __name__ == '__main__':
