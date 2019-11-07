@@ -3,6 +3,7 @@ import logging
 import sys
 import math
 import itertools
+import os
 from datetime import datetime
 from jobtech.common.customlogging import configure_logging
 from importers import settings
@@ -165,7 +166,8 @@ def _grouper(n, iterable):
 
 
 def start_daily_index():
-    new_index_name = "platsannons-%s" % datetime.now().strftime('%Y%m%d-%H')
+    new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX,
+                                datetime.now().strftime('%Y%m%d-%H'))
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)

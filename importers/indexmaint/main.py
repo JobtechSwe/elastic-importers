@@ -8,7 +8,7 @@ READ_SUFFIX = '-read'
 
 
 def set_platsannons_read_alias(idxname=None):
-    if len(sys.argv) > 1:
+    if not idxname and len(sys.argv) > 1:
         idxname = sys.argv[1]
     if not idxname:
         print("Must provide name of index to alias against.")
