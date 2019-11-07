@@ -19,6 +19,7 @@ ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 ENRICHER_PARAM_DOC_ID = 'doc_id'
 ENRICHER_PARAM_DOC_HEADLINE = 'doc_headline'
 ENRICHER_PARAM_DOC_TEXT = 'doc_text'
+ENRICHER_PARAM_INC_SYNONYMS = 'include_synonyms'
 
 ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
@@ -116,6 +117,47 @@ platsannons_mappings = {
                 "type": "object",
                 "properties": {
                     "enriched": {
+                        "type": "object",
+                        "properties": {
+                            "occupation": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "skill": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "trait": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "location": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "enriched_synonyms": {
                         "type": "object",
                         "properties": {
                             "occupation": {
