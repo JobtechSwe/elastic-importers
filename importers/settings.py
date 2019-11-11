@@ -78,8 +78,8 @@ platsannons_mappings = {
                 "punctuation_filter": {
                     "type": "mapping",
                     "mappings": [
-                        ". => ",
-                        ", => ",
+                        ". => \\u0020",
+                        ", => \\u0020",
                         ": => ",
                         "! => "
                     ]
