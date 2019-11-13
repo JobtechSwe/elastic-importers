@@ -3,7 +3,6 @@ import logging
 import sys
 import math
 import itertools
-import os
 from datetime import datetime
 from jobtech.common.customlogging import configure_logging
 from importers import settings
