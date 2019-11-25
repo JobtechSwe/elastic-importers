@@ -34,7 +34,7 @@ def convert_ad(message):
     annons['number_of_vacancies'] = message.get('antalPlatser')
 
     cleaned_description_text = clean_html(message.get('annonstextFormaterad'))
-    if cleaned_description_text == '':
+    if cleaned_description_text == '' and not message.get('avpublicerad'):
         log.warning('description.text is empty for ad id: %s' % annons['id'])
 
     annons['description'] = {
