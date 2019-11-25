@@ -127,7 +127,7 @@ def load_list_of_updated_ads(timestamp=0):
         if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)
 
     try:
-        r = requests.get(feed_url)
+        r = requests.get(feed_url, timeout=20)
         r.raise_for_status()
         json_result = r.json()
         items = json_result.get('idLista', [])

@@ -34,7 +34,7 @@ WORKDIR /app
 # runs unit tests with @pytest.mark.unit annotation only
 RUN python3 -m pip install -r requirements.txt && \
     python3 setup.py install && \
-    python3 -m pytest -s -m unit tests/
+    python3 -m pytest -m unit tests/
 
 
 WORKDIR /
