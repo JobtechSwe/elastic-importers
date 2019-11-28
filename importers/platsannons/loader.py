@@ -138,6 +138,30 @@ def load_list_of_updated_ads(timestamp=0):
     return items
 
 
+def get_correct_logo_url(ad):
+    logo_url = None
+    if ad and 'employer' in ad:
+        if 'workplace_id' in ad['employer'] \
+                and ad['employer']['workplace_id'] \
+                and int(ad['employer']['workplace_id']) > 0:
+            '''
+            Special logo for workplace_id for ads with source_type VIA_AF_FORMULAR eller VIA_PLATSBANKEN_AD or 
+            VIA_ANNONSERA (workplace_id > 0)
+            '''
+            workplace_id = ad['employer']['workplace_id']
+            possible_logo_url = '%sarbetsplatser/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, workplace_id)
+            r = requests.head(possible_logo_url, timeout=10)
+            if r.status_code == 200:
+                logo_url = possible_logo_url
+        elif 'organization_number' in ad['employer'] and ad['employer']['organization_number']:
+            org_number = ad['employer']['organization_number']
+            possible_logo_url = '%sorganisation/%s/logotyper/logo.png' % (settings.COMPANY_LOGO_BASE_URL, org_number)
+            r = requests.head(possible_logo_url, timeout=10)
+            if r.status_code == 200:
+                logo_url = possible_logo_url
+    return logo_url
+
+
 def _cleanup_stringvalues(value):
     if isinstance(value, dict):
         value = {_cleanup_stringvalues(k): _cleanup_stringvalues(v) for k, v in value.items()}

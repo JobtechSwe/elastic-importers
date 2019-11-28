@@ -316,6 +316,8 @@ URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
 API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
 #    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
 #              'http://localhost:6357/enrichtextdocumentsbinary')
+COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
+                                  'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 
 # For kandidat import
 ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
