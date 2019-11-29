@@ -280,7 +280,7 @@ def bulk(items, table):
 
     elapsed_time = time.time() - start_time
 
-    log.info("Bulk inserted %d docs in: %s seconds." % (len(adapted_items), elapsed_time))
+    log.info("Bulk inserted %d docs in: %5.2f seconds." % (len(adapted_items), elapsed_time))
 
 
 def convert_to_timestamp(date, document_id=None):
