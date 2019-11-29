@@ -155,7 +155,7 @@ def find_correct_logo_url(workplace_id, org_number):
     cache_key = "%s-%s" % (str(workplace_id), str(org_number))
     if cache_key in logo_cache:
         logo_url = logo_cache.get(cache_key)
-        log.debug("Returning cached logo \"%s\"for %s" % (logo_url, cache_key))
+        log.debug("Returning cached logo \"%s\" for workplace-orgnr %s" % (logo_url, cache_key))
         return logo_url
 
     cache_logo = True
