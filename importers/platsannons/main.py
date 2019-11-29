@@ -62,6 +62,9 @@ def start(es_index=None):
     log.info('Fetching details for %s ads...' % len(ad_ids))
     nr_of_items_per_batch = int(settings.PG_BATCH_SIZE)
     nr_of_items_per_batch = min(nr_of_items_per_batch, len(ad_ids))
+    if nr_of_items_per_batch < 1:
+        log.error("Failed to retrieve any ads")
+        sys.exit(1)
     nr_of_batches = math.ceil(len(ad_ids) / nr_of_items_per_batch)
     # Partition list into manageable chunks
     ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
