@@ -78,6 +78,7 @@ def start(es_index=None):
         ad_details, batch_failed_ads = loader.bulk_fetch_ad_details(ad_batch)
 
         doc_counter += (len(ad_details) - len(batch_failed_ads))
+        log.debug("Failed ads in a batch %d" % len(batch_failed_ads))
 
         for failed_ad in batch_failed_ads.copy():
             # On fail, check for ad in postgresql
@@ -128,7 +129,8 @@ def start(es_index=None):
                     len(failed_ads))
 
     elapsed_time = time.time() - start_time
-    log.info("Processed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+    m, s = divmod(elapsed_time, 60)
+    log.info("Processed %d docs in: %d minutes %5.2f seconds." % (doc_counter, m, s))
 
 
 def _load_from_postgresql(last_timestamp, es_index):
