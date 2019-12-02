@@ -114,7 +114,7 @@ def start(es_index=None):
         for failed_ad in failed_ads.copy():
             recovered_ad = loader.load_details_from_la(failed_ad)
             if recovered_ad:
-                log.info("Successfully downloaded previously failed ad %s form LA" %
+                log.info("Successfully downloaded previously failed ad from LA: %s" %
                          recovered_ad['id'])
                 recovered_ads.append(recovered_ad)
                 failed_ads.remove(failed_ad)
@@ -123,9 +123,9 @@ def start(es_index=None):
     if recovered_ads:
         num_idxd_ads = _convert_and_save_to_elastic(recovered_ads, es_index,
                                                     es_index_deleted)
-        log.info("Indexed %d recovered ads." % num_idxd_ads)
+        log.info("Indexed recovered ads: %d" % num_idxd_ads)
     if failed_ads:
-        log.warning("There are %d ads reported from stream that can't be downloaded.",
+        log.warning("Ads reported from stream that can't be downloaded: %d",
                     len(failed_ads))
 
     elapsed_time = time.time() - start_time
@@ -146,10 +146,10 @@ def _load_from_postgresql(last_timestamp, es_index):
         doc_counter += current_doc_count
 
         if platsannonser:
-            log.info("Still working ... %d ads indexed so far." % doc_counter)
+            log.info("Still working ... ads indexed so far: %d" % doc_counter)
             _convert_and_save_to_elastic(platsannonser, es_index, None)
         else:
-            log.info("Indexed %d ads into elastic" % doc_counter)
+            log.info("Indexed ads into elastic: %d" % doc_counter)
             break
 
 
