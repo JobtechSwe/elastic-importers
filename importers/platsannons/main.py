@@ -78,7 +78,7 @@ def start(es_index=None):
         ad_details, batch_failed_ads = loader.bulk_fetch_ad_details(ad_batch)
 
         doc_counter += (len(ad_details) - len(batch_failed_ads))
-        log.debug("Failed ads in a batch %d" % len(batch_failed_ads))
+        log.warning("Batch: %d Failed ads: %d" % (i+1, len(batch_failed_ads)))
 
         for failed_ad in batch_failed_ads.copy():
             # On fail, check for ad in postgresql
@@ -158,7 +158,7 @@ def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     converted_ads = [converter.convert_ad(raw_ad)
                      for raw_ad in raw_ads]
     enriched_ads = enricher.enrich(converted_ads)
-    log.debug("Indexing %d documents into %s" % (len(enriched_ads), es_index))
+    log.info("Indexing: %d documents into: %s" % (len(enriched_ads), es_index))
     # Bulk save cooked-list to elastic
     elastic.bulk_index(enriched_ads, es_index, deleted_index)
     return len(enriched_ads)

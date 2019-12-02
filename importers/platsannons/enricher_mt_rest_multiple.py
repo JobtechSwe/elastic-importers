@@ -31,6 +31,7 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
             log.debug("No document data to enrich, moving on to the next one.")
             continue
         if doc_id == '':
+            log.error("Value error, headline: %s" % str(doc_headline))
             raise ValueError('Document has no id, enrichment is not possible, headline: '
                              % doc_headline)
 

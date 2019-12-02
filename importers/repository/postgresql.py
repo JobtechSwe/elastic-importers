@@ -301,14 +301,14 @@ def convert_to_timestamp(date, document_id=None):
 
         try:
             ts = time.mktime(time.strptime(date, dateformat)) * 1000
-            log.debug("Converted date %s to %d" % (date, ts))
+            log.debug("Converted date: %s to: %d" % (date, ts))
             conversion_failure = False
             break
         except ValueError:
             conversion_failure = True
 
     if conversion_failure:
-        log.debug("Failed to convert date %s for document %s " % (date, document_id))
+        log.info("Failed to convert date: %s for document: %s " % (date, document_id))
 
     return int(ts)
 
