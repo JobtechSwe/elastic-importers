@@ -260,12 +260,6 @@ platsannons_mappings = {
                     },
                     "region_code": {
                         "type": "keyword",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
                     },
                     "region_concept_id": {
                         "type": "keyword",
