@@ -62,6 +62,9 @@ def start(es_index=None):
     log.info('Fetching details for %s ads...' % len(ad_ids))
     nr_of_items_per_batch = int(settings.PG_BATCH_SIZE)
     nr_of_items_per_batch = min(nr_of_items_per_batch, len(ad_ids))
+    if nr_of_items_per_batch < 1:
+        log.error("Failed to retrieve any ads")
+        sys.exit(1)
     nr_of_batches = math.ceil(len(ad_ids) / nr_of_items_per_batch)
     # Partition list into manageable chunks
     ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
@@ -75,6 +78,7 @@ def start(es_index=None):
         ad_details, batch_failed_ads = loader.bulk_fetch_ad_details(ad_batch)
 
         doc_counter += (len(ad_details) - len(batch_failed_ads))
+        log.warning("Batch: %d Failed ads: %d" % (i+1, len(batch_failed_ads)))
 
         for failed_ad in batch_failed_ads.copy():
             # On fail, check for ad in postgresql
@@ -125,7 +129,8 @@ def start(es_index=None):
                     len(failed_ads))
 
     elapsed_time = time.time() - start_time
-    log.info("Processed %d docs in: %s seconds." % (doc_counter, elapsed_time))
+    m, s = divmod(elapsed_time, 60)
+    log.info("Processed %d docs in: %d minutes %5.2f seconds." % (doc_counter, m, s))
 
 
 def _load_from_postgresql(last_timestamp, es_index):
@@ -153,7 +158,7 @@ def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     converted_ads = [converter.convert_ad(raw_ad)
                      for raw_ad in raw_ads]
     enriched_ads = enricher.enrich(converted_ads)
-    log.debug("Indexing %d documents into %s" % (len(enriched_ads), es_index))
+    log.info("Indexing: %d documents into: %s" % (len(enriched_ads), es_index))
     # Bulk save cooked-list to elastic
     elastic.bulk_index(enriched_ads, es_index, deleted_index)
     return len(enriched_ads)

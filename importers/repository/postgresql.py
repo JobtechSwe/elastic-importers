@@ -280,7 +280,7 @@ def bulk(items, table):
 
     elapsed_time = time.time() - start_time
 
-    log.info("Bulk inserted %d docs in: %s seconds." % (len(adapted_items), elapsed_time))
+    log.info("Bulk inserted %d docs in: %5.2f seconds." % (len(adapted_items), elapsed_time))
 
 
 def convert_to_timestamp(date, document_id=None):
@@ -301,14 +301,14 @@ def convert_to_timestamp(date, document_id=None):
 
         try:
             ts = time.mktime(time.strptime(date, dateformat)) * 1000
-            log.debug("Converted date %s to %d" % (date, ts))
+            log.debug("Converted date: %s to: %d" % (date, ts))
             conversion_failure = False
             break
         except ValueError:
             conversion_failure = True
 
     if conversion_failure:
-        log.debug("Failed to convert date %s for document %s " % (date, document_id))
+        log.info("Failed to convert date: %s for document: %s " % (date, document_id))
 
     return int(ts)
 
