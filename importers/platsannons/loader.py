@@ -60,7 +60,7 @@ def load_details_from_la(ad_meta):
     fail_max = 10
     ad_id = ad_meta['annonsId']
     if ad_meta.get('avpublicerad', False):
-        log.debug("Ad %s is removed, preparing to delete" % ad_id)
+        log.debug("Ad is avpublicerad, preparing to remove it: %s" % ad_id)
         removed_date = ad_meta.get('avpubliceringsdatum') or \
             time.strftime("%Y-%m-%dT%H:%M:%S",
                           time.localtime(ad_meta.get('uppdateradTid') / 1000))
@@ -72,46 +72,46 @@ def load_details_from_la(ad_meta):
                 'uppdateradTid': ad_meta.get('uppdateradTid'),
                 'updatedAt': ad_meta.get('uppdateradTid'),
                 'timestamp': ad_meta.get('uppdateradTid')}
-    detail_url = settings.LA_DETAILS_URL + str(ad_id)
+    detail_url_la = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:
-            r = requests.get(detail_url, timeout=10)
+            r = requests.get(detail_url_la, timeout=10)
             r.raise_for_status()
             ad = r.json()
             if ad:
                 ad['id'] = str(ad['annonsId'])
                 ad['updatedAt'] = ad_meta['uppdateradTid']
                 ad['expiresAt'] = ad['sistaPubliceringsdatum']
-                desensitized_ad = _clean_sensitive_data(ad, detail_url)
+                desensitized_ad = _clean_sensitive_data(ad, detail_url_la)
                 clean_ad = _cleanup_stringvalues(desensitized_ad)
                 return clean_ad
         # On fail, try again 10 times with 0.3 second delay
         except requests.exceptions.ConnectionError as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning("Unable to load data from %s - Connection error, try %d"
-                        % (detail_url, fail_count))
+            log.warning("Unable to load data from: %s - Connection error, try: %d"
+                        % (detail_url_la, fail_count))
             if fail_count >= fail_max:
-                log.error("Failed to continue loading data from %s - Connection error" %
-                          detail_url, e)
+                log.error("Failed to continue loading data from: %s - "
+                          "Connection error: %s Exit!" % (detail_url_la, e))
                 sys.exit(1)
         except requests.exceptions.Timeout as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning("Unable to load data from %s - Timeout, try %d"
-                        % (detail_url, fail_count))
+            log.warning("Unable to load data from: %s - Timeout, try: %d"
+                        % (detail_url_la, fail_count))
             if fail_count >= fail_max:
-                log.error("Failed to continue loading data from %s - Timeout" %
-                          detail_url, e)
+                log.error("Failed to continue loading data from: %s - "
+                          "Timeout: %s Exit!" % (detail_url_la, e))
                 sys.exit(1)
         except requests.exceptions.RequestException as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning("Unable to fetch data at %s - ambiguous exception, try %d"
-                        % (detail_url, fail_count))
+            log.warning("Unable to fetch data at: %s - ambiguous exception, try: %d"
+                        % (detail_url_la, fail_count))
             if fail_count >= fail_max:
-                log.error("Failed to fetch data at %s - ambiguous exception, skipping"
-                          % detail_url, e)
+                log.error("Failed to fetch data at: %s - ambiguous exception, skipping: %s"
+                          % (detail_url_la, e))
                 raise e
 
 
