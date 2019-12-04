@@ -28,8 +28,8 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
         doc_headline = get_doc_headline_input(annons)
         doc_text = annons.get('description', {}).get('text_formatted', '')
         if not doc_text:
-            log.info("No document data to enrich -  empty description for id: "
-                     "%s, moving on to the next one." % doc_id)
+            log.debug("No document data to enrich -  empty description for id: "
+                      "%s, moving on to the next one." % doc_id)
             continue
         if doc_id == '':
             log.error("Value error - no id, headline: %s" % str(doc_headline))
