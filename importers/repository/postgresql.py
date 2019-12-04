@@ -164,8 +164,8 @@ def fetch_ad(ad_id, table):
 def fetch_expired_ads(ad_id_list, table, last_ts):
     try:
         ad_ids = tuple(ad_id_list)
-        pg_conn = get_new_pg_conn()
-        cur = pg_conn.cursor()
+        conn = get_new_pg_conn()
+        cur = conn.cursor()
         sql_missing = (f"SELECT id FROM {table}" +
                        f" WHERE expires > {last_ts}" +
                        f" AND doc @> '{{\"avpublicerad\": false}}'" +
@@ -177,13 +177,13 @@ def fetch_expired_ads(ad_id_list, table, last_ts):
         log.error(e)
     finally:
         cur.close()
-        pg_conn.close()
+        conn.close()
 
 
 def check_missing_ads(ad_id_list, table):
     try:
-        pg_conn = get_new_pg_conn()
-        cur = pg_conn.cursor()
+        conn = get_new_pg_conn()
+        cur = conn.cursor()
         ad_ids = tuple(ad_id_list)
         sql = f"SELECT id FROM {table} WHERE TRIM(id) in %s"
         cur.execute(sql, (ad_ids,))
@@ -194,7 +194,7 @@ def check_missing_ads(ad_id_list, table):
         log.error(e)
     finally:
         cur.close()
-        pg_conn.close()
+        conn.close()
 
 
 def update_ad(ad_id, doc, timestamp, table):
@@ -301,7 +301,6 @@ def convert_to_timestamp(date, document_id=None):
 
         try:
             ts = time.mktime(time.strptime(date, dateformat)) * 1000
-            log.debug("Converted date: %s to: %d" % (date, ts))
             conversion_failure = False
             break
         except ValueError:
