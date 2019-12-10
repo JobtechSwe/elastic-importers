@@ -12,64 +12,62 @@ Creates console script entry points to ne run with different intervals, usually 
     
 This creates symlinked versions of the scripts to enable development without having to run setup for every change.
 
+## Configuration
+The application is entirely configured using environment variables. 
+
+|Environment variable   | Default value  | Comment |Used by system|
+|---|---|---|---|
+| ES_HOST  | localhost  | Elasticsearch host | all |
+| ES_PORT  | 9200  | Elasticsearch port | all |
+| ES_USER  |   | Elasticsearch username | all |
+| ES_PWD  |   | Elasticsearch password | all |
+| ES_TAX_INDEX_BASE  | taxonomy-  | Base string from which index for different taxonomyversions will be created |import-taxonomy|
+| ES_TAX_INDEX_ALIAS  |  taxonomy | Alias for index that is the current version of the taxonomy |import-taxonomy|
+| ES_TAX_ARCHIVE_ALIAS  |  taxonomy-archive | Alias collecting all older versions of the taxonomy |import-taxonomy|
+| ES_ANNONS_INDEX | platsannons | Base index name for job ads |import-platsannonser, import-platsannonser-daily|
+| LA_FEED_URL | | REST feed API for changes in job ads | import-platsannonser, import-platsannonser-daily |
+| LA_BOOTSTRAP_FEED_URL | | REST feed API for all currently available job ads | import-platsannonser-daily |
+| LA_DETAILS_URL | | REST feed API job ad details (i.e. the entire job ad) | import-platsannonser, import-platsannonser-daily |
+| LA_DETAILS_PARALLELISM | 8 | Limits how many simultaneous threads are run for loading ad details | import-platsannonser, import-platsannonser-daily |
+| URL_ENRICH_TEXTDOCS_BINARY_SERVICE | https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocumentsbinary | Endpoint for ML enrichment of job ads |import-platsannonser, import-platsannonser-daily|
+| API_KEY_ENRICH_TEXTDOCS | | API key to use for enrichment | import-platsannonser, import-platsannonser-daily |
+| COMPANY_LOGO_BASE_URL | https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/ | Endpoint to check for available company logo associated with job ad | import-platsannonser, import-platsannonser-daily|
+
 ## Console scripts
 ### import-taxonomy
-Importerar värdeförråd från Arbetsförmedlingens taxonomitjänst via SOAP. Förutsätter att det finns ett Elasticsearch-cluster att ladda
-in datan till. Datat ändras relativt sällan och scriptet bör inte köras mer ofta än dagligen för närvarande.
-Följande environmental variabler används:
+Dumps taxonomy data into elasticsearch.
 
-|Environment variable   | Default value  | Comment |
-|---|---|---|
-| ES_HOST  | localhost  | Elasticsearch host |
-| ES_PORT  | 9200  | Elasticsearch port |
-| ES_USER  |   | Elasticsearch username |
-| ES_PWD  |   | Elasticsearch password |
-| ES_TAX_INDEX_BASE  | taxonomy-  | Base string from which index for different taxonomyversions will be created |
-| ES_TAX_INDEX_ALIAS  |  taxonomy | Alias for index that is the current version of the taxonomy |
-| ES_TAX_ARCHIVE_ALIAS  |  taxonomy-archive | Alias collecting all older versions of the taxonomy |
-| TAXONOMY_SERVICE_URL  | http://api.arbetsformedlingen.se/taxonomi/v0/TaxonomiService.asmx  | URL for the taxonomy SOAP service |
-
-
-#### Användning
+#### Usage
 
     $ import-taxonomy
     
 ### import-platsannonser
-Importerar platsannonser från databas till Elasticsearch. 
+Imports updated,new and removed job ads from a REST endpoint at Arbetsförmedlingen.
 
-Om det konfigurerade indexet inte existerar skapas det, och ett "skriv-alias" sätts upp mot det indexet med suffix "-write" (e.g. platsannons-write). 
-På samma sätt är ```sokannonser-api``` konfigurerat för att läsa från ett "läs-alias" med suffix "-read".
+If the configured index does not exists it is created and two aliases are created, with the suffixes "-read", and "-write" (e.g. platsannons-write) once import is completed.
+The "-read" alias is used by default by the JobSearch API.
 
-#### Användning
-Kommandot ```import-platsannonser``` startar en import av platsannonser till förkonfigurerat skriv-alias.
+#### Usage
 
-#### Omindexering
-Vid förändringar i mappningar eller datastruktur behöver man läsa om hela indexet. Med fördel gör man då ett nytt index som man läser in allt data till utan att ställa som skriv-aliaset. 
-Om man anger ett indexnamn som argument till ```import-platsannonser``` så skapas det indexet (om det inte redan finns), men inget nytt skriv-alias skapas.
-På så sätt kan man skriva datat till ett nytt index och när det är klart kan man peka om skriv- och läs-aliasen till det nya indexet utan nedtid.
+    $ import-platsannonser
+    
+Starts an import into the current "-write" alias if it exists. Otherwise, a new is created as stated above.
+This script is typically run every few minutes by cron.
 
-    $ import-platsannonser nytt-platsannons-index
-    ... vänta tills datat lästs in ...
-    $ set-write-alias-platsannons nytt-platsannons-index
-    $ set-read-alias-platsannons nytt-platsannons-index
+### import-platsannoser-daily
 
-### import-auranest
-TBD
-#### Användning
-TBD
+    $ import-platsannonser-daily
+    
+Creates a new index for platsannonser according to the configured ```ES_ANNONS_INDEX``` environment variable, with todays date and hour as a suffix, and starts a full load into that index.
+After successfull import, new "-read" and "-write" aliases are pointed to the new index.
+This is run every night to create a fresh index and make sure no ads are missed by ```import-platsannonser```.
 
-### Test
+## Test
 
 ## Köra unittester
     $ python3 -m pytest -svv -ra -m unit tests/
     
-## Köra integrationstester    
-Skapa fil /elastic-importers/tests/integration_tests/pytest_secrets.env
-
-...och lägg in följande rader i pytest_secrets.env samt byt ut <värde> till faktiska usernames och password etc:
-ES_USER=<elastic username>
-ES_PWD=<elastic password>
-ES_HOST=<elastic host, utan protokoll och port>
-ES_PORT=9243
+### Köra integrationstester    
+When running integration tests, the system needs access to other services so you need to specify environment variables in order for it to run properly.
 
     $ python3 -m pytest -svv -ra -m integration tests/
