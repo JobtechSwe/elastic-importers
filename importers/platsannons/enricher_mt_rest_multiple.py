@@ -15,7 +15,7 @@ counter = None
 
 def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     log.info('Running enrich with %s processes' % str(parallelism))
-    log.info('Enriching %s documents calling: %s'
+    log.info('Enriching: %s documents calling: %s'
              % (len(annonser), settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE))
 
     global counter
@@ -28,9 +28,11 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
         doc_headline = get_doc_headline_input(annons)
         doc_text = annons.get('description', {}).get('text_formatted', '')
         if not doc_text:
-            log.debug("No document data to enrich, moving on to the next one.")
+            log.debug("No document data to enrich -  empty description for id: "
+                      "%s, moving on to the next one." % doc_id)
             continue
         if doc_id == '':
+            log.error("Value error - no id, headline: %s" % str(doc_headline))
             raise ValueError('Document has no id, enrichment is not possible, headline: '
                              % doc_headline)
 

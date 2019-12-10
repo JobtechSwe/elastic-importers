@@ -71,10 +71,8 @@ def enrich(annonser, parallelism=1):
         }
         batch_indatas.append(batch_indata)
 
-
     enrich_results_data = execute_calls(batch_indatas, parallelism)
     log.info('Enriched %s/%s documents' % (len(enrich_results_data), len(annonser)))
-
 
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
@@ -87,10 +85,10 @@ def enrich(annonser, parallelism=1):
 def get_doc_headline_input(annons):
     # If 'freetext' differs from 'header', 'freetext' is the occupationtitle (taxonomy) from an AF-ad.
     doc_headline1 = annons.get('title', {}).get('freetext', '')
-    if(doc_headline1 is None):
+    if doc_headline1 is None:
         doc_headline1 = ''
     doc_headline2 = annons.get('header', '')
-    if(doc_headline2 is None):
+    if doc_headline2 is None:
         doc_headline2 = ''
 
     if doc_headline1 != '' and doc_headline1 != doc_headline2:
@@ -101,6 +99,7 @@ def get_doc_headline_input(annons):
     if clean_text(doc_headline) == '':
         doc_headline = ''
     return doc_headline
+
 
 def clean_text(text):
     if text is None:
@@ -114,9 +113,10 @@ def get_enrich_result(batch_indata, timeout):
     # log.debug('len(batch_indata[documents_input])', len(batch_indata['documents_input']))
     # log.info('get_enrich_result - Sending %s ads (documents_input) for enrichment' % (len(batch_indata['documents_input'])))
     # log.debug('Enriching Id: %s' % (input_doc_params[NarvalEnricher.PARAM_DOC_ID]))
-    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE, headers=headers, json = batch_indata, timeout=timeout)
+    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE, headers=headers, json=batch_indata, timeout=timeout)
     r.raise_for_status()
     return r.json()
+
 
 def execute_calls(batch_indatas, parallelism):
     global timeout_enrich_api

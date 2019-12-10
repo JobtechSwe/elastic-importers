@@ -4,6 +4,8 @@ from dateutil import parser
 from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
 from importers.common import clean_html
+from importers.platsannons.loader import find_correct_logo_url
+
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -34,7 +36,7 @@ def convert_ad(message):
     annons['number_of_vacancies'] = message.get('antalPlatser')
 
     cleaned_description_text = clean_html(message.get('annonstextFormaterad'))
-    if cleaned_description_text == '':
+    if cleaned_description_text == '' and not message.get('avpublicerad'):
         log.warning('description.text is empty for ad id: %s' % annons['id'])
 
     annons['description'] = {
@@ -123,7 +125,9 @@ def convert_ad(message):
                                                     kompetens.get('varde'),
                                                     kompetens.get('vikt'))
             for kompetens in message.get('kompetenser', [])
-            if get_null_safe_value(kompetens, 'vikt', NICE_TO_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
+            if get_null_safe_value(kompetens,
+                                   'vikt',
+                                   NICE_TO_HAVE_WEIGHT) < MUST_HAVE_WEIGHT
         ],
         'languages': [
             get_concept_as_annons_value_with_weight('sprak',
@@ -147,7 +151,7 @@ def convert_ad(message):
         try:
             _set_education(annons, message)
         except TypeError:
-            log.warning(f"Skipping education fields on ad {annons['id']} due to TypeError")
+            log.warning(f"Skipping education on ad {annons['id']} due to TypeError")
 
     annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
     annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
@@ -155,31 +159,40 @@ def convert_ad(message):
     annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
     annons['source_type'] = message.get('kallaTyp')
     annons['timestamp'] = message.get('updatedAt')
+    # Try to find an url for employer logo
+    workplace_id = annons.get('employer', {}).get('workplace_id', 0)
+    organization_number = annons.get('employer', {}).get('organization_number', None)
+    annons['logo_url'] = find_correct_logo_url(workplace_id, organization_number)
     # Extract labels as keywords for easier searching
     return _add_keywords(annons)
 
 
 def _set_education(annons, message):
-    if get_null_safe_value(message.get('utbildningsinriktning'), 'vikt', 0) >= MUST_HAVE_WEIGHT:
+    if get_null_safe_value(message.get('utbildningsinriktning'),
+                           'vikt', 0) >= MUST_HAVE_WEIGHT:
         annons['must_have']['education'] = [
             get_concept_as_annons_value_with_weight(
-                ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                ['sun-education-field-1', 'sun-education-field-2',
+                 'sun-education-field-3'],
                 message.get('utbildningsinriktning', {}).get('varde'),
                 message.get('utbildningsinriktning', {}).get('vikt'))]
         annons['must_have']['education_level'] = [
             get_concept_as_annons_value_with_weight(
-                ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                ['sun-education-level-1', 'sun-education-level-2',
+                 'sun-education-level-3'],
                 message.get('utbildningsniva', {}).get('varde'),
                 message.get('utbildningsniva', {}).get('vikt'))]
     else:
         annons['nice_to_have']['education'] = [
             get_concept_as_annons_value_with_weight(
-                ['sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3'],
+                ['sun-education-field-1', 'sun-education-field-2',
+                 'sun-education-field-3'],
                 message.get('utbildningsinriktning', {}).get('varde'),
                 message.get('utbildningsinriktning', {}).get('vikt'))]
         annons['nice_to_have']['education_level'] = [
             get_concept_as_annons_value_with_weight(
-                ['sun-education-level-1', 'sun-education-level-2', 'sun-education-level-3'],
+                ['sun-education-level-1', 'sun-education-level-2',
+                 'sun-education-level-3'],
                 message.get('utbildningsniva', {}).get('varde'),
                 message.get('utbildningsniva', {}).get('vikt'))]
 
@@ -316,7 +329,7 @@ def get_concept_as_annons_value_with_weight(taxtype, legacy_id, weight=None):
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, legacy_id))
     except RequestError:
-        log.warning(f'Taxonomy request failed with arguments type: {taxtype} and legacy_id: {legacy_id}')
+        log.warning(f'Request failed with argtype: {taxtype} and legacy_id: {legacy_id}')
     return weighted_concept
 
 
@@ -418,7 +431,8 @@ def __leftreplace(astring, pattern, sub):
 
 def _trim_location(locationstring):
     # Look for unwanted words (see tests/unit/test_converter.py)
-    regex = re.compile('[0-9\\-]+|.+,|([\\d\\w]+\\-[\\d]+)|\\(.*|.*\\)|\\(\\)|\\w*\\d+\\w*')
+    pattern = '[0-9\\-]+|.+,|([\\d\\w]+\\-[\\d]+)|\\(.*|.*\\)|\\(\\)|\\w*\\d+\\w*'
+    regex = re.compile(pattern)
     stopwords = ['box']
     if locationstring:
         # Magic regex

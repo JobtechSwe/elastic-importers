@@ -6,7 +6,6 @@ from elasticsearch.helpers import bulk, scan
 from elasticsearch import Elasticsearch
 from importers import settings
 
-
 log = logging.getLogger(__name__)
 
 if settings.ES_USER and settings.ES_PWD:
@@ -38,17 +37,17 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                 tombstone = {
                     'id': doc_id,
                     'removed': True,
-                    'removed_date':  document.get('removed_date'),
+                    'removed_date': document.get('removed_date'),
                     'timestamp': document.get('timestamp'),
                     'publication_date': None,
                     'last_publication_date': None,
                 }
                 yield remove_statement
                 yield {
-                        '_index': deleted_index,
-                        '_id': doc_id,
-                        '_source': tombstone,
-                    }
+                    '_index': deleted_index,
+                    '_id': doc_id,
+                    '_source': tombstone,
+                }
             else:
                 yield remove_statement
         else:
@@ -128,7 +127,8 @@ def get_glitch_jobtechjobs_ids(max_items=None):
     doc_counter = 0
 
     ids = []
-    for doc in scan(es, query=query, index=settings.ES_AURANEST_INDEX, size=1000):
+    for doc in scan(es, query=query, index=settings.ES_AURANEST_INDEX,
+                    size=1000):
         doc_counter += 1
         if max_items and doc_counter > max_items:
             break
@@ -147,10 +147,11 @@ def index_exists(indexname):
         except Exception as e:
             if fail_count > 1:
                 # Elastic has its own failure management, so > 1 is enough.
-                log.error("Elastic not available. Stop trying.")
+                log.error("Elastic not available after try: %d .Stop trying. %s"
+                          % (fail_count, str(e)))
                 raise e
             log.warning("Elasticsearch currently not available. Waiting ...")
-            log.debug("Connection failed: %s" % str(e))
+            log.warning("Connection failed: %s" % str(e))
             fail_count += 1
             time.sleep(1)
 
@@ -191,7 +192,8 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
         log.info("Setting up alias %s for index %s" % (read_alias, es_index))
         put_alias([es_index], read_alias)
     if stream_alias and not alias_exists(stream_alias):
-        log.info("Setting up alias %s for indices %s" % (stream_alias, (es_index, deleted_index)))
+        log.info("Setting up alias %s for indices %s" % (
+        stream_alias, (es_index, deleted_index)))
         put_alias([es_index, deleted_index], stream_alias)
 
     current_index = write_alias or es_index
@@ -243,5 +245,6 @@ def update_alias(indexnames, old_indexlist, aliasname):
         actions["actions"].append({"remove": {"index": index,
                                               "alias": aliasname}})
 
-    actions["actions"].append({"add": {"indices": indexnames, "alias": aliasname}})
+    actions["actions"].append(
+        {"add": {"indices": indexnames, "alias": aliasname}})
     es.indices.update_aliases(body=actions)

@@ -30,15 +30,15 @@ PG_DBNAME = os.getenv('PG_DBNAME')
 PG_USER = os.getenv('PG_USER')
 PG_PASSWORD = os.getenv('PG_PASSWORD')
 PG_BATCH_SIZE = os.getenv('PG_BATCH_SIZE', 2000)
-PG_AURANEST_TABLE = os.getenv('PG_AURANEST_TABLE', 'auranest')
+# PG_AURANEST_TABLE = os.getenv('PG_AURANEST_TABLE', 'auranest')
 PG_PLATSANNONS_TABLE = os.getenv('PG_PLATSANNONS_TABLE', 'platsannons_la')
 PG_SSLMODE = os.getenv('PG_SSLMODE', 'require')
 
-AURANEST_FEED_URL = os.getenv('AURANEST_FEED_URL')
-AURANEST_DETAILS_URL = os.getenv('AURANEST_DETAILS_URL')
-AURANEST_USER = os.getenv('AURANEST_USER')
-AURANEST_PASSWORD = os.getenv('AURANEST_PASSWORD')
-AURANEST_EXPIRE_PATH = 'source.removedAt'
+# AURANEST_FEED_URL = os.getenv('AURANEST_FEED_URL')
+# AURANEST_DETAILS_URL = os.getenv('AURANEST_DETAILS_URL')
+# AURANEST_USER = os.getenv('AURANEST_USER')
+# AURANEST_PASSWORD = os.getenv('AURANEST_PASSWORD')
+# AURANEST_EXPIRE_PATH = 'source.removedAt'
 
 LOADER_START_DATE = os.getenv('LOADER_START_DATE', '2018-01-01')
 
@@ -79,7 +79,7 @@ platsannons_mappings = {
                     "type": "mapping",
                     "mappings": [
                         ". => ",
-                        ", => ",
+                        ", => \\u0020",
                         ": => ",
                         "! => "
                     ]
@@ -260,12 +260,6 @@ platsannons_mappings = {
                     },
                     "region_code": {
                         "type": "keyword",
-                        "fields": {
-                            "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                            }
-                        }
                     },
                     "region_concept_id": {
                         "type": "keyword",
@@ -297,16 +291,6 @@ platsannons_mappings = {
     }
 }
 
-# For postgres (platsannonser and auranest)
-PG_HOST = os.getenv("PG_HOST")
-PG_PORT = os.getenv("PG_PORT", 5432)
-PG_DBNAME = os.getenv("PG_DBNAME")
-PG_USER = os.getenv("PG_USER")
-PG_PASSWORD = os.getenv("PG_PASSWORD")
-PG_BATCH_SIZE = os.getenv("PG_BATCH_SIZE", 1000)
-PG_PLATSANNONS_TABLE = os.getenv("PG_PLATSANNONS_TABLE", "platsannons_la")
-PG_AURANEST_TABLE = os.getenv("PG_AURANEST_TABLE", "auranest")
-PG_SSLMODE = os.getenv("PG_SSLMODE", 'require')
 
 # For berikning (platsannonser och auranest)
 URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
@@ -316,104 +300,106 @@ URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
 API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
 #    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
 #              'http://localhost:6357/enrichtextdocumentsbinary')
+COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
+                                  'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 
 # For kandidat import
-ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
-                              os.getenv('ES_KANDIDAT', 'kandidater'))
-ORACLE_USER = os.getenv('ORACLE_USER')
-ORACLE_PASSWORD = os.getenv('ORACLE_PASSWORD')
-ORACLE_PORT = os.getenv('ORACLE_PORT', '1521')
-ORACLE_HOST = os.getenv('ORACLE_HOST')
-ORACLE_SERVICE = os.getenv('ORACLE_SERVICE')
+# ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
+#                               os.getenv('ES_KANDIDAT', 'kandidater'))
+# ORACLE_USER = os.getenv('ORACLE_USER')
+# ORACLE_PASSWORD = os.getenv('ORACLE_PASSWORD')
+# ORACLE_PORT = os.getenv('ORACLE_PORT', '1521')
+# ORACLE_HOST = os.getenv('ORACLE_HOST')
+# ORACLE_SERVICE = os.getenv('ORACLE_SERVICE')
 
 # For auranest import
-ES_AURANEST_PREFIX = os.getenv('ES_AURANEST_INDEX',
-                               os.getenv('ES_AURANEST', 'auranest'))
-ES_AURANEST_INDEX = "%s%s" % (ES_AURANEST_PREFIX, WRITE_INDEX_SUFFIX)
+# ES_AURANEST_PREFIX = os.getenv('ES_AURANEST_INDEX',
+#                               os.getenv('ES_AURANEST', 'auranest'))
+#ES_AURANEST_INDEX = "%s%s" % (ES_AURANEST_PREFIX, WRITE_INDEX_SUFFIX)
 
-auranest_mappings = {
-    "settings": {
-        "analysis": {
-            "normalizer": {
-                "lc_normalizer": {
-                    "type": "custom",
-                    "filter": ["lowercase"]
-                }
-            }
-        }
-    },
-    "mappings": {
-            "properties": {
-                "id": {
-                    "type": "keyword"
-                },
-                "group": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "keyword"
-                        }
-                    }
-                },
-                "occupations": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    },
-                    "copy_to": "keywords"
-                },
-                "skills": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    },
-                    "copy_to": "keywords"
-                },
-                "traits": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    },
-                    "copy_to": "keywords"
-                },
-                "location": {
-                    "type": "object",
-                    "properties": {
-                        "translations": {
-                            "type": "object",
-                            "properties": {
-                                "sv-SE": {
-                                    "type": "text",
-                                    "copy_to": "keywords",
-                                    "fields": {
-                                        "keyword": {
-                                            "type": "keyword",
-                                            "ignore_above": 256
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "keywords": {
-                    "type": "text",
-                    "fields": {
-                        "raw": {
-                            "type": "keyword",
-                            "normalizer": "lc_normalizer"
-                        }
-                    }
-                },
-            }
-    }
-}
+# auranest_mappings = {
+#     "settings": {
+#         "analysis": {
+#             "normalizer": {
+#                 "lc_normalizer": {
+#                     "type": "custom",
+#                     "filter": ["lowercase"]
+#                 }
+#             }
+#         }
+#     },
+#     "mappings": {
+#             "properties": {
+#                 "id": {
+#                     "type": "keyword"
+#                 },
+#                 "group": {
+#                     "type": "object",
+#                     "properties": {
+#                         "id": {
+#                             "type": "keyword"
+#                         }
+#                     }
+#                 },
+#                 "occupations": {
+#                     "type": "text",
+#                     "fields": {
+#                         "keyword": {
+#                             "type": "keyword",
+#                             "ignore_above": 256
+#                         }
+#                     },
+#                     "copy_to": "keywords"
+#                 },
+#                 "skills": {
+#                     "type": "text",
+#                     "fields": {
+#                         "keyword": {
+#                             "type": "keyword",
+#                             "ignore_above": 256
+#                         }
+#                     },
+#                     "copy_to": "keywords"
+#                 },
+#                 "traits": {
+#                     "type": "text",
+#                     "fields": {
+#                         "keyword": {
+#                             "type": "keyword",
+#                             "ignore_above": 256
+#                         }
+#                     },
+#                     "copy_to": "keywords"
+#                 },
+#                 "location": {
+#                     "type": "object",
+#                     "properties": {
+#                         "translations": {
+#                             "type": "object",
+#                             "properties": {
+#                                 "sv-SE": {
+#                                     "type": "text",
+#                                     "copy_to": "keywords",
+#                                     "fields": {
+#                                         "keyword": {
+#                                             "type": "keyword",
+#                                             "ignore_above": 256
+#                                         }
+#                                     }
+#                                 }
+#                             }
+#                         }
+#                     }
+#                 },
+#                 "keywords": {
+#                     "type": "text",
+#                     "fields": {
+#                         "raw": {
+#                             "type": "keyword",
+#                             "normalizer": "lc_normalizer"
+#                         }
+#                     }
+#                 },
+#             }
+#     }
+# }
