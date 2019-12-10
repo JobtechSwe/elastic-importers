@@ -1,21 +1,18 @@
 # elastic-importer
-Elasticsearch importscript för kandidat- och annons-söktjänster.
-
-## Användning
-Script som är tänkta att köras med olika intervall, i regel via cron, för att ladda in diverse olika typer av data till Elasticsearch.
+Imports job ads and taxonomy values into elasticsearch. 
+Creates console script entry points to ne run with different intervals, usually via cron to load data into elastic.
 
 ## Installation
-### Exempel virtualenv:
 
-    $ workon <virtuell miljö för huvudapplikationen>
-    $ python setup.py develop
+    $ python setup.py 
 
-### Exempel anaconda:
+### For development 
 
-    $ source activate <virtuell miljö för huvudapplikationen>
     $ python setup.py develop
     
+This creates symlinked versions of the scripts to enable development without having to run setup for every change.
 
+## Console scripts
 ### import-taxonomy
 Importerar värdeförråd från Arbetsförmedlingens taxonomitjänst via SOAP. Förutsätter att det finns ett Elasticsearch-cluster att ladda
 in datan till. Datat ändras relativt sällan och scriptet bör inte köras mer ofta än dagligen för närvarande.
@@ -37,11 +34,6 @@ Följande environmental variabler används:
 
     $ import-taxonomy
     
-### import-kandidater
-TBD
-#### Användning
-TBD
-
 ### import-platsannonser
 Importerar platsannonser från databas till Elasticsearch. 
 
