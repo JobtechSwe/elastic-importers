@@ -26,8 +26,9 @@ def _setup_index(es_index):
                                                        settings.platsannons_deleted_mappings)
         log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
                  % ('af-platsannons', settings.PG_BATCH_SIZE, es_index))
+        log.info('Index for removed items: %s' % delete_index)
     except Exception as e:
-        log.error("Elastic operations failed: %s" % str(e))
+        log.error("Elastic operations failed. Exit! %s" % str(e))
         sys.exit(1)
     return es_index, delete_index
 
