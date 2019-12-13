@@ -72,6 +72,25 @@ platsannons_mappings = {
                     "tokenizer": "whitespace",
                     "filter": ["lowercase"],
                     "char_filter": ["punctuation_filter"]
+                },
+                "wildcard_prefix": {
+                    "type": "custom",
+                    "tokenizer": "whitespace",
+                    "filter": ["lowercase", "edgengram_filter"],
+                    "char_filter": ["punctuation_filter"]
+                },
+                "wildcard_suffix": {
+                    "type": "custom",
+                    "tokenizer": "whitespace",
+                    "filter": ["lowercase", "reverse", "edgengram_filter", "reverse"],
+                    "char_filter": ["punctuation_filter"]
+                }
+            },
+            "filter": {
+                "edgengram_filter": {
+                    "type": "edge_ngram",
+                    "min_gram": 3,
+                    "max_gram": 14
                 }
             },
             "char_filter": {
@@ -101,6 +120,16 @@ platsannons_mappings = {
                     "words": {
                         "type": "text",
                         "analyzer": "simple_word_splitter"
+                    },
+                    "prefix": {
+                        "type": "text",
+                        "analyzer": "wildcard_prefix",
+                        "search_analyzer": "simple_word_splitter"
+                    },
+                    "suffix": {
+                        "type": "text",
+                        "analyzer": "wildcard_suffix",
+                        "search_analyzer": "simple_word_splitter"
                     }
                 }
             },
@@ -109,7 +138,19 @@ platsannons_mappings = {
                 "properties": {
                     "text": {
                         "type": "text",
-                        "analyzer": "simple_word_splitter"
+                        "analyzer": "simple_word_splitter",
+                        "fields": {
+                            "prefix": {
+                                "type": "text",
+                                "analyzer": "wildcard_prefix",
+                                "search_analyzer": "simple_word_splitter"
+                            },
+                            "suffix": {
+                                "type": "text",
+                                "analyzer": "wildcard_suffix",
+                                "search_analyzer": "simple_word_splitter"
+                            }
+                        }
                     }
                 }
             },
