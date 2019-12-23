@@ -49,6 +49,7 @@ def read_docs_with_ids(tablename, ids, converter=None):
 
 def read_from_pg_since(last_ids, timestamp, tablename, converter=None):
     if not pg_conn:
+        log.warning('No database configured for this session.')
         return
 
     cur = pg_conn.cursor()
@@ -114,6 +115,7 @@ def table_exists(table):
 
 def create_default_table(table):
     if not pg_conn:
+        log.warning('No database configured for this session.')
         return
     statements = (
         "CREATE TABLE {table} (id VARCHAR(64) PRIMARY KEY, doc JSONB, "
@@ -134,6 +136,7 @@ def create_default_table(table):
 
 def system_status(table):
     if not pg_conn:
+        log.warning('No database configured for this session.')
         return None
     if not table_exists(table):
         create_default_table(table)
@@ -153,6 +156,7 @@ def system_status(table):
 
 def fetch_ad(ad_id, table):
     if not pg_conn:
+        log.warning('No database configured for this session.')
         return None
     cur = pg_conn.cursor()
     cur.execute("SELECT * FROM " + table + " WHERE TRIM(id) = %s", [str(ad_id)])
@@ -221,6 +225,7 @@ def set_all_expired(table):
 
 def set_expired_for_ids(table, ad_ids, expired=True):
     if not pg_conn:
+        log.warning('No database configured for this session.')
         return
     cur = pg_conn.cursor()
     for ad_id in ad_ids:
