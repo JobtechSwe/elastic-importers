@@ -52,12 +52,11 @@ def start(es_index=None):
     if not settings.LA_FEED_URL:
         # Try to load cached ads from database
         if not settings.PG_DBNAME:
-            raise Exception('No configuration found for pgsql not for rest feed.')
+            raise Exception('No config found for db, neither for REST feed.')
         _load_from_postgresql(last_timestamp, es_index)
         return
 
     # Load list of updated ad ids
-    log.info("Loading updates from REST endpoint.")
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)
 
     log.info('Fetching details for %s ads...' % len(ad_ids))
@@ -80,7 +79,7 @@ def start(es_index=None):
 
         doc_counter += (len(ad_details) - len(batch_failed_ads))
         log.info("Batch: %d/%d Failed ads: %d"
-                    % (i+1, nr_of_batches, len(batch_failed_ads)))
+                 % (i+1, nr_of_batches, len(batch_failed_ads)))
 
         for failed_ad in batch_failed_ads.copy():
             # On fail, check for ad in postgresql
@@ -113,7 +112,7 @@ def start(es_index=None):
 
         log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
 
-    # Iterate over failed-list, trying to find in LA, postgresql
+    # Iterate over failed-list, trying to find in LA, db
     recovered_ads = []
     if failed_ads:
         log.info("Last pass, trying to load failed ads from LA")
@@ -143,7 +142,7 @@ def start(es_index=None):
 
 
 def _load_from_postgresql(last_timestamp, es_index):
-    log.info("No feed configuration detected, using database as source.")
+    log.info("No REST feed configuration detected, using database as source.")
     doc_counter = 0
     last_identifiers = elastic.get_ids_with_timestamp(last_timestamp, es_index)
 
@@ -167,7 +166,7 @@ def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     converted_ads = [converter.convert_ad(raw_ad)
                      for raw_ad in raw_ads]
     enriched_ads = enricher.enrich(converted_ads)
-    log.info("Indexing: %d documents into: %s" % (len(enriched_ads), es_index))
+    log.info("Indexing: %d enriched documents into: %s" % (len(enriched_ads), es_index))
     # Bulk save cooked-list to elastic
     elastic.bulk_index(enriched_ads, es_index, deleted_index)
     return len(enriched_ads)
