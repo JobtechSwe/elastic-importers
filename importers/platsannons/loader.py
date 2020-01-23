@@ -116,8 +116,6 @@ def load_details_from_la(ad_meta):
 
 
 def _clean_sensitive_data(ad, detail_url):
-    if 'kontaktpersoner' in ad:
-        del ad['kontaktpersoner']
     if 'organisationsnummer' in ad and \
             len(ad.get('organisationsnummer', '').strip()) > 9:
         orgnr = ad['organisationsnummer']

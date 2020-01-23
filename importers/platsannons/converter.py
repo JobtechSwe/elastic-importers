@@ -147,6 +147,8 @@ def convert_ad(message):
         'education_level': [],
     }
 
+    annons['application_contact'] = _build_contacts(message.get('kontaktpersoner', []))
+
     if message.get('utbildningsinriktning'):
         try:
             _set_education(annons, message)
@@ -207,6 +209,28 @@ def _get_default_scope_of_work(arbtid_typ):
         default_min_omf = 0
         default_max_omf = 100
     return default_min_omf, default_max_omf
+
+
+def _build_contacts(kontaktpersoner):
+    appl_contact_list = []
+    for kontaktperson in kontaktpersoner:
+        appl_contact = {}
+        name = "%s %s" % (get_null_safe_value(kontaktperson, 'fornamn', ''),
+                          get_null_safe_value(kontaktperson, 'efternamn', ''))
+        appl_contact['name'] = name.strip() or None
+        appl_contact['description'] = kontaktperson.get('beskrivning')
+        appl_contact['email'] = kontaktperson.get('epost')
+        phone_numbers = "%s, %s" % (get_null_safe_value(kontaktperson, 'telefonnummer', ''),
+                                    get_null_safe_value(kontaktperson, 'mobilnummer', ''))
+        appl_contact['telephone'] = phone_numbers.strip(', ') or None
+        if kontaktperson.get('fackligRepresentant'):
+            appl_contact['contactType'] = "Facklig representant"
+        else:
+            appl_contact['contactType'] = kontaktperson.get('befattning')
+
+        appl_contact_list.append(appl_contact)
+
+    return appl_contact_list
 
 
 def _set_occupations(annons, message):

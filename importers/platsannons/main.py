@@ -164,8 +164,10 @@ def _load_from_postgresql(last_timestamp, es_index):
 
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     # Loop over raw-list, convert and enrich into cooked-list
+    log.info("Convering ads to proper format ...")
     converted_ads = [converter.convert_ad(raw_ad)
                      for raw_ad in raw_ads]
+    log.info("Enriching ads with ML ...")
     enriched_ads = enricher.enrich(converted_ads)
     log.info("Indexing: %d documents into: %s" % (len(enriched_ads), es_index))
     # Bulk save cooked-list to elastic
