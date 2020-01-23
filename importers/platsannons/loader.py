@@ -134,7 +134,7 @@ def load_list_of_updated_ads(timestamp=0):
     items = []
     feed_url = settings.LA_BOOTSTRAP_FEED_URL \
         if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)
-
+    log.info("Loading updates from endpoint: %s" % feed_url)
     try:
         r = requests.get(feed_url, timeout=60)
         r.raise_for_status()
