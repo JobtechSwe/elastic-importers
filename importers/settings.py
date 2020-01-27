@@ -166,6 +166,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             },
@@ -175,6 +178,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             },
@@ -184,6 +190,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             },
@@ -193,6 +202,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             }
@@ -207,6 +219,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             },
@@ -216,6 +231,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             },
@@ -225,6 +243,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             },
@@ -234,6 +255,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             }
@@ -275,6 +299,9 @@ platsannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
                                     }
                                 }
                             }
