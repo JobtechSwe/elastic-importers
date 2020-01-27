@@ -85,7 +85,7 @@ def start(es_index=None):
             # On fail, check for ad in postgresql
             failed_id = failed_ad['annonsId']
             log.warning("Working through list of failed ads, total in batch: %d."
-                        "Failed id: %s" % (len(batch_failed_ads.copy), failed_ad))
+                        "Failed id: %s" % (len(batch_failed_ads), failed_ad))
             pgsql_ad = postgresql.fetch_ad(failed_id, settings.PG_PLATSANNONS_TABLE)
             if pgsql_ad:
                 ad_details[failed_id] = pgsql_ad
