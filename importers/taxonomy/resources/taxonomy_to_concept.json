@@ -40531,6 +40531,12 @@
             "legacyAmsTaxonomyId": "25",
             "preferredTerm": "Norrbottens län",
             "type": "region"
+        },
+        "90": {
+            "conceptId": "vrDq_rUY_7PX",
+            "legacyAmsTaxonomyId": "90",
+            "preferredTerm": "Ospecifierad",
+            "type": "region"
         }
     },
     "skill": {
