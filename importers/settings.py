@@ -361,13 +361,18 @@ platsannons_mappings = {
 
 
 # For berikning (platsannonser och auranest)
-URL_ENRICH_TEXTDOCS_BINARY_SERVICE = \
-    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
+URL_ENRICH_TEXTDOCS_SERVICE = \
+    os.getenv('URL_ENRICH_TEXTDOCS_SERVICE',
               'https://textdoc-enrichments.dev.services.jtech.se'
-              '/enrichtextdocumentsbinary')
+              '/enrichtextdocuments')
 API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
 #    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
 #              'http://localhost:6357/enrichtextdocumentsbinary')
+ENRICH_THRESHOLD_OCCUPATION = os.getenv('ENRICH_THRESHOLD_OCCUPATION', 0.8)
+ENRICH_THRESHOLD_SKILL = os.getenv('ENRICH_THRESHOLD_SKILL', 0.5)
+ENRICH_THRESHOLD_GEO = os.getenv('ENRICH_THRESHOLD_GEO', 0.7)
+ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_GEO', 0.5)
+
 COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 

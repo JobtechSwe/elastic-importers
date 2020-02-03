@@ -15,7 +15,7 @@ timeout_enrich_api = 90
 def enrich(annonser, parallelism=1):
     # enricher_mt.py - 2019-01-09 11:19:52+0100|INFO|importers.platsannons.main|MESSAGE: Indexed 999 docs in: 23.753832817077637 seconds.
     log.info('Running enrich with %s processes' % str(parallelism))
-    log.info('Enriching documents calling: %s' % settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE)
+    log.info('Enriching documents calling: %s' % settings.URL_ENRICH_TEXTDOCS_SERVICE)
     global counter
     counter = Value('i', 0)
 
@@ -113,7 +113,7 @@ def get_enrich_result(batch_indata, timeout):
     # log.debug('len(batch_indata[documents_input])', len(batch_indata['documents_input']))
     # log.info('get_enrich_result - Sending %s ads (documents_input) for enrichment' % (len(batch_indata['documents_input'])))
     # log.debug('Enriching Id: %s' % (input_doc_params[NarvalEnricher.PARAM_DOC_ID]))
-    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE, headers=headers, json=batch_indata, timeout=timeout)
+    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE, headers=headers, json=batch_indata, timeout=timeout)
     r.raise_for_status()
     return r.json()
 
@@ -140,8 +140,8 @@ def execute_calls(batch_indatas, parallelism):
                 log.error('Call generated an exception: %s' % (str(exc)))
                 raise exc
 
-
     return enriched_output
+
 
 def enrich_doc(annons, enriched_output):
     enriched_candidates = enriched_output['enriched_candidates']

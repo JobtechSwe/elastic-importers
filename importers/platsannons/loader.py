@@ -175,6 +175,9 @@ def find_correct_logo_url(workplace_id, org_number):
     except requests.exceptions.ReadTimeout as e:
         cache_logo = False
         log.warning("Logo URL timeout: %s" % str(e))
+    except requests.exceptions.ConnectionError as e:
+        cache_logo = False
+        log.warning("Logo URL connection error: %s" % str(e))
 
     if cache_logo:
         logo_cache[cache_key] = logo_url

@@ -190,4 +190,4 @@ def start_daily_index():
 if __name__ == '__main__':
     configure_logging([__name__, 'importers'])
     log = logging.getLogger(__name__)
-    start()
+    start_daily_index()

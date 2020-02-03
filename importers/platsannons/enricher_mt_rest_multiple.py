@@ -16,7 +16,7 @@ counter = None
 def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     log.info('Running enrich with %s processes' % str(parallelism))
     log.info('Enriching: %s documents calling: %s'
-             % (len(annonser), settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE))
+             % (len(annonser), settings.URL_ENRICH_TEXTDOCS_SERVICE))
 
     global counter
     counter = Value('i', 0)
@@ -100,7 +100,7 @@ def get_doc_headline_input(annons):
 def get_enrich_result(batch_indata, timeout):
     headers = {'Content-Type': 'application/json',
                'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
-    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_BINARY_SERVICE,
+    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE,
                       headers=headers, json=batch_indata, timeout=timeout)
     r.raise_for_status()
     return r.json()
@@ -169,11 +169,15 @@ def process_enriched_candidates_synonyms(annons, enriched_output):
 
 def set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_name):
     enriched_node = annons['keywords'][fieldname]
-    enriched_node['occupation'] = [candidate[candidate_prop_name].lower()
-                                   for candidate in enriched_candidates['occupations']]
-    enriched_node['skill'] = [candidate[candidate_prop_name].lower()
-                              for candidate in enriched_candidates['competencies']]
-    enriched_node['trait'] = [candidate[candidate_prop_name].lower()
-                              for candidate in enriched_candidates['traits']]
-    enriched_node['location'] = [candidate[candidate_prop_name].lower()
-                                 for candidate in enriched_candidates['geos']]
+    enriched_node['occupation'] = list(set([candidate[candidate_prop_name].lower()
+                                            for candidate in enriched_candidates['occupations']
+                                            if candidate['prediction'] >= settings.ENRICH_THRESHOLD_OCCUPATION]))
+    enriched_node['skill'] = list(set([candidate[candidate_prop_name].lower()
+                                       for candidate in enriched_candidates['competencies']
+                                       if candidate['prediction'] >= settings.ENRICH_THRESHOLD_SKILL]))
+    enriched_node['trait'] = list(set([candidate[candidate_prop_name].lower()
+                                       for candidate in enriched_candidates['traits']
+                                       if candidate['prediction'] >= settings.ENRICH_THRESHOLD_TRAIT]))
+    enriched_node['location'] = list(set([candidate[candidate_prop_name].lower()
+                                          for candidate in enriched_candidates['geos']
+                                          if candidate['prediction'] >= settings.ENRICH_THRESHOLD_GEO]))
