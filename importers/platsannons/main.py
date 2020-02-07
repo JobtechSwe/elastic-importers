@@ -47,7 +47,6 @@ def start(es_index=None):
     es_index, es_index_deleted = _setup_index(es_index)
     log.info("Starting ad import into index: %s" % es_index)
     last_timestamp = _check_last_timestamp(es_index)
-    doc_counter = 0
 
     if not settings.LA_FEED_URL:
         # Try to load cached ads from database
@@ -58,8 +57,26 @@ def start(es_index=None):
 
     # Load list of updated ad ids
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)
+    number_of_ids_to_load = len(ad_ids)
+    while len(ad_ids) > 0:
+        log.info('Fetching details for %s ads...' % len(ad_ids))
+        _load_and_process_ads(ad_ids, es_index, es_index_deleted)
+        log.info("Verifying that all ads have been indexed")
+        ad_ids = _find_missing_ids_and_create_loadinglist(ad_ids, es_index)
+        if len(ad_ids) > 0:
+            log.warning("There are still %d ads unaccounted for. Trying again ..." % len(ad_ids))
 
-    log.info('Fetching details for %s ads...' % len(ad_ids))
+    elapsed_time = time.time() - start_time
+    m, s = divmod(elapsed_time, 60)
+    log.info("Processed %d docs in: %d minutes %5.2f seconds." % (number_of_ids_to_load, m, s))
+
+    elastic.es.indices.refresh(es_index)
+    num_doc_elastic = elastic.es.cat.count(es_index, params={"format": "json"})[0]['count']
+    log.info("All done! Elastic reports a total of %s indexed documents." % num_doc_elastic)
+
+
+def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
+    doc_counter = 0
     nr_of_items_per_batch = int(settings.PG_BATCH_SIZE)
     nr_of_items_per_batch = min(nr_of_items_per_batch, len(ad_ids))
     if nr_of_items_per_batch < 1:
@@ -68,36 +85,16 @@ def start(es_index=None):
     nr_of_batches = math.ceil(len(ad_ids) / nr_of_items_per_batch)
     # Partition list into manageable chunks
     ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
-
     processed_ads_total = 0
-    failed_ads = []
     for i, ad_batch in enumerate(ad_batches):
         log.info('Processing batch %s/%s' % (i + 1, nr_of_batches))
 
         # Fetch ads from LA to raw-list
-        ad_details, batch_failed_ads = loader.bulk_fetch_ad_details(ad_batch)
+        ad_details = loader.bulk_fetch_ad_details(ad_batch)
 
-        doc_counter += (len(ad_details) - len(batch_failed_ads))
-        log.info("Batch: %d/%d Failed ads: %d"
-                 % (i+1, nr_of_batches, len(batch_failed_ads)))
-
-        for failed_ad in batch_failed_ads.copy():
-            # On fail, check for ad in postgresql
-            failed_id = failed_ad['annonsId']
-            log.warning("Working through list of failed ads, total in batch: %d."
-                        "Failed id: %s" % (len(batch_failed_ads), failed_ad))
-            pgsql_ad = postgresql.fetch_ad(failed_id, settings.PG_PLATSANNONS_TABLE)
-            if pgsql_ad:
-                ad_details[failed_id] = pgsql_ad
-                batch_failed_ads.remove(failed_ad)
-                log.info("OK getting failed ad from db, id: %s" % failed_ad)
-            else:
-                log.warning("NOK getting failed ad from db, id: %s" % failed_ad)
-            # On fail, keep ID in failed-list
-
-        failed_ads.extend(batch_failed_ads)
         raw_ads = [raw_ad for raw_ad in list(ad_details.values())
                    if not raw_ad.get('removed', False)]
+        doc_counter += len(raw_ads)
         deleted_ids = [raw_ad['annonsId'] for raw_ad in list(ad_details.values())
                        if raw_ad.get('removed', False)]
         # Save raw-list to postgresql
@@ -112,33 +109,7 @@ def start(es_index=None):
 
         log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
 
-    # Iterate over failed-list, trying to find in LA, db
-    recovered_ads = []
-    if failed_ads:
-        log.info("Last pass, trying to load failed ads from LA")
-        for failed_ad in failed_ads.copy():
-            recovered_ad = loader.load_details_from_la(failed_ad)
-            if recovered_ad:
-                log.info("Successfully downloaded previously failed ad from LA:"
-                         " %s" % recovered_ad['id'])
-                recovered_ads.append(recovered_ad)
-                failed_ads.remove(failed_ad)
-            else:
-                log.warning("Unsuccessfully downloaded previously failed ad "
-                            "from LA: %s" % recovered_ad['id'])
-
-    # Save any recovered ads
-    if recovered_ads:
-        num_idxd_ads = _convert_and_save_to_elastic(recovered_ads, es_index,
-                                                    es_index_deleted)
-        log.info("Indexed recovered ads: %d" % num_idxd_ads)
-    if failed_ads:
-        log.warning("Ads reported from stream that can't be downloaded: %d",
-                    len(failed_ads))
-
-    elapsed_time = time.time() - start_time
-    m, s = divmod(elapsed_time, 60)
-    log.info("Processed %d docs in: %d minutes %5.2f seconds." % (doc_counter, m, s))
+    return doc_counter
 
 
 def _load_from_postgresql(last_timestamp, es_index):
@@ -170,8 +141,15 @@ def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     enriched_ads = enricher.enrich(converted_ads)
     log.info("Indexing: %d enriched documents into: %s" % (len(enriched_ads), es_index))
     # Bulk save cooked-list to elastic
-    elastic.bulk_index(enriched_ads, es_index, deleted_index)
-    return len(enriched_ads)
+    num_indexed = elastic.bulk_index(enriched_ads, es_index, deleted_index)
+    return num_indexed
+
+
+def _find_missing_ids_and_create_loadinglist(ad_ids, es_index):
+    id_lookup = {str(a['annonsId']): a for a in ad_ids if not a['avpublicerad']}
+    loaded_ids = [str(a['annonsId']) for a in ad_ids if not a['avpublicerad']]
+    missing_ids = elastic.find_missing_ad_ids(loaded_ids, es_index)
+    return [id_lookup[missing_id] for missing_id in missing_ids]
 
 
 def _grouper(n, iterable):
@@ -190,4 +168,4 @@ def start_daily_index():
 if __name__ == '__main__':
     configure_logging([__name__, 'importers'])
     log = logging.getLogger(__name__)
-    start_daily_index()
+    start()

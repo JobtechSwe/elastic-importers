@@ -20,7 +20,6 @@ def bulk_fetch_ad_details(ad_batch):
     global counter
     counter = Value('i', 0)
     result_output = {}
-    failed_ads = []
     # with statement to ensure threads are cleaned up promptly
     with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
         # Start the load operations
@@ -45,14 +44,12 @@ def bulk_fetch_ad_details(ad_batch):
                 error_message = 'Fetch ad details call generated an exception: %s' % \
                     (str(exc))
                 log.error(error_message)
-                failed_ads.append(input_data)
             except Exception as exc:
                 error_message = 'Fetch ad details call generated an exception: %s' % \
                     (str(exc))
                 log.error(error_message)
-                failed_ads.append(input_data)
 
-    return result_output, failed_ads
+    return result_output
 
 
 def load_details_from_la(ad_meta):
@@ -84,6 +81,8 @@ def load_details_from_la(ad_meta):
                 ad['expiresAt'] = ad['sistaPubliceringsdatum']
                 desensitized_ad = _clean_sensitive_data(ad, detail_url_la)
                 clean_ad = _cleanup_stringvalues(desensitized_ad)
+                ad['logo_url'] = find_correct_logo_url(ad.get('arbetsgivareId'),
+                                                       ad.get('organisationsnummer'))
                 return clean_ad
         # On fail, try again 10 times with 0.3 second delay
         except requests.exceptions.ConnectionError as e:
@@ -160,14 +159,14 @@ def find_correct_logo_url(workplace_id, org_number):
     try:
         if workplace_id and int(workplace_id) > 0:
             possible_logo_url = "%sarbetsplatser/%s/logotyper/logo.png" \
-                % (settings.COMPANY_LOGO_BASE_URL, workplace_id)
+                                % (settings.COMPANY_LOGO_BASE_URL, workplace_id)
             r = requests.head(possible_logo_url, timeout=10)
             if r.status_code == 200:
                 logo_url = possible_logo_url
 
         elif org_number:
             possible_logo_url = '%sorganisation/%s/logotyper/logo.png' \
-                % (settings.COMPANY_LOGO_BASE_URL, org_number)
+                                % (settings.COMPANY_LOGO_BASE_URL, org_number)
             r = requests.head(possible_logo_url, timeout=10)
             if r.status_code == 200:
                 logo_url = possible_logo_url
@@ -182,8 +181,9 @@ def find_correct_logo_url(workplace_id, org_number):
     if cache_logo:
         logo_cache[cache_key] = logo_url
 
-    log.debug("Returning found logo url: %s" % logo_url)
-
+    log.debug("Returning found logo url for (orgnr/ag-id): %s/%s: %s" % (org_number,
+                                                                         workplace_id,
+                                                                         logo_url))
     return logo_url
 
 
