@@ -4,7 +4,6 @@ from dateutil import parser
 from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
 from importers.common import clean_html
-from importers.platsannons.loader import find_correct_logo_url
 
 
 logging.basicConfig()
@@ -147,6 +146,8 @@ def convert_ad(message):
         'education_level': [],
     }
 
+    annons['application_contact'] = _build_contacts(message.get('kontaktpersoner', []))
+
     if message.get('utbildningsinriktning'):
         try:
             _set_education(annons, message)
@@ -159,10 +160,7 @@ def convert_ad(message):
     annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
     annons['source_type'] = message.get('kallaTyp')
     annons['timestamp'] = message.get('updatedAt')
-    # Try to find an url for employer logo
-    workplace_id = annons.get('employer', {}).get('workplace_id', 0)
-    organization_number = annons.get('employer', {}).get('organization_number', None)
-    annons['logo_url'] = find_correct_logo_url(workplace_id, organization_number)
+    annons['logo_url'] = message.get('logo_url')
     # Extract labels as keywords for easier searching
     return _add_keywords(annons)
 
@@ -207,6 +205,28 @@ def _get_default_scope_of_work(arbtid_typ):
         default_min_omf = 0
         default_max_omf = 100
     return default_min_omf, default_max_omf
+
+
+def _build_contacts(kontaktpersoner):
+    appl_contact_list = []
+    for kontaktperson in kontaktpersoner:
+        appl_contact = {}
+        name = "%s %s" % (get_null_safe_value(kontaktperson, 'fornamn', ''),
+                          get_null_safe_value(kontaktperson, 'efternamn', ''))
+        appl_contact['name'] = name.strip() or None
+        appl_contact['description'] = kontaktperson.get('beskrivning')
+        appl_contact['email'] = kontaktperson.get('epost')
+        phone_numbers = "%s, %s" % (get_null_safe_value(kontaktperson, 'telefonnummer', ''),
+                                    get_null_safe_value(kontaktperson, 'mobilnummer', ''))
+        appl_contact['telephone'] = phone_numbers.strip(', ') or None
+        if kontaktperson.get('fackligRepresentant'):
+            appl_contact['contactType'] = "Facklig representant"
+        else:
+            appl_contact['contactType'] = kontaktperson.get('befattning')
+
+        appl_contact_list.append(appl_contact)
+
+    return appl_contact_list
 
 
 def _set_occupations(annons, message):

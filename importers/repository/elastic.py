@@ -2,7 +2,7 @@ import logging
 import certifi
 import time
 from ssl import create_default_context
-from elasticsearch.helpers import bulk, scan
+from elasticsearch.helpers import bulk, scan, BulkIndexError
 from elasticsearch import Elasticsearch
 from importers import settings
 
@@ -42,14 +42,24 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'publication_date': None,
                     'last_publication_date': None,
                 }
-                yield remove_statement
+                #yield remove_statement
+                yield {
+                    '_index': indexname,
+                    '_id': doc_id,
+                    '_source': tombstone,
+                }
                 yield {
                     '_index': deleted_index,
                     '_id': doc_id,
                     '_source': tombstone,
                 }
             else:
-                yield remove_statement
+                # yield remove_statement
+                yield {
+                    '_index': indexname,
+                    '_id': doc_id,
+                    '_source': tombstone,
+                }
         else:
             yield {
                 '_index': indexname,
@@ -59,8 +69,9 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
 
 
 def bulk_index(documents, indexname, deleted_index=None, idkey='id'):
-    bulk(es, _bulk_generator(documents, indexname, idkey, deleted_index),
-         request_timeout=30, raise_on_error=False)
+    result = bulk(es, _bulk_generator(documents, indexname, idkey, deleted_index),
+                  request_timeout=30, raise_on_error=True, yield_ok=False)
+    return result[0]
 
 
 def get_last_timestamp(indexname):
@@ -91,6 +102,22 @@ def get_ids_with_timestamp(ts, indexname):
                          })
     hits = response['hits']['hits']
     return [hit['_source']['id'] for hit in hits]
+
+
+def find_missing_ad_ids(ad_ids, es_index):
+    es.indices.refresh(es_index)
+    missing_ads_dsl = {
+        "query": {
+            "ids": {
+                "values": ad_ids
+            }
+        }
+    }
+    ads = scan(es, query=missing_ads_dsl, index=es_index)
+    indexed_ids = []
+    for ad in ads:
+        indexed_ids.append(ad['_id'])
+    return set(ad_ids)-set(indexed_ids)
 
 
 def get_glitch_jobtechjobs_ids(max_items=None):

@@ -1,4 +1,5 @@
 import sys
+import logging
 from elasticsearch.exceptions import NotFoundError
 from importers.repository import elastic
 from importers import settings
@@ -6,12 +7,14 @@ from importers import settings
 WRITE_SUFFIX = '-write'
 READ_SUFFIX = '-read'
 
+log = logging.getLogger(__name__)
+
 
 def set_platsannons_read_alias(idxname=None):
     if not idxname and len(sys.argv) > 1:
         idxname = sys.argv[1]
     if not idxname:
-        print("Must provide name of index to alias against.")
+        log.error("Must provide name of index to alias against. Exit!")
         sys.exit(1)
 
     aliasname = "%s%s" % (settings.ES_ANNONS_PREFIX, READ_SUFFIX)
@@ -27,7 +30,7 @@ def set_platsannons_write_alias(idxname=None):
     if len(sys.argv) > 1:
         idxname = sys.argv[1]
     if not idxname:
-        print("Must provide name of index to alias against.")
+        log.error("Must provide name of index to alias against. Exit!")
         sys.exit(1)
 
     change_alias([idxname], settings.ES_ANNONS_INDEX)
@@ -35,7 +38,7 @@ def set_platsannons_write_alias(idxname=None):
 
 def set_auranest_read_alias():
     if len(sys.argv) < 1:
-        print("Must provide name of index to alias against.")
+        log.error("Must provide name of index to alias against. Exit!")
         sys.exit(1)
 
     idxname = sys.argv[1]
@@ -45,7 +48,7 @@ def set_auranest_read_alias():
 
 def set_auranest_write_alias():
     if len(sys.argv) < 1:
-        print("Must provide name of index to alias against.")
+        log.error("Must provide name of index to alias against. Exit!")
         sys.exit(1)
 
     idxname = sys.argv[1]
@@ -54,7 +57,7 @@ def set_auranest_write_alias():
 
 def create_platsannons_index():
     if len(sys.argv) < 1:
-        print("Must provide name of index to alias against.")
+        log.error("Must provide name of index to alias against. Exit!")
         sys.exit(1)
 
     idxname = sys.argv[1]
@@ -62,7 +65,7 @@ def create_platsannons_index():
 
 
 def change_alias(idxnames, aliasname):
-    print(f"Setting alias {aliasname} to point to {idxnames}")
+    log.info(f"Setting alias: {aliasname} to point to: {idxnames}")
     try:
         if elastic.alias_exists(aliasname):
             oldindices = list(elastic.get_alias(aliasname).keys())
@@ -70,8 +73,8 @@ def change_alias(idxnames, aliasname):
         else:
             elastic.add_indices_to_alias(idxnames, aliasname)
     except NotFoundError:
-        print("Error: Can't create alias \"%s\". Index \"%s\" not found" % (aliasname,
-                                                                            idxnames))
+        log.error("Error: Can't create alias: %s. Index: %s not found. Exit!"
+                  % (aliasname, idxnames))
         sys.exit(1)
 
 

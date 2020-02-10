@@ -6,21 +6,6 @@ import json
 import pytest
 
 
-# Sammanfattning av ändringar, aktivitet https://trello.com/c/Jim7sieL
-# Exempel på ny källa: https://www.arbetsformedlingen.se/rest/ledigtarbete/rest/af/v1/ledigtarbete/publikt/annonser/23189102
-# =====================================================================
-# Borttagna properties:
-# 'status' +  'publicerad', 'skapad', 'uppdaterad', 'uppdaterad_av', 'skapad_av', 'anvandarId'
-# 'publiceringskanaler' + 'platsbanken', 'ais', 'platsjournalen'
-
-# Flyttade properties:
-# 'sista_publiceringsdatum' flyttad från status/sista_publiceringsdatum till 'sista_publiceringsdatum' (högsta nivån)
-
-# Nya properties:
-# 'avpublicerad' (boolean)
-# 'avpubliceringsdatum' - finns endast om avpublicerad är True
-# 'external_id'
-
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
@@ -30,11 +15,13 @@ def get_source_ads_from_file():
         # pprint(result)
         return result['testannonser']
 
+
 def get_target_ads_from_file():
     with open(currentdir + 'test_resources/platsannonser_target_test_import.json') as f:
         result = json.load(f)
         # pprint(result)
         return result['hits']['hits']
+
 
 # @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
@@ -44,13 +31,11 @@ def test_platsannons_conversion():
     source_ads = get_source_ads_from_file()
     target_ads = get_target_ads_from_file()
 
-
     annons_id = '22884504'
     source_ad = get_source_ad(annons_id, source_ads)
 
     annons_id = source_ad['annonsId']
     assert_ad_properties(annons_id, source_ads, target_ads)
-
 
 
 def assert_ad_properties(annons_id, source_ads, target_ads):
@@ -63,7 +48,6 @@ def assert_ad_properties(annons_id, source_ads, target_ads):
     message_envelope = {}
     # message_envelope['annons'] = source_ad
     message_envelope = source_ad
-
 
     message_envelope['version'] = 1
     message_envelope['timestamp'] = target_ad['timestamp']
@@ -101,13 +85,13 @@ def assert_ad_properties(annons_id, source_ads, target_ads):
             assert 'workplace_id' in employer_node_keys
 
     #########################
-    # Borttagna attribut
+    # Removed
     #########################
     assert 'status' not in conv_ad
     assert 'publiceringskanaler' not in conv_ad
 
     #########################
-    # Nya/strukturellt ändrade attribut
+    # New and changed
     #########################
     assert 'removed' in conv_ad
     assert conv_ad['removed'] == source_ad['avpublicerad']
@@ -134,7 +118,6 @@ def test_corrupt_platsannons():
     # target_ad = get_target_ad(annons_id, target_ads)
     message_envelope = source_ad
 
-
     message_envelope['version'] = 1
     message_envelope['timestamp'] = 1539958052330
     # pprint(message_envelope)
@@ -150,13 +133,12 @@ def test_corrupt_platsannons():
     assert len(conv_ad['nice_to_have']['work_experiences']) == 2
 
 
-
-
 def get_source_ad(annons_id, ads):
     ads_with_id = [ad for ad in ads if str(ad['annonsId']) == str(annons_id)]
     ad = None if len(ads_with_id) == 0 else ads_with_id[0]
     ad['annonsId'] = str(ad['annonsId'])
     return ad
+
 
 def get_target_ad(annons_id, ads):
     ads_with_id = [ad['_source'] for ad in ads if str(ad['_source']['id']) == str(annons_id)]
