@@ -79,10 +79,10 @@ def load_details_from_la(ad_meta):
                 ad['id'] = str(ad['annonsId'])
                 ad['updatedAt'] = ad_meta['uppdateradTid']
                 ad['expiresAt'] = ad['sistaPubliceringsdatum']
-                desensitized_ad = _clean_sensitive_data(ad, detail_url_la)
-                clean_ad = _cleanup_stringvalues(desensitized_ad)
                 ad['logo_url'] = find_correct_logo_url(ad.get('arbetsgivareId'),
                                                        ad.get('organisationsnummer'))
+                desensitized_ad = _clean_sensitive_data(ad, detail_url_la)
+                clean_ad = _cleanup_stringvalues(desensitized_ad)
                 return clean_ad
         # On fail, try again 10 times with 0.3 second delay
         except requests.exceptions.ConnectionError as e:
@@ -155,7 +155,7 @@ def find_correct_logo_url(workplace_id, org_number):
         log.debug("Returning cached logo \"%s\" for workplace-orgnr %s" % (logo_url, cache_key))
         return logo_url
 
-    cache_logo = True
+    cache_logo = False
     try:
         if workplace_id and int(workplace_id) > 0:
             possible_logo_url = "%sarbetsplatser/%s/logotyper/logo.png" \
@@ -163,6 +163,7 @@ def find_correct_logo_url(workplace_id, org_number):
             r = requests.head(possible_logo_url, timeout=10)
             if r.status_code == 200:
                 logo_url = possible_logo_url
+                cache_logo = True
 
         elif org_number:
             possible_logo_url = '%sorganisation/%s/logotyper/logo.png' \
@@ -170,12 +171,11 @@ def find_correct_logo_url(workplace_id, org_number):
             r = requests.head(possible_logo_url, timeout=10)
             if r.status_code == 200:
                 logo_url = possible_logo_url
+                cache_logo = True
 
     except requests.exceptions.ReadTimeout as e:
-        cache_logo = False
         log.warning("Logo URL timeout: %s" % str(e))
     except requests.exceptions.ConnectionError as e:
-        cache_logo = False
         log.warning("Logo URL connection error: %s" % str(e))
 
     if cache_logo:
