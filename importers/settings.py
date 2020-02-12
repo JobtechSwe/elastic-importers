@@ -207,6 +207,19 @@ platsannons_mappings = {
                                         "type": "completion"
                                     }
                                 }
+                            },
+                            "completion_terms": {
+                                "type": "string",
+                                "analyzer": "completion_analyzer",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    },
+                                    "suggest": {
+                                        "type": "completion"
+                                    }
+                                }
                             }
                         }
                     },
