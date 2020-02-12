@@ -4,7 +4,6 @@ from dateutil import parser
 from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
 from importers.common import clean_html
-from importers.platsannons.loader import find_correct_logo_url
 
 
 logging.basicConfig()
@@ -161,10 +160,7 @@ def convert_ad(message):
     annons['removed_date'] = _isodate(message.get('avpubliceringsdatum'))
     annons['source_type'] = message.get('kallaTyp')
     annons['timestamp'] = message.get('updatedAt')
-    # Try to find an url for employer logo
-    workplace_id = annons.get('employer', {}).get('workplace_id', 0)
-    organization_number = annons.get('employer', {}).get('organization_number', None)
-    annons['logo_url'] = find_correct_logo_url(workplace_id, organization_number)
+    annons['logo_url'] = message.get('logo_url')
     # Extract labels as keywords for easier searching
     return _add_keywords(annons)
 

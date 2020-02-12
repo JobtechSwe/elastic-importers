@@ -331,6 +331,9 @@ platsannons_mappings = {
             "application_deadline": {
                 "type": "date"
             },
+            "access": {
+                "type": "text"
+            },
             "workplace_address": {
                 "properties": {
                     "municipality_code": {
