@@ -181,5 +181,3 @@ def set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_n
     enriched_node['location'] = list(set([candidate[candidate_prop_name].lower()
                                           for candidate in enriched_candidates['geos']
                                           if candidate['prediction'] >= settings.ENRICH_THRESHOLD_GEO]))
-    enriched_node['completion_terms'] = enriched_node['occupation'] + enriched_node['skill'] + enriched_node['trait'] \
-                                        + enriched_node['location']
