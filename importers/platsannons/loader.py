@@ -79,7 +79,7 @@ def load_details_from_la(ad_meta):
                 ad['id'] = str(ad['annonsId'])
                 ad['updatedAt'] = ad_meta['uppdateradTid']
                 ad['expiresAt'] = ad['sistaPubliceringsdatum']
-                ad['logo_url'] = find_correct_logo_url(ad.get('arbetsgivareId'),
+                ad['logo_url'] = find_correct_logo_url(ad.get('arbetsplatsId'),
                                                        ad.get('organisationsnummer'))
                 desensitized_ad = _clean_sensitive_data(ad, detail_url_la)
                 clean_ad = _cleanup_stringvalues(desensitized_ad)
@@ -165,7 +165,7 @@ def find_correct_logo_url(workplace_id, org_number):
                 logo_url = possible_logo_url
                 cache_logo = True
 
-        elif org_number:
+        if not logo_url and org_number:
             possible_logo_url = '%sorganisation/%s/logotyper/logo.png' \
                                 % (settings.COMPANY_LOGO_BASE_URL, org_number)
             r = requests.head(possible_logo_url, timeout=10)
