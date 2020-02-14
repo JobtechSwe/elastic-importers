@@ -84,6 +84,14 @@ platsannons_mappings = {
                     "tokenizer": "whitespace",
                     "filter": ["lowercase", "reverse", "edgengram_filter", "reverse"],
                     "char_filter": ["punctuation_filter"]
+                },
+                "bigram_combiner": {
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "custom_shingle",
+                        "my_char_filter"
+                    ]
                 }
             },
             "filter": {
@@ -91,6 +99,17 @@ platsannons_mappings = {
                     "type": "edge_ngram",
                     "min_gram": 3,
                     "max_gram": 14
+                },
+                "custom_shingle": {
+                     "type": "shingle",
+                     "min_shingle_size": 2,
+                     "max_shingle_size": 3,
+                     "output_unigrams": True
+                },
+                "my_char_filter": {
+                     "type": "pattern_replace",
+                     "pattern": " ",
+                     "replacement": ""
                 }
             },
             "char_filter": {
@@ -162,6 +181,7 @@ platsannons_mappings = {
                         "properties": {
                             "occupation": {
                                 "type": "text",
+                                "analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
@@ -174,6 +194,7 @@ platsannons_mappings = {
                             },
                             "skill": {
                                 "type": "text",
+                                "analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
@@ -186,6 +207,7 @@ platsannons_mappings = {
                             },
                             "trait": {
                                 "type": "text",
+                                "analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
@@ -198,19 +220,7 @@ platsannons_mappings = {
                             },
                             "location": {
                                 "type": "text",
-                                "fields": {
-                                    "raw": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
-                                    }
-                                }
-                            },
-                            "completion_terms": {
-                                "type": "string",
-                                "analyzer": "completion_analyzer",
+                                "analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
