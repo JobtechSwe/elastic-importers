@@ -125,7 +125,7 @@ def execute_calls(batch_indatas, parallelism):
                     with counter.get_lock():
                         counter.value += 1
                         if counter.value % 100 == 0:
-                            log.info("enrichtextdocumentsbinary - Processed %s docs"
+                            log.info("enrichtextdocuments - Processed %s docs"
                                      % (str(counter.value)))
             except Exception as exc:
                 log.error('Enrichment call generated an exception: %s' % (str(exc)))

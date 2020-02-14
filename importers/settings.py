@@ -90,7 +90,7 @@ platsannons_mappings = {
                 "edgengram_filter": {
                     "type": "edge_ngram",
                     "min_gram": 3,
-                    "max_gram": 14
+                    "max_gram": 30
                 }
             },
             "char_filter": {
