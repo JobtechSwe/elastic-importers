@@ -57,8 +57,7 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     for i, annons_batch in enumerate(annons_batches):
         annons_batch_indatas = [annons_indata for annons_indata in annons_batch]
         batch_indata = {
-            "documents_input": annons_batch_indatas,
-            settings.ENRICHER_PARAM_INC_SYNONYMS: True
+            "documents_input": annons_batch_indatas
         }
         batch_indatas.append(batch_indata)
 
@@ -139,7 +138,7 @@ def enrich_doc(annons, enriched_output):
         annons['keywords'] = {}
 
     process_enriched_candidates(annons, enriched_output)
-    process_enriched_candidates_synonyms(annons, enriched_output)
+    process_enriched_candidates_typeahead_terms(annons, enriched_output)
 
     return annons
 
@@ -152,32 +151,56 @@ def process_enriched_candidates(annons, enriched_output):
     if fieldname not in annons['keywords']:
         annons['keywords'][fieldname] = {}
 
-    set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_name)
-
-
-def process_enriched_candidates_synonyms(annons, enriched_output):
-    if 'enriched_candidates_synonyms' in enriched_output:
-        enriched_candidates = enriched_output['enriched_candidates_synonyms']
-        fieldname = 'enriched_synonyms'
-
-        candidate_prop_name = 'term'
-        if fieldname not in annons['keywords']:
-            annons['keywords'][fieldname] = {}
-
-        set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_name)
-
-
-def set_enriched_values(annons, enriched_candidates, fieldname, candidate_prop_name):
     enriched_node = annons['keywords'][fieldname]
+
     enriched_node['occupation'] = list(set([candidate[candidate_prop_name].lower()
-                                            for candidate in enriched_candidates['occupations']
-                                            if candidate['prediction'] >= settings.ENRICH_THRESHOLD_OCCUPATION]))
+                                            for candidate in filter_candidates(enriched_candidates,
+                                                                               "occupations",
+                                                                               settings.ENRICH_THRESHOLD_OCCUPATION)]))
     enriched_node['skill'] = list(set([candidate[candidate_prop_name].lower()
-                                       for candidate in enriched_candidates['competencies']
-                                       if candidate['prediction'] >= settings.ENRICH_THRESHOLD_SKILL]))
+                                       for candidate in filter_candidates(enriched_candidates, "competencies",
+                                                                          settings.ENRICH_THRESHOLD_SKILL)]))
     enriched_node['trait'] = list(set([candidate[candidate_prop_name].lower()
-                                       for candidate in enriched_candidates['traits']
-                                       if candidate['prediction'] >= settings.ENRICH_THRESHOLD_TRAIT]))
+                                       for candidate in filter_candidates(enriched_candidates, "traits",
+                                                                          settings.ENRICH_THRESHOLD_TRAIT)]))
+
     enriched_node['location'] = list(set([candidate[candidate_prop_name].lower()
-                                          for candidate in enriched_candidates['geos']
-                                          if candidate['prediction'] >= settings.ENRICH_THRESHOLD_GEO]))
+                                          for candidate in filter_candidates(enriched_candidates, "geos",
+                                                                             settings.ENRICH_THRESHOLD_GEO)]))
+
+
+def process_enriched_candidates_typeahead_terms(annons, enriched_output):
+    enriched_candidates = enriched_output['enriched_candidates']
+    fieldname = 'enriched_typeahead_terms'
+
+    if fieldname not in annons['keywords']:
+        annons['keywords'][fieldname] = {}
+
+    enriched_typeahead_node = annons['keywords'][fieldname]
+
+    enriched_typeahead_node['occupation'] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, "occupations", settings.ENRICH_THRESHOLD_OCCUPATION))
+
+    enriched_typeahead_node['skill'] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, "competencies", settings.ENRICH_THRESHOLD_SKILL))
+
+    enriched_typeahead_node['trait'] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, "traits", settings.ENRICH_THRESHOLD_TRAIT))
+
+    enriched_typeahead_node['location'] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, "geos", settings.ENRICH_THRESHOLD_GEO))
+
+
+def filter_valid_typeahead_terms(candidates):
+    typeahead_for_type = set()
+    for cand in candidates:
+        typeahead_for_type.add(cand['concept_label'].lower())
+        if not cand['term_misspelled']:
+            typeahead_for_type.add(cand['term'].lower())
+    return list(typeahead_for_type)
+
+
+def filter_candidates(enriched_candidates, type_name, prediction_threshold):
+    return [candidate
+            for candidate in enriched_candidates[type_name]
+            if candidate['prediction'] >= prediction_threshold]
