@@ -367,6 +367,7 @@ platsannons_mappings = {
                     },
                     "country_concept_id": {
                         "type": "keyword",
+                        "null_value": "i46j_HmG_v64"  # Assume Sweden when not specified
                     },
                     "coordinates": {
                         "type": "geo_point",
