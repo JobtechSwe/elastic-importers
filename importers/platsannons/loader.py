@@ -57,7 +57,7 @@ def load_details_from_la(ad_meta):
     fail_max = 10
     ad_id = ad_meta['annonsId']
     if ad_meta.get('avpublicerad', False):
-        log.debug("Ad is avpublicerad, preparing to remove it: %s" % ad_id)
+        log.info("Ad is avpublicerad, preparing to remove it: %s" % ad_id)
         removed_date = ad_meta.get('avpubliceringsdatum') or \
             time.strftime("%Y-%m-%dT%H:%M:%S",
                           time.localtime(ad_meta.get('uppdateradTid') / 1000))
