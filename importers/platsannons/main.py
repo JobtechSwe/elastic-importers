@@ -99,8 +99,8 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
                        if raw_ad.get('removed', False)]
         # Save raw-list to postgresql
         postgresql.bulk(raw_ads, settings.PG_PLATSANNONS_TABLE)
-        log.debug(f'Postgresql bulked ads (id, updatedAt): '
-                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
+        log.info(f'Fetched batch of ads  (id, updatedAt): '
+                 f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
         # Set expired on all removed ads
         postgresql.set_expired_for_ids(settings.PG_PLATSANNONS_TABLE, deleted_ids)
 
