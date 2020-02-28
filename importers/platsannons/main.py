@@ -65,14 +65,16 @@ def start(es_index=None):
         ad_ids = _find_missing_ids_and_create_loadinglist(ad_ids, es_index)
         if len(ad_ids) > 0:
             log.warning("There are still %d ads unaccounted for. Trying again ..." % len(ad_ids))
+        else:
+            log.info("No ads unaccounted for.")
 
     elapsed_time = time.time() - start_time
     m, s = divmod(elapsed_time, 60)
     log.info("Processed %d docs in: %d minutes %5.2f seconds." % (number_of_ids_to_load, m, s))
 
-    elastic.es.indices.refresh(es_index)
-    num_doc_elastic = elastic.es.cat.count(es_index, params={"format": "json"})[0]['count']
-    log.info("All done! Elastic reports a total of %s indexed documents." % num_doc_elastic)
+    num_doc_elastic = elastic.document_count(es_index)
+    if num_doc_elastic:
+        log.info("All done! Elastic reports a total of %s indexed documents." % num_doc_elastic)
 
 
 def _load_and_process_ads(ad_ids, es_index, es_index_deleted):

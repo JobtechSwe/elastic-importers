@@ -12,9 +12,9 @@ if settings.ES_USER and settings.ES_PWD:
     context = create_default_context(cafile=certifi.where())
     es = Elasticsearch([settings.ES_HOST], port=settings.ES_PORT,
                        use_ssl=True, scheme='https', ssl_context=context,
-                       http_auth=(settings.ES_USER, settings.ES_PWD))
+                       http_auth=(settings.ES_USER, settings.ES_PWD), timeout=60)
 else:
-    es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}])
+    es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}], timeout=60)
 
 
 def _bulk_generator(documents, indexname, idkey, deleted_index):
@@ -105,7 +105,13 @@ def get_ids_with_timestamp(ts, indexname):
 
 
 def find_missing_ad_ids(ad_ids, es_index):
-    es.indices.refresh(es_index)
+    # Check if the index has the ad ids. If refresh fails, still scan and log but return 0.
+    try:
+        es.indices.refresh(es_index)
+        refresh_success = True
+    except Exception as e:
+        refresh_success = False
+        log.warn("Refresh operation failed when trying to find missing ads: %s" % str(e))
     missing_ads_dsl = {
         "query": {
             "ids": {
@@ -117,7 +123,23 @@ def find_missing_ad_ids(ad_ids, es_index):
     indexed_ids = []
     for ad in ads:
         indexed_ids.append(ad['_id'])
-    return set(ad_ids)-set(indexed_ids)
+    missing_ad_ids = set(ad_ids)-set(indexed_ids)
+    if not refresh_success:
+        log.warn(f"Found {len(missing_ad_ids)} missing from index {es_index}.")
+        return 0
+    else:
+        return missing_ad_ids
+
+
+def document_count(es_index):
+    # Returns the number of documents in the index or None if operation fails.
+    try:
+        es.indices.refresh(es_index)
+        num_doc_elastic = es.cat.count(es_index, params={"format": "json"})[0]['count']
+    except Exception as e:
+        log.warn("Oeration failed when trying to count ads: %s" % str(e))
+        num_doc_elastic = None
+    return num_doc_elastic
 
 
 def get_glitch_jobtechjobs_ids(max_items=None):
