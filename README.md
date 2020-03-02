@@ -29,7 +29,7 @@ The application is entirely configured using environment variables.
 | LA_BOOTSTRAP_FEED_URL | | REST feed API for all currently available job ads | import-platsannonser-daily |
 | LA_DETAILS_URL | | REST feed API job ad details (i.e. the entire job ad) | import-platsannonser, import-platsannonser-daily |
 | LA_DETAILS_PARALLELISM | 8 | Limits how many simultaneous threads are run for loading ad details | import-platsannonser, import-platsannonser-daily |
-| URL_ENRICH_TEXTDOCS_BINARY_SERVICE | https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocumentsbinary | Endpoint for ML enrichment of job ads |import-platsannonser, import-platsannonser-daily|
+| URL_ENRICH_TEXTDOCS_SERVICE | https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments | Endpoint for ML enrichment of job ads |import-platsannonser, import-platsannonser-daily|
 | API_KEY_ENRICH_TEXTDOCS | | API key to use for enrichment | import-platsannonser, import-platsannonser-daily |
 | COMPANY_LOGO_BASE_URL | https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/ | Endpoint to check for available company logo associated with job ad | import-platsannonser, import-platsannonser-daily|
 
