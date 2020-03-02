@@ -264,7 +264,8 @@ def bulk(items, table):
                       json.dumps(item),
                       convert_to_timestamp(item['updatedAt'], item['id']),
                       convert_to_timestamp(item.get('expiresAt'), item['id']),
-                      json.dumps(item), False) for item in items if item]
+                      json.dumps(item),
+                      False) for item in items if item]
     try:
         bulk_conn = get_new_pg_conn()
         cur = bulk_conn.cursor()
@@ -277,7 +278,7 @@ def bulk(items, table):
         bulk_conn.commit()
 
     except psycopg2.DatabaseError as e:
-        log.error('Could not bulk insert in database', e)
+        log.error('Could not bulk insert in database. Exit!', e)
         sys.exit(1)
     finally:
         cur.close()

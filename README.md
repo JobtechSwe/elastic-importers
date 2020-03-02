@@ -1,6 +1,6 @@
 # elastic-importer
 Imports job ads and taxonomy values into elasticsearch. 
-Creates console script entry points to ne run with different intervals, usually via cron to load data into elastic.
+Creates console script entry points to run with different intervals, usually via cron to load data into elastic.
 
 ## Installation
 
@@ -20,8 +20,8 @@ The application is entirely configured using environment variables.
 | ES_HOST  | localhost  | Elasticsearch host | all |
 | ES_PORT  | 9200  | Elasticsearch port | all |
 | ES_USER  |   | Elasticsearch username | all |
-| ES_PWD  |   | Elasticsearch password | all |
-| ES_TAX_INDEX_BASE  | taxonomy-  | Base string from which index for different taxonomyversions will be created |import-taxonomy|
+| ES_PWD   |   | Elasticsearch password | all |
+| ES_TAX_INDEX_BASE  | taxonomy-  | Base string from which index for different taxonomy versions will be created |import-taxonomy|
 | ES_TAX_INDEX_ALIAS  |  taxonomy | Alias for index that is the current version of the taxonomy |import-taxonomy|
 | ES_TAX_ARCHIVE_ALIAS  |  taxonomy-archive | Alias collecting all older versions of the taxonomy |import-taxonomy|
 | ES_ANNONS_INDEX | platsannons | Base index name for job ads |import-platsannonser, import-platsannonser-daily|
