@@ -203,8 +203,6 @@ platsannons_mappings = {
                         "properties": {
                             "occupation": {
                                 "type": "text",
-                                "analyzer": "bigram_combiner",
-                                "search_analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
@@ -217,8 +215,6 @@ platsannons_mappings = {
                             },
                             "skill": {
                                 "type": "text",
-                                "analyzer": "bigram_combiner",
-                                "search_analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
@@ -231,8 +227,6 @@ platsannons_mappings = {
                             },
                             "trait": {
                                 "type": "text",
-                                "analyzer": "bigram_combiner",
-                                "search_analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
@@ -245,8 +239,6 @@ platsannons_mappings = {
                             },
                             "location": {
                                 "type": "text",
-                                "analyzer": "bigram_combiner",
-                                "search_analyzer": "bigram_combiner",
                                 "fields": {
                                     "raw": {
                                         "type": "keyword",
