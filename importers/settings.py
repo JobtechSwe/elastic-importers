@@ -95,12 +95,12 @@ platsannons_mappings = {
                 "trigram": {
                     "type": "custom",
                     "tokenizer": "standard",
-                    "filter": ["lowercase", "shingle", "swedish_stop", "swedish_keywords", "swedish_stemmer"]
+                    "filter": ["lowercase", "shingle", "swedish_stop", "swedish_keywords"]
                 },
                 "reverse": {
                     "type": "custom",
                     "tokenizer": "standard",
-                    "filter": ["lowercase", "reverse", "swedish_stop", "swedish_keywords", "swedish_stemmer"]
+                    "filter": ["lowercase", "reverse", "swedish_stop", "swedish_keywords"]
                 }
             },
             "filter": {
@@ -132,11 +132,7 @@ platsannons_mappings = {
                 "swedish_keywords": {
                     "type": "keyword_marker",
                     "keywords": ["exempel"]
-                },
-                "swedish_stemmer": {
-                    "type": "stemmer",
-                    "language":  "swedish"
-                },
+                }
             },
             "char_filter": {
                 "punctuation_filter": {
@@ -176,14 +172,6 @@ platsannons_mappings = {
                         "analyzer": "wildcard_suffix",
                         "search_analyzer": "simple_word_splitter"
                     },
-                    "trigram": {
-                        "type": "text",
-                        "analyzer": "trigram"
-                    },
-                    "reverse": {
-                        "type": "text",
-                        "analyzer": "reverse"
-                    },
                 }
             },
             "description": {
@@ -202,14 +190,6 @@ platsannons_mappings = {
                                 "type": "text",
                                 "analyzer": "wildcard_suffix",
                                 "search_analyzer": "simple_word_splitter"
-                            },
-                            "trigram": {
-                                "type": "text",
-                                "analyzer": "trigram"
-                            },
-                            "reverse": {
-                                "type": "text",
-                                "analyzer": "reverse"
                             },
                         }
                     }
@@ -329,7 +309,20 @@ platsannons_mappings = {
                                         "type": "completion"
                                     }
                                 }
-                            }
+                            },
+                            "compound": {
+                                "type": "text",
+                                "fields": {
+                                    "trigram": {
+                                        "type": "text",
+                                        "analyzer": "trigram"
+                                    },
+                                    "reverse": {
+                                        "type": "text",
+                                        "analyzer": "reverse"
+                                    },
+                                }
+                            },
                         }
                     },
                     "extracted": {

@@ -190,6 +190,10 @@ def process_enriched_candidates_typeahead_terms(annons, enriched_output):
     enriched_typeahead_node['location'] = filter_valid_typeahead_terms(
         filter_candidates(enriched_candidates, "geos", settings.ENRICH_THRESHOLD_GEO))
 
+    enriched_typeahead_node['compound'] = enriched_typeahead_node['occupation'] \
+                                          + enriched_typeahead_node['skill'] \
+                                          + enriched_typeahead_node['location']
+
 
 def filter_valid_typeahead_terms(candidates):
     typeahead_for_type = set()
