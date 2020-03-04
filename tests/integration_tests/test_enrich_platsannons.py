@@ -36,6 +36,7 @@ def test_get_and_enrich_ad_details():
     occupations = enriched_ad['keywords']['enriched']['occupation']
 
     assert 'mattläggare' in occupations
+    assert 'golvläggare' in occupations
 
     assert 'luleå' in geos
 

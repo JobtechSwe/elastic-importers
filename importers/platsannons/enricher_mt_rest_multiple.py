@@ -25,7 +25,7 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     annonser_input_data = []
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
-        doc_headline = get_null_safe_value(annons, 'headline', '')
+        doc_headline = get_doc_headline_input(annons)
         doc_text = annons.get('description', {}).get('text_formatted', '')
         if not doc_text:
             log.debug("No document data to enrich -  empty description for id: "
@@ -71,6 +71,29 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
             enrich_doc(annons, enriched_output)
 
     return annonser
+
+
+def get_doc_headline_input(annons):
+    sep = ' | '
+    # Add occupation from structured data in headline.
+    doc_headline_occupation = annons.get('occupation', {}).get('label', '')
+    if doc_headline_occupation is None:
+        doc_headline_occupation = ''
+
+    wp_address_node = annons.get('workplace_address', {})
+    wp_address_input = ''
+    if wp_address_node:
+        wp_city = get_null_safe_value(wp_address_node, 'city', '')
+        wp_municipality = get_null_safe_value(wp_address_node, 'municipality', '')
+        wp_region = get_null_safe_value(wp_address_node, 'region', '')
+        wp_country = get_null_safe_value(wp_address_node, 'country', '')
+        wp_address_input = wp_city + sep + wp_municipality + sep + wp_region + sep + wp_country
+
+    doc_headline = get_null_safe_value(annons, 'headline', '')
+
+    doc_headline_input = wp_address_input + sep + doc_headline_occupation + sep + doc_headline
+
+    return doc_headline_input
 
 
 def get_enrich_result(batch_indata, timeout):
