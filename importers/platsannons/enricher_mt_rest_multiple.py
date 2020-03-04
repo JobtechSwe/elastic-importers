@@ -25,7 +25,7 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     annonser_input_data = []
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
-        doc_headline = get_doc_headline_input(annons)
+        doc_headline = get_null_safe_value(annons, 'headline', '')
         doc_text = annons.get('description', {}).get('text_formatted', '')
         if not doc_text:
             log.debug("No document data to enrich -  empty description for id: "
@@ -71,29 +71,6 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
             enrich_doc(annons, enriched_output)
 
     return annonser
-
-
-def get_doc_headline_input(annons):
-    sep = ' | '
-    # Add occupation from structured data in headline.
-    doc_headline_occupation = annons.get('occupation', {}).get('label', '')
-    if doc_headline_occupation is None:
-        doc_headline_occupation = ''
-
-    wp_address_node = annons.get('workplace_address', {})
-    wp_address_input = ''
-    if wp_address_node:
-        wp_city = get_null_safe_value(wp_address_node, 'city', '')
-        wp_municipality = get_null_safe_value(wp_address_node, 'municipality', '')
-        wp_region = get_null_safe_value(wp_address_node, 'region', '')
-        wp_country = get_null_safe_value(wp_address_node, 'country', '')
-        wp_address_input = wp_city + sep + wp_municipality + sep + wp_region + sep + wp_country
-
-    doc_headline = get_null_safe_value(annons, 'headline', '')
-
-    doc_headline_input = wp_address_input + sep + doc_headline_occupation + sep + doc_headline
-
-    return doc_headline_input
 
 
 def get_enrich_result(batch_indata, timeout):
@@ -143,6 +120,17 @@ def enrich_doc(annons, enriched_output):
     return annons
 
 
+SOURCE_TYPE_OCCUPATION = "occupations"
+SOURCE_TYPE_SKILL = "competencies"
+SOURCE_TYPE_TRAIT = "traits"
+SOURCE_TYPE_LOCATION = "geos"
+
+TARGET_TYPE_OCCUPATION = "occupation"
+TARGET_TYPE_SKILL = "skill"
+TARGET_TYPE_TRAIT = "trait"
+TARGET_TYPE_LOCATION = "location"
+TARGET_TYPE_COMPOUND = "compound"
+
 def process_enriched_candidates(annons, enriched_output):
     enriched_candidates = enriched_output['enriched_candidates']
     fieldname = 'enriched'
@@ -153,19 +141,19 @@ def process_enriched_candidates(annons, enriched_output):
 
     enriched_node = annons['keywords'][fieldname]
 
-    enriched_node['occupation'] = list(set([candidate[candidate_prop_name].lower()
+    enriched_node[TARGET_TYPE_OCCUPATION] = list(set([candidate[candidate_prop_name].lower()
                                             for candidate in filter_candidates(enriched_candidates,
-                                                                               "occupations",
+                                                                               SOURCE_TYPE_OCCUPATION,
                                                                                settings.ENRICH_THRESHOLD_OCCUPATION)]))
-    enriched_node['skill'] = list(set([candidate[candidate_prop_name].lower()
-                                       for candidate in filter_candidates(enriched_candidates, "competencies",
+    enriched_node[TARGET_TYPE_SKILL] = list(set([candidate[candidate_prop_name].lower()
+                                       for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_SKILL,
                                                                           settings.ENRICH_THRESHOLD_SKILL)]))
-    enriched_node['trait'] = list(set([candidate[candidate_prop_name].lower()
-                                       for candidate in filter_candidates(enriched_candidates, "traits",
+    enriched_node[TARGET_TYPE_TRAIT] = list(set([candidate[candidate_prop_name].lower()
+                                       for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_TRAIT,
                                                                           settings.ENRICH_THRESHOLD_TRAIT)]))
 
-    enriched_node['location'] = list(set([candidate[candidate_prop_name].lower()
-                                          for candidate in filter_candidates(enriched_candidates, "geos",
+    enriched_node[TARGET_TYPE_LOCATION] = list(set([candidate[candidate_prop_name].lower()
+                                                    for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION,
                                                                              settings.ENRICH_THRESHOLD_GEO)]))
 
 
@@ -178,21 +166,21 @@ def process_enriched_candidates_typeahead_terms(annons, enriched_output):
 
     enriched_typeahead_node = annons['keywords'][fieldname]
 
-    enriched_typeahead_node['occupation'] = filter_valid_typeahead_terms(
-        filter_candidates(enriched_candidates, "occupations", settings.ENRICH_THRESHOLD_OCCUPATION))
+    enriched_typeahead_node[TARGET_TYPE_OCCUPATION] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, SOURCE_TYPE_OCCUPATION, settings.ENRICH_THRESHOLD_OCCUPATION))
 
-    enriched_typeahead_node['skill'] = filter_valid_typeahead_terms(
-        filter_candidates(enriched_candidates, "competencies", settings.ENRICH_THRESHOLD_SKILL))
+    enriched_typeahead_node[TARGET_TYPE_SKILL] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, SOURCE_TYPE_SKILL, settings.ENRICH_THRESHOLD_SKILL))
 
-    enriched_typeahead_node['trait'] = filter_valid_typeahead_terms(
-        filter_candidates(enriched_candidates, "traits", settings.ENRICH_THRESHOLD_TRAIT))
+    enriched_typeahead_node[TARGET_TYPE_TRAIT] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, SOURCE_TYPE_TRAIT, settings.ENRICH_THRESHOLD_TRAIT))
 
-    enriched_typeahead_node['location'] = filter_valid_typeahead_terms(
-        filter_candidates(enriched_candidates, "geos", settings.ENRICH_THRESHOLD_GEO))
+    enriched_typeahead_node[TARGET_TYPE_LOCATION] = filter_valid_typeahead_terms(
+        filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION, settings.ENRICH_THRESHOLD_GEO))
 
-    enriched_typeahead_node['compound'] = enriched_typeahead_node['occupation'] \
-                                          + enriched_typeahead_node['skill'] \
-                                          + enriched_typeahead_node['location']
+    enriched_typeahead_node[TARGET_TYPE_COMPOUND] = enriched_typeahead_node[TARGET_TYPE_OCCUPATION] \
+                                          + enriched_typeahead_node[TARGET_TYPE_SKILL] \
+                                          + enriched_typeahead_node[TARGET_TYPE_LOCATION]
 
 
 def filter_valid_typeahead_terms(candidates):
@@ -205,6 +193,14 @@ def filter_valid_typeahead_terms(candidates):
 
 
 def filter_candidates(enriched_candidates, type_name, prediction_threshold):
-    return [candidate
-            for candidate in enriched_candidates[type_name]
-            if candidate['prediction'] >= prediction_threshold]
+    candidates = [candidate
+                  for candidate in enriched_candidates[type_name]
+                  if candidate['prediction'] >= prediction_threshold]
+    if type_name == SOURCE_TYPE_OCCUPATION or type_name == SOURCE_TYPE_LOCATION:
+        # Check if candidates are in ad headline and add  them as enriched
+        # even though the prediction value is below threshold.
+        candidates = candidates + [candidate
+         for candidate in enriched_candidates[type_name]
+         if candidate['sentence_index'] == 0 and candidate not in candidates]
+
+    return candidates
