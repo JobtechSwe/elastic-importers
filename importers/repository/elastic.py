@@ -125,7 +125,7 @@ def find_missing_ad_ids(ad_ids, es_index):
         indexed_ids.append(ad['_id'])
     missing_ad_ids = set(ad_ids)-set(indexed_ids)
     if not refresh_success:
-        log.warn(f"Found {len(missing_ad_ids)} missing from index {es_index}.")
+        log.warn(f"Found: {len(missing_ad_ids)} missing ads from index: {es_index}")
         return 0
     else:
         return missing_ad_ids
@@ -137,52 +137,9 @@ def document_count(es_index):
         es.indices.refresh(es_index)
         num_doc_elastic = es.cat.count(es_index, params={"format": "json"})[0]['count']
     except Exception as e:
-        log.warn("Oeration failed when trying to count ads: %s" % str(e))
+        log.warn("Operation failed when trying to count ads: %s" % str(e))
         num_doc_elastic = None
     return num_doc_elastic
-
-
-def get_glitch_jobtechjobs_ids(max_items=None):
-    '''
-    Gets ids for ads that lacks "removedAt" but has
-    a deadline in the past.
-    '''
-    query = {
-        "query": {
-            "bool": {
-                "must_not": [
-                    {
-                        "exists": {
-                            "field": "source.removedAt"
-                        }
-                    }
-                ],
-                "must": [
-                    {
-                        "exists": {
-                            "field": "application.deadline"
-                        }
-                    },
-                    {
-                        "range": {
-                            "application.deadline": {
-                                "lt": "now/m"
-                            }
-                        }
-                    }
-                ]
-            }
-        }}
-    doc_counter = 0
-
-    ids = []
-    for doc in scan(es, query=query, index=settings.ES_AURANEST_INDEX,
-                    size=1000):
-        doc_counter += 1
-        if max_items and doc_counter > max_items:
-            break
-        ids.append(doc['_source']['id'])
-    return ids
 
 
 def index_exists(indexname):
@@ -242,7 +199,7 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
         put_alias([es_index], read_alias)
     if stream_alias and not alias_exists(stream_alias):
         log.info("Setting up alias %s for indices %s" % (
-        stream_alias, (es_index, deleted_index)))
+                 stream_alias, (es_index, deleted_index)))
         put_alias([es_index, deleted_index], stream_alias)
 
     current_index = write_alias or es_index
@@ -297,3 +254,46 @@ def update_alias(indexnames, old_indexlist, aliasname):
     actions["actions"].append(
         {"add": {"indices": indexnames, "alias": aliasname}})
     es.indices.update_aliases(body=actions)
+
+#used in auranest and 2 integration tests
+def get_glitch_jobtechjobs_ids(max_items=None):
+    '''
+    Gets ids for ads that lacks "removedAt" but has
+    a deadline in the past.
+    '''
+    query = {
+        "query": {
+            "bool": {
+                "must_not": [
+                    {
+                        "exists": {
+                            "field": "source.removedAt"
+                        }
+                    }
+                ],
+                "must": [
+                    {
+                        "exists": {
+                            "field": "application.deadline"
+                        }
+                    },
+                    {
+                        "range": {
+                            "application.deadline": {
+                                "lt": "now/m"
+                            }
+                        }
+                    }
+                ]
+            }
+        }}
+    doc_counter = 0
+
+    ids = []
+    for doc in scan(es, query=query, index=settings.ES_AURANEST_INDEX,
+                    size=1000):
+        doc_counter += 1
+        if max_items and doc_counter > max_items:
+            break
+        ids.append(doc['_source']['id'])
+    return ids
