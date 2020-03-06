@@ -305,6 +305,10 @@ platsannons_mappings = {
                             "compound": {
                                 "type": "text",
                                 "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    },
                                     "trigram": {
                                         "type": "text",
                                         "analyzer": "trigram"
