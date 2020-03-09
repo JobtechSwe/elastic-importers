@@ -6,14 +6,14 @@ import json
 import pytest
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Disabled")
 @pytest.mark.integration
 def test_glitchfix():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
     from importers.auranest.main import glitchfix
     glitchfix()
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Disabled")
 @pytest.mark.integration
 def test_get_glitch_jobtechjobs_ids():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -22,12 +22,12 @@ def test_get_glitch_jobtechjobs_ids():
     gen_ids = get_glitch_jobtechjobs_ids(max_items=100)
 
     ids = [id for id in gen_ids]
-    pprint(ids)
+    # pprint(ids)
     # for id in gen_ids:
     #     print(id)
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
+@pytest.mark.skip(reason="Disabled")
 @pytest.mark.integration
 def test_glitchfix_read_ads_from_postgres():
     print('============================', sys._getframe().f_code.co_name, '============================ ')

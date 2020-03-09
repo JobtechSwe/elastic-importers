@@ -18,20 +18,20 @@ def test_get_and_enrich_ad_details():
     ad_meta = {'annonsId': annons_id, 'avpublicerad': False, 'uppdateradTid': 1582272745821}
 
     ad_detail = load_details_from_la(ad_meta=ad_meta)
-    pprint(ad_detail)
+    # pprint(ad_detail)
     ad_details = {}
     ad_details[annons_id] = ad_detail
-    pprint(ad_details)
+    # pprint(ad_details)
     converted_ads = [converter.convert_ad(ad) for ad in ad_details.values()]
     enriched_ads = enricher.enrich(converted_ads)
-    pprint(enriched_ads)
+    # pprint(enriched_ads)
 
     assert len(enriched_ads) > 0
 
     enriched_ad = enriched_ads[0]
     geos = enriched_ad['keywords']['enriched']['location']
 
-    pprint(enriched_ad)
+    # pprint(enriched_ad)
 
     occupations = enriched_ad['keywords']['enriched']['occupation']
 
