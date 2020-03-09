@@ -309,6 +309,9 @@ platsannons_mappings = {
                                         "type": "keyword",
                                         "ignore_above": 256
                                     },
+                                    "suggest": {
+                                        "type": "completion"
+                                    },
                                     "trigram": {
                                         "type": "text",
                                         "analyzer": "trigram"
