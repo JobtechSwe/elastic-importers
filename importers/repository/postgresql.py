@@ -26,7 +26,7 @@ if settings.PG_DBNAME and settings.PG_USER:
     except psycopg2.OperationalError as e:
         log.error("Failed to connect to PostgreSQL on %s:%s" % (settings.PG_HOST,
                                                                 settings.PG_PORT))
-        log.error("Reason for PostgreSQL failure: %s" % str(e))
+        log.error("Reason for PostgreSQL failure: %s Exit!" % str(e))
         sys.exit(1)
 
 
@@ -264,7 +264,8 @@ def bulk(items, table):
                       json.dumps(item),
                       convert_to_timestamp(item['updatedAt'], item['id']),
                       convert_to_timestamp(item.get('expiresAt'), item['id']),
-                      json.dumps(item), False) for item in items if item]
+                      json.dumps(item),
+                      False) for item in items if item]
     try:
         bulk_conn = get_new_pg_conn()
         cur = bulk_conn.cursor()
@@ -277,7 +278,7 @@ def bulk(items, table):
         bulk_conn.commit()
 
     except psycopg2.DatabaseError as e:
-        log.error('Could not bulk insert in database', e)
+        log.error('Could not bulk insert in database. Exit!', e)
         sys.exit(1)
     finally:
         cur.close()

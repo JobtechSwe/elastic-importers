@@ -1,6 +1,6 @@
 # elastic-importer
 Imports job ads and taxonomy values into elasticsearch. 
-Creates console script entry points to ne run with different intervals, usually via cron to load data into elastic.
+Creates console script entry points to run with different intervals, usually via cron to load data into elastic.
 
 ## Installation
 
@@ -20,8 +20,8 @@ The application is entirely configured using environment variables.
 | ES_HOST  | localhost  | Elasticsearch host | all |
 | ES_PORT  | 9200  | Elasticsearch port | all |
 | ES_USER  |   | Elasticsearch username | all |
-| ES_PWD  |   | Elasticsearch password | all |
-| ES_TAX_INDEX_BASE  | taxonomy-  | Base string from which index for different taxonomyversions will be created |import-taxonomy|
+| ES_PWD   |   | Elasticsearch password | all |
+| ES_TAX_INDEX_BASE  | taxonomy-  | Base string from which index for different taxonomy versions will be created |import-taxonomy|
 | ES_TAX_INDEX_ALIAS  |  taxonomy | Alias for index that is the current version of the taxonomy |import-taxonomy|
 | ES_TAX_ARCHIVE_ALIAS  |  taxonomy-archive | Alias collecting all older versions of the taxonomy |import-taxonomy|
 | ES_ANNONS_INDEX | platsannons | Base index name for job ads |import-platsannonser, import-platsannonser-daily|
@@ -29,7 +29,7 @@ The application is entirely configured using environment variables.
 | LA_BOOTSTRAP_FEED_URL | | REST feed API for all currently available job ads | import-platsannonser-daily |
 | LA_DETAILS_URL | | REST feed API job ad details (i.e. the entire job ad) | import-platsannonser, import-platsannonser-daily |
 | LA_DETAILS_PARALLELISM | 8 | Limits how many simultaneous threads are run for loading ad details | import-platsannonser, import-platsannonser-daily |
-| URL_ENRICH_TEXTDOCS_BINARY_SERVICE | https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocumentsbinary | Endpoint for ML enrichment of job ads |import-platsannonser, import-platsannonser-daily|
+| URL_ENRICH_TEXTDOCS_SERVICE | https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments | Endpoint for ML enrichment of job ads |import-platsannonser, import-platsannonser-daily|
 | API_KEY_ENRICH_TEXTDOCS | | API key to use for enrichment | import-platsannonser, import-platsannonser-daily |
 | COMPANY_LOGO_BASE_URL | https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/ | Endpoint to check for available company logo associated with job ad | import-platsannonser, import-platsannonser-daily|
 

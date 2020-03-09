@@ -19,7 +19,6 @@ ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 ENRICHER_PARAM_DOC_ID = 'doc_id'
 ENRICHER_PARAM_DOC_HEADLINE = 'doc_headline'
 ENRICHER_PARAM_DOC_TEXT = 'doc_text'
-ENRICHER_PARAM_INC_SYNONYMS = 'include_synonyms'
 
 ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
@@ -84,13 +83,55 @@ platsannons_mappings = {
                     "tokenizer": "whitespace",
                     "filter": ["lowercase", "reverse", "edgengram_filter", "reverse"],
                     "char_filter": ["punctuation_filter"]
+                },
+                "bigram_combiner": {
+                    "tokenizer": "standard",
+                    "filter": [
+                        "lowercase",
+                        "custom_shingle",
+                        "my_char_filter"
+                    ]
+                },
+                "trigram": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["lowercase", "shingle", "swedish_stop", "swedish_keywords"]
+                },
+                "reverse": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["lowercase", "reverse", "swedish_stop", "swedish_keywords"]
                 }
             },
             "filter": {
                 "edgengram_filter": {
                     "type": "edge_ngram",
                     "min_gram": 3,
-                    "max_gram": 14
+                    "max_gram": 30
+                },
+                "custom_shingle": {
+                     "type": "shingle",
+                     "min_shingle_size": 2,
+                     "max_shingle_size": 3,
+                     "output_unigrams": True
+                },
+                "my_char_filter": {
+                     "type": "pattern_replace",
+                     "pattern": " ",
+                     "replacement": ""
+                },
+                "shingle": {
+                    "type": "shingle",
+                    "min_shingle_size": 2,
+                    "max_shingle_size": 3
+                },
+                "swedish_stop": {
+                    "type": "stop",
+                    "stopwords": "_swedish_"
+                },
+                "swedish_keywords": {
+                    "type": "keyword_marker",
+                    "keywords": ["exempel"]
                 }
             },
             "char_filter": {
@@ -130,7 +171,7 @@ platsannons_mappings = {
                         "type": "text",
                         "analyzer": "wildcard_suffix",
                         "search_analyzer": "simple_word_splitter"
-                    }
+                    },
                 }
             },
             "description": {
@@ -149,7 +190,7 @@ platsannons_mappings = {
                                 "type": "text",
                                 "analyzer": "wildcard_suffix",
                                 "search_analyzer": "simple_word_splitter"
-                            }
+                            },
                         }
                     }
                 }
@@ -210,7 +251,7 @@ platsannons_mappings = {
                             }
                         }
                     },
-                    "enriched_synonyms": {
+                    "enriched_typeahead_terms": {
                         "type": "object",
                         "properties": {
                             "occupation": {
@@ -260,7 +301,24 @@ platsannons_mappings = {
                                         "type": "completion"
                                     }
                                 }
-                            }
+                            },
+                            "compound": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    },
+                                    "trigram": {
+                                        "type": "text",
+                                        "analyzer": "trigram"
+                                    },
+                                    "reverse": {
+                                        "type": "text",
+                                        "analyzer": "reverse"
+                                    },
+                                }
+                            },
                         }
                     },
                     "extracted": {
@@ -341,6 +399,7 @@ platsannons_mappings = {
                     },
                     "country_concept_id": {
                         "type": "keyword",
+                        "null_value": "i46j_HmG_v64"  # Assume Sweden when not specified
                     },
                     "coordinates": {
                         "type": "geo_point",
@@ -374,108 +433,7 @@ API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
 ENRICH_THRESHOLD_OCCUPATION = os.getenv('ENRICH_THRESHOLD_OCCUPATION', 0.8)
 ENRICH_THRESHOLD_SKILL = os.getenv('ENRICH_THRESHOLD_SKILL', 0.5)
 ENRICH_THRESHOLD_GEO = os.getenv('ENRICH_THRESHOLD_GEO', 0.7)
-ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_GEO', 0.5)
+ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_TRAIT', 0.5)
 
 COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
-
-# For kandidat import
-# ES_KANDIDAT_INDEX = os.getenv('ES_KANDIDAT_INDEX',
-#                               os.getenv('ES_KANDIDAT', 'kandidater'))
-# ORACLE_USER = os.getenv('ORACLE_USER')
-# ORACLE_PASSWORD = os.getenv('ORACLE_PASSWORD')
-# ORACLE_PORT = os.getenv('ORACLE_PORT', '1521')
-# ORACLE_HOST = os.getenv('ORACLE_HOST')
-# ORACLE_SERVICE = os.getenv('ORACLE_SERVICE')
-
-# For auranest import
-# ES_AURANEST_PREFIX = os.getenv('ES_AURANEST_INDEX',
-#                               os.getenv('ES_AURANEST', 'auranest'))
-#ES_AURANEST_INDEX = "%s%s" % (ES_AURANEST_PREFIX, WRITE_INDEX_SUFFIX)
-
-# auranest_mappings = {
-#     "settings": {
-#         "analysis": {
-#             "normalizer": {
-#                 "lc_normalizer": {
-#                     "type": "custom",
-#                     "filter": ["lowercase"]
-#                 }
-#             }
-#         }
-#     },
-#     "mappings": {
-#             "properties": {
-#                 "id": {
-#                     "type": "keyword"
-#                 },
-#                 "group": {
-#                     "type": "object",
-#                     "properties": {
-#                         "id": {
-#                             "type": "keyword"
-#                         }
-#                     }
-#                 },
-#                 "occupations": {
-#                     "type": "text",
-#                     "fields": {
-#                         "keyword": {
-#                             "type": "keyword",
-#                             "ignore_above": 256
-#                         }
-#                     },
-#                     "copy_to": "keywords"
-#                 },
-#                 "skills": {
-#                     "type": "text",
-#                     "fields": {
-#                         "keyword": {
-#                             "type": "keyword",
-#                             "ignore_above": 256
-#                         }
-#                     },
-#                     "copy_to": "keywords"
-#                 },
-#                 "traits": {
-#                     "type": "text",
-#                     "fields": {
-#                         "keyword": {
-#                             "type": "keyword",
-#                             "ignore_above": 256
-#                         }
-#                     },
-#                     "copy_to": "keywords"
-#                 },
-#                 "location": {
-#                     "type": "object",
-#                     "properties": {
-#                         "translations": {
-#                             "type": "object",
-#                             "properties": {
-#                                 "sv-SE": {
-#                                     "type": "text",
-#                                     "copy_to": "keywords",
-#                                     "fields": {
-#                                         "keyword": {
-#                                             "type": "keyword",
-#                                             "ignore_above": 256
-#                                         }
-#                                     }
-#                                 }
-#                             }
-#                         }
-#                     }
-#                 },
-#                 "keywords": {
-#                     "type": "text",
-#                     "fields": {
-#                         "raw": {
-#                             "type": "keyword",
-#                             "normalizer": "lc_normalizer"
-#                         }
-#                     }
-#                 },
-#             }
-#     }
-# }

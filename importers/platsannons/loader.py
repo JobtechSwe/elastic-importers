@@ -15,13 +15,15 @@ logo_cache = {}
 
 def bulk_fetch_ad_details(ad_batch):
     parallelism = int(settings.LA_DETAILS_PARALLELISM)
-    log.info('Multithreaded fetch ad details with %s processes' % str(parallelism))
+    log.info(
+        'Multithreaded fetch ad details with %s processes' % str(parallelism))
 
     global counter
     counter = Value('i', 0)
     result_output = {}
     # with statement to ensure threads are cleaned up promptly
-    with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
+    with concurrent.futures.ThreadPoolExecutor(
+            max_workers=parallelism) as executor:
         # Start the load operations
         future_to_fetch_result = {
             executor.submit(load_details_from_la, ad_data): ad_data
@@ -37,16 +39,17 @@ def bulk_fetch_ad_details(ad_batch):
                     # log.info('Counter: %s' % counter.value)
                     counter.value += 1
                     if counter.value % 100 == 0:
-                        log.info("Multithreaded fetch ad details - Processed %s docs" %
-                                 (str(counter.value)))
+                        log.info(
+                            "Multithreaded fetch ad details - Processed %s docs" %
+                            (str(counter.value)))
             except requests.exceptions.HTTPError as exc:
                 # status_code = exc.response.status_code
                 error_message = 'Fetch ad details call generated an exception: %s' % \
-                    (str(exc))
+                                (str(exc))
                 log.error(error_message)
             except Exception as exc:
                 error_message = 'Fetch ad details call generated an exception: %s' % \
-                    (str(exc))
+                                (str(exc))
                 log.error(error_message)
 
     return result_output
@@ -57,10 +60,11 @@ def load_details_from_la(ad_meta):
     fail_max = 10
     ad_id = ad_meta['annonsId']
     if ad_meta.get('avpublicerad', False):
-        log.debug("Ad is avpublicerad, preparing to remove it: %s" % ad_id)
+        log.info("Ad is avpublicerad, preparing to remove it: %s" % ad_id)
         removed_date = ad_meta.get('avpubliceringsdatum') or \
-            time.strftime("%Y-%m-%dT%H:%M:%S",
-                          time.localtime(ad_meta.get('uppdateradTid') / 1000))
+                       time.strftime("%Y-%m-%dT%H:%M:%S",
+                                     time.localtime(
+                                         ad_meta.get('uppdateradTid') / 1000))
 
         return {'annonsId': ad_id, 'id': ad_id, 'removed': True,
                 'avpublicerad': True,
@@ -80,7 +84,8 @@ def load_details_from_la(ad_meta):
                 ad['updatedAt'] = ad_meta['uppdateradTid']
                 ad['expiresAt'] = ad['sistaPubliceringsdatum']
                 ad['logo_url'] = find_correct_logo_url(ad.get('arbetsplatsId'),
-                                                       ad.get('organisationsnummer'))
+                                                       ad.get(
+                                                           'organisationsnummer'))
                 desensitized_ad = _clean_sensitive_data(ad, detail_url_la)
                 clean_ad = _cleanup_stringvalues(desensitized_ad)
                 return clean_ad
@@ -88,8 +93,9 @@ def load_details_from_la(ad_meta):
         except requests.exceptions.ConnectionError as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning("Unable to load data from: %s - Connection error, try: %d"
-                        % (detail_url_la, fail_count))
+            log.warning(
+                "Unable to load data from: %s - Connection error, try: %d"
+                % (detail_url_la, fail_count))
             if fail_count >= fail_max:
                 log.error("Failed to continue loading data from: %s - "
                           "Connection error: %s Exit!" % (detail_url_la, e))
@@ -106,11 +112,13 @@ def load_details_from_la(ad_meta):
         except requests.exceptions.RequestException as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning("Unable to fetch data at: %s - ambiguous exception, try: %d"
-                        % (detail_url_la, fail_count))
+            log.warning(
+                "Unable to fetch data at: %s - ambiguous exception, try: %d"
+                % (detail_url_la, fail_count))
             if fail_count >= fail_max:
-                log.error("Failed to fetch data at: %s - ambiguous exception, skipping: %s"
-                          % (detail_url_la, e))
+                log.error(
+                    "Failed to fetch data at: %s - ambiguous exception, skipping: %s"
+                    % (detail_url_la, e))
                 raise e
 
 
@@ -152,7 +160,8 @@ def find_correct_logo_url(workplace_id, org_number):
     cache_key = "%s-%s" % (str(workplace_id), str(org_number))
     if cache_key in logo_cache:
         logo_url = logo_cache.get(cache_key)
-        log.debug("Returning cached logo \"%s\" for workplace-orgnr %s" % (logo_url, cache_key))
+        log.debug("Returning cached logo for workplace-orgnr %s: %s" % (
+                  cache_key, logo_url))
         return logo_url
 
     cache_logo = False
@@ -181,9 +190,8 @@ def find_correct_logo_url(workplace_id, org_number):
     if cache_logo:
         logo_cache[cache_key] = logo_url
 
-    log.debug("Returning found logo url for (orgnr/ag-id): %s/%s: %s" % (org_number,
-                                                                         workplace_id,
-                                                                         logo_url))
+    log.debug("Returning found logo url for workplace-orgnr %s-%s: %s" % (
+              workplace_id, org_number, logo_url))
     return logo_url
 
 
