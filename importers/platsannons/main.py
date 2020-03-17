@@ -161,7 +161,7 @@ def _grouper(n, iterable):
 
 def start_daily_index():
     new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX,
-                                datetime.now().strftime('%Y%m%d-%H'))
+                                datetime.now().strftime('%Y%m%d-%H.%M'))
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)
