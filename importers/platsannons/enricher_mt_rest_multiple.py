@@ -154,6 +154,7 @@ TARGET_TYPE_TRAIT = "trait"
 TARGET_TYPE_LOCATION = "location"
 TARGET_TYPE_COMPOUND = "compound"
 
+
 def process_enriched_candidates(annons, enriched_output):
     enriched_candidates = enriched_output['enriched_candidates']
     fieldname = 'enriched'
@@ -178,6 +179,8 @@ def process_enriched_candidates(annons, enriched_output):
     enriched_node[TARGET_TYPE_LOCATION] = list(set([candidate[candidate_prop_name].lower()
                                                     for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION,
                                                                              settings.ENRICH_THRESHOLD_GEO)]))
+    enriched_node[TARGET_TYPE_COMPOUND] = enriched_node[TARGET_TYPE_OCCUPATION] + enriched_node[TARGET_TYPE_SKILL] \
+                                          + enriched_node[TARGET_TYPE_LOCATION]
 
 
 def process_enriched_candidates_typeahead_terms(annons, enriched_output):
