@@ -169,17 +169,22 @@ def process_enriched_candidates(annons, enriched_output):
                                             for candidate in filter_candidates(enriched_candidates,
                                                                                SOURCE_TYPE_OCCUPATION,
                                                                                settings.ENRICH_THRESHOLD_OCCUPATION)]))
+
     enriched_node[TARGET_TYPE_SKILL] = list(set([candidate[candidate_prop_name].lower()
                                        for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_SKILL,
                                                                           settings.ENRICH_THRESHOLD_SKILL)]))
+
     enriched_node[TARGET_TYPE_TRAIT] = list(set([candidate[candidate_prop_name].lower()
                                        for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_TRAIT,
                                                                           settings.ENRICH_THRESHOLD_TRAIT)]))
 
+
     enriched_node[TARGET_TYPE_LOCATION] = list(set([candidate[candidate_prop_name].lower()
-                                                    for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION,
+                                          for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION,
                                                                              settings.ENRICH_THRESHOLD_GEO)]))
-    enriched_node[TARGET_TYPE_COMPOUND] = enriched_node[TARGET_TYPE_OCCUPATION] + enriched_node[TARGET_TYPE_SKILL] \
+
+    enriched_node[TARGET_TYPE_COMPOUND] = enriched_node[TARGET_TYPE_OCCUPATION] \
+                                          + enriched_node[TARGET_TYPE_SKILL] \
                                           + enriched_node[TARGET_TYPE_LOCATION]
 
 
