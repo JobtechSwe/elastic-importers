@@ -50,6 +50,9 @@ LA_DETAILS_PARALLELISM = os.getenv('LA_DETAILS_PARALLELISM', 8)
 platsannons_deleted_mappings = {
     "mappings": {
         "properties": {
+            "id": {
+                "type": "keyword"
+            },
             "publication_date": {
                 "type": "date",
                 "null_value": "1970-01-01"
