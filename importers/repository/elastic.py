@@ -18,6 +18,8 @@ else:
 
 
 def _bulk_generator(documents, indexname, idkey, deleted_index):
+
+    log.debug("(_bulk_generator) index: %s, idkey: %s, deleted_index: %s" % (indexname, idkey, deleted_index))
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
