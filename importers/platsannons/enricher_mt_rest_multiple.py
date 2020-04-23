@@ -59,6 +59,8 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     for i, annons_batch in enumerate(annons_batches):
         annons_batch_indatas = [annons_indata for annons_indata in annons_batch]
         batch_indata = {
+            "include_terms_info": True,
+            "include_sentences": True,
             "documents_input": annons_batch_indatas
         }
         batch_indatas.append(batch_indata)
