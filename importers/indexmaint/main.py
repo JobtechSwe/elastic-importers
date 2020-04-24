@@ -70,8 +70,10 @@ def change_alias(idxnames, aliasname):
         if elastic.alias_exists(aliasname):
             oldindices = list(elastic.get_alias(aliasname).keys())
             elastic.update_alias(idxnames, oldindices, aliasname)
+            log.info("Update_alias. Index names: %s. Old indices: %s. Alias name: %s" % (idxnames, oldindices, aliasname))
         else:
             elastic.add_indices_to_alias(idxnames, aliasname)
+            log.info("Add_indices. Index names: %s. Alias name: %s" % (idxnames, aliasname))
     except NotFoundError:
         log.error("Error: Can't create alias: %s. Index: %s not found. Exit!"
                   % (aliasname, idxnames))

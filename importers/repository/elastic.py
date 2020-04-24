@@ -237,7 +237,8 @@ def create_index(indexname, extra_mappings=None):
     result = es.indices.create(index=indexname, body=body, ignore=400)
     if 'error' in result:
         log.error("Error on create index: %s" % result)
-
+    else:
+        log.info("New index created without errors: %s" % indexname)
 
 def add_indices_to_alias(indexlist, aliasname):
     response = es.indices.update_aliases(body={
