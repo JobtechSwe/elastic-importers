@@ -35,7 +35,7 @@ def _setup_index(es_index):
 
 def _check_last_timestamp(es_index):
     last_timestamp = elastic.get_last_timestamp(es_index)
-    log.info("Last timestamp: %d (%s)" % (last_timestamp,
+    log.info("Index: %s Last timestamp: %d (%s)" % (es_index, last_timestamp,
                                           datetime.fromtimestamp(last_timestamp
                                                                  / 1000)))
     return last_timestamp
