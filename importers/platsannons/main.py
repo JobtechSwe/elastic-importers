@@ -48,7 +48,9 @@ def start(es_index=None):
     log.info("Starting ad import into index: %s" % es_index)
     last_timestamp = _check_last_timestamp(es_index)
 
-    assert settings.LA_FEED_URL, "LA_FEED_URL not set"
+    if not settings.LA_FEED_URL:
+        log.error("LA_FEED_URL is not set. Exit!")
+        sys.exit(1)
 
     # Load list of updated ad ids
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)

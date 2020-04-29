@@ -24,6 +24,5 @@ setup(
             'importers.indexmaint.main:create_platsannons_index'
         ],
     },
-    setup_requires=["pytest-runner"],
     tests_require=["pytest"]
 )
