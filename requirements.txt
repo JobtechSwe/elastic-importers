@@ -4,7 +4,5 @@ requests
 elasticsearch
 python-dateutil
 pytest
-pytest-runner
-pytest-envfiles
 flashtext
 beautifulsoup4
