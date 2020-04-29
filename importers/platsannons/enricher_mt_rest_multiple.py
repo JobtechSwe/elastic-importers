@@ -2,6 +2,7 @@ import logging
 from multiprocessing import Value
 import requests
 import math
+import time
 import concurrent.futures
 from importers import settings
 from importers.common import grouper
@@ -11,6 +12,7 @@ log = logging.getLogger(__name__)
 
 timeout_enrich_api = 90
 counter = None
+RETRIES = 10
 
 
 def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
@@ -97,12 +99,18 @@ def get_doc_headline_input(annons):
 
 
 def get_enrich_result(batch_indata, timeout):
-    headers = {'Content-Type': 'application/json',
-               'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
-    r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE,
-                      headers=headers, json=batch_indata, timeout=timeout)
-    r.raise_for_status()
-    return r.json()
+    headers = {'Content-Type': 'application/json', 'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
+    for retry in range(RETRIES):
+        try:
+            r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE, headers=headers, json=batch_indata, timeout=timeout)
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            log.warning(f"get_enrich_result() retrying after error: {e}")
+            time.sleep(0.3)
+        else:  # no error
+            return r.json()
+    log.error(f"get_enrich_result() failed after {RETRIES} retries with error: {e}" )
+    raise e
 
 
 def execute_calls(batch_indatas, parallelism):
@@ -166,22 +174,24 @@ def process_enriched_candidates(annons, enriched_output):
     enriched_node = annons['keywords'][fieldname]
 
     enriched_node[TARGET_TYPE_OCCUPATION] = list(set([candidate[candidate_prop_name].lower()
-                                            for candidate in filter_candidates(enriched_candidates,
-                                                                               SOURCE_TYPE_OCCUPATION,
-                                                                               settings.ENRICH_THRESHOLD_OCCUPATION)]))
+                                                      for candidate in filter_candidates(enriched_candidates,
+                                                                                         SOURCE_TYPE_OCCUPATION,
+                                                                                         settings.ENRICH_THRESHOLD_OCCUPATION)]))
 
     enriched_node[TARGET_TYPE_SKILL] = list(set([candidate[candidate_prop_name].lower()
-                                       for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_SKILL,
-                                                                          settings.ENRICH_THRESHOLD_SKILL)]))
+                                                 for candidate in
+                                                 filter_candidates(enriched_candidates, SOURCE_TYPE_SKILL,
+                                                                   settings.ENRICH_THRESHOLD_SKILL)]))
 
     enriched_node[TARGET_TYPE_TRAIT] = list(set([candidate[candidate_prop_name].lower()
-                                       for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_TRAIT,
-                                                                          settings.ENRICH_THRESHOLD_TRAIT)]))
-
+                                                 for candidate in
+                                                 filter_candidates(enriched_candidates, SOURCE_TYPE_TRAIT,
+                                                                   settings.ENRICH_THRESHOLD_TRAIT)]))
 
     enriched_node[TARGET_TYPE_LOCATION] = list(set([candidate[candidate_prop_name].lower()
-                                          for candidate in filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION,
-                                                                             settings.ENRICH_THRESHOLD_GEO)]))
+                                                    for candidate in
+                                                    filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION,
+                                                                      settings.ENRICH_THRESHOLD_GEO)]))
 
     enriched_node[TARGET_TYPE_COMPOUND] = enriched_node[TARGET_TYPE_OCCUPATION] \
                                           + enriched_node[TARGET_TYPE_SKILL] \
@@ -210,8 +220,8 @@ def process_enriched_candidates_typeahead_terms(annons, enriched_output):
         filter_candidates(enriched_candidates, SOURCE_TYPE_LOCATION, settings.ENRICH_THRESHOLD_GEO))
 
     enriched_typeahead_node[TARGET_TYPE_COMPOUND] = enriched_typeahead_node[TARGET_TYPE_OCCUPATION] \
-                                          + enriched_typeahead_node[TARGET_TYPE_SKILL] \
-                                          + enriched_typeahead_node[TARGET_TYPE_LOCATION]
+                                                    + enriched_typeahead_node[TARGET_TYPE_SKILL] \
+                                                    + enriched_typeahead_node[TARGET_TYPE_LOCATION]
 
 
 def filter_valid_typeahead_terms(candidates):
@@ -231,7 +241,7 @@ def filter_candidates(enriched_candidates, type_name, prediction_threshold):
         # Check if candidates are in ad headline and add  them as enriched
         # even though the prediction value is below threshold.
         candidates = candidates + [candidate
-         for candidate in enriched_candidates[type_name]
-         if candidate['sentence_index'] == 0 and candidate not in candidates]
+                                   for candidate in enriched_candidates[type_name]
+                                   if candidate['sentence_index'] == 0 and candidate not in candidates]
 
     return candidates
