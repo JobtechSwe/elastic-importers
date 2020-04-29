@@ -36,25 +36,6 @@ def set_platsannons_write_alias(idxname=None):
     change_alias([idxname], settings.ES_ANNONS_INDEX)
 
 
-def set_auranest_read_alias():
-    if len(sys.argv) < 1:
-        log.error("Must provide name of index to alias against. Exit!")
-        sys.exit(1)
-
-    idxname = sys.argv[1]
-    aliasname = "%s%s" % (settings.ES_AURANEST_PREFIX, READ_SUFFIX)
-    change_alias([idxname], aliasname)
-
-
-def set_auranest_write_alias():
-    if len(sys.argv) < 1:
-        log.error("Must provide name of index to alias against. Exit!")
-        sys.exit(1)
-
-    idxname = sys.argv[1]
-    change_alias([idxname], settings.ES_AURANEST_INDEX)
-
-
 def create_platsannons_index():
     if len(sys.argv) < 1:
         log.error("Must provide name of index to alias against. Exit!")

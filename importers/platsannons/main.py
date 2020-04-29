@@ -7,7 +7,7 @@ from datetime import datetime
 from jobtech.common.customlogging import configure_logging
 from importers import settings
 from importers.platsannons import loader, converter, enricher_mt_rest_multiple as enricher
-from importers.repository import elastic, postgresql
+from importers.repository import elastic
 from importers.indexmaint.main import (set_platsannons_read_alias,
                                        set_platsannons_write_alias)
 
@@ -36,8 +36,8 @@ def _setup_index(es_index):
 def _check_last_timestamp(es_index):
     last_timestamp = elastic.get_last_timestamp(es_index)
     log.info("Index: %s Last timestamp: %d (%s)" % (es_index, last_timestamp,
-                                          datetime.fromtimestamp(last_timestamp
-                                                                 / 1000)))
+                                                    datetime.fromtimestamp(last_timestamp
+                                                                           / 1000)))
     return last_timestamp
 
 
@@ -49,11 +49,8 @@ def start(es_index=None):
     last_timestamp = _check_last_timestamp(es_index)
 
     if not settings.LA_FEED_URL:
-        # Try to load cached ads from database
-        if not settings.PG_DBNAME:
-            raise Exception('No config found for db, neither for REST feed.')
-        _load_from_postgresql(last_timestamp, es_index)
-        return
+        log.error("LA_FEED_URL is not set. Exit!")
+        sys.exit(1)
 
     # Load list of updated ad ids
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)
@@ -97,14 +94,9 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         raw_ads = [raw_ad for raw_ad in list(ad_details.values())
                    if not raw_ad.get('removed', False)]
         doc_counter += len(raw_ads)
-        deleted_ids = [raw_ad['annonsId'] for raw_ad in list(ad_details.values())
-                       if raw_ad.get('removed', False)]
-        # Save raw-list to postgresql
-        postgresql.bulk(raw_ads, settings.PG_PLATSANNONS_TABLE)
+
         log.info(f'Fetched batch of ads  (id, updatedAt): '
                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
-        # Set expired on all removed ads
-        postgresql.set_expired_for_ids(settings.PG_PLATSANNONS_TABLE, deleted_ids)
 
         _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted)
         processed_ads_total = processed_ads_total + len(ad_batch)
@@ -114,24 +106,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
     return doc_counter
 
 
-def _load_from_postgresql(last_timestamp, es_index):
-    log.info("No REST feed configuration detected, using database as source.")
-    doc_counter = 0
-    last_identifiers = elastic.get_ids_with_timestamp(last_timestamp, es_index)
 
-    while True:
-        (last_identifiers, last_timestamp, platsannonser) = \
-            postgresql.read_from_pg_since(last_identifiers, last_timestamp,
-                                          settings.PG_PLATSANNONS_TABLE)
-        current_doc_count = len(platsannonser)
-        doc_counter += current_doc_count
-
-        if platsannonser:
-            log.info("Still working ... ads indexed so far: %d" % doc_counter)
-            _convert_and_save_to_elastic(platsannonser, es_index, None)
-        else:
-            log.info("Indexed ads into elastic: %d" % doc_counter)
-            break
 
 
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):

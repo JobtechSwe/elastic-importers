@@ -4,14 +4,13 @@ ENV TZ=Europe/Stockholm
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install packages to allow apt to use a repository over HTTPS:
-RUN apt-get update && apt-get install -yq --no-install-recommends --fix-missing \
+RUN date && apt-get update && apt-get install -yq --no-install-recommends --fix-missing \
     apt-transport-https \
     ca-certificates \
     python3.7 \
     python3-dev \
     python3-setuptools \
     python3-pip \
-    postgresql-client \
     libxml2-dev \
     libxslt-dev \
     git \
@@ -38,7 +37,7 @@ RUN python3 -m pip install -r requirements.txt && \
 
 
 WORKDIR /
-RUN rm -frv /app
+RUN date && rm -frv /app
 
 
 USER 10000
