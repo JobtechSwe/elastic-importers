@@ -1,8 +1,0 @@
-git+https://github.com/JobtechSwe/valuestore-module.git@develop
-requests
-elasticsearch
-python-dateutil
-pytest
-pytest-runner
-pytest-envfiles
-flashtext
