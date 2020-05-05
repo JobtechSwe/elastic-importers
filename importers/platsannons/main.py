@@ -46,8 +46,10 @@ def start(es_index=None):
     # Get, set and create elastic index
     es_index, es_index_deleted = _setup_index(es_index)
     log.info("Starting ad import into index: %s" % es_index)
+    last_timestamp = _check_last_timestamp(es_index)
     # add 1 msec to skip loading last ad
-    last_timestamp = _check_last_timestamp(es_index) + 1 if _check_last_timestamp(es_index) else 0
+    if last_timestamp:
+        last_timestamp = last_timestamp + 1
     log.debug("Timestamp to load from: %d" % last_timestamp)
 
     if not settings.LA_FEED_URL:
