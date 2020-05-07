@@ -19,19 +19,10 @@ ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 ENRICHER_PARAM_DOC_ID = 'doc_id'
 ENRICHER_PARAM_DOC_HEADLINE = 'doc_headline'
 ENRICHER_PARAM_DOC_TEXT = 'doc_text'
-
 ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
-# From loaders
-PG_HOST = os.getenv('PG_HOST')
-PG_PORT = os.getenv('PG_PORT', 5432)
-PG_DBNAME = os.getenv('PG_DBNAME')
-PG_USER = os.getenv('PG_USER')
-PG_PASSWORD = os.getenv('PG_PASSWORD')
+# legacy name starts with PG
 PG_BATCH_SIZE = os.getenv('PG_BATCH_SIZE', 2000)
-PG_PLATSANNONS_TABLE = os.getenv('PG_PLATSANNONS_TABLE', 'platsannons_la')
-PG_SSLMODE = os.getenv('PG_SSLMODE', 'require')
-
 
 LOADER_START_DATE = os.getenv('LOADER_START_DATE', '2018-01-01')
 
