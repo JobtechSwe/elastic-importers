@@ -240,12 +240,14 @@ def create_index(indexname, extra_mappings=None):
     else:
         log.info("New index created without errors: %s" % indexname)
 
+
 def add_indices_to_alias(indexlist, aliasname):
     response = es.indices.update_aliases(body={
         "actions": [
             {"add": {"indices": indexlist, "alias": aliasname}}
         ]
     })
+    log.info("add_indices_to_alias. Index names: %s. Alias name: %s" % (indexlist, aliasname))
     return response
 
 
@@ -260,5 +262,7 @@ def update_alias(indexnames, old_indexlist, aliasname):
 
     actions["actions"].append(
         {"add": {"indices": indexnames, "alias": aliasname}})
+    log.info("update_alias. Index names: %s. Old removed indices: %s. Alias name: %s" % (indexnames, old_indexlist, aliasname))
+    log.debug("update_alias. Actions: %s" % actions)
     es.indices.update_aliases(body=actions)
 
