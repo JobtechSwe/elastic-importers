@@ -41,7 +41,7 @@ def create_valuestore_jobs(taxonomy_jobterms, taxonomy_jobgroups,
                      ('parent', jobgroups[field['LocaleCode']])])
         for field in taxonomy_jobterms
     }
-    return (jobterms, jobgroups, jobfields)
+    return jobterms, jobgroups, jobfields
 
 
 def create_valuestore_geo(file_places, taxonomy_municipalities, taxonomy_regions,
@@ -86,7 +86,7 @@ def create_valuestore_geo(file_places, taxonomy_municipalities, taxonomy_regions
         #del places[identifier]['concept_id']
         places[identifier]['parent'] = municipality
     #print(places)
-    return (places, municipalities, regions, countries)
+    return places, municipalities, regions, countries
 
 
 def _slugify(string):
@@ -104,7 +104,7 @@ def create_valuestore_skills(taxonomy_skills):
                      ('description', field['Term'])])
         for field in taxonomy_skills
     }
-    return (skills)
+    return skills
 
 
 def create_valuestore_work_time_extent(taxonomy_work_time_extent):
@@ -116,7 +116,7 @@ def create_valuestore_work_time_extent(taxonomy_work_time_extent):
                      ('concept_id', str(field['uuid_id']))])
         for field in taxonomy_work_time_extent
     }
-    return (wte)
+    return wte
 
 
 def create_valuestore_languages(taxonomy_languages):
@@ -129,7 +129,7 @@ def create_valuestore_languages(taxonomy_languages):
                      ('legacy_ams_taxonomy_num_id', int(field['LanguageID']))])
         for field in taxonomy_languages
     }
-    return (languages)
+    return languages
 
 
 def create_valuestore_employment_types(taxonomy_employmenttypes):
@@ -205,7 +205,7 @@ def create_valuestore_education_fields(taxonomy_education_field_SUN1, taxonomy_e
         for field in taxonomy_education_field_SUN3
     }
 
-    return (education_field_SUN1, education_field_SUN2, education_field_SUN3)
+    return education_field_SUN1, education_field_SUN2, education_field_SUN3
 
 
 def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_education_levels_SUN2,
@@ -242,7 +242,7 @@ def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_
         for field in taxonomy_education_levels_SUN3
     }
 
-    return (education_levels_SUN1, education_levels_SUN2, education_levels_SUN3)
+    return education_levels_SUN1, education_levels_SUN2, education_levels_SUN3
 
 
 def create_valuestore_deprecated_education_level(taxonomy_education_level):

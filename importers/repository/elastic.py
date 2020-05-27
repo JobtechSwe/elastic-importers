@@ -233,10 +233,11 @@ def create_index(indexname, extra_mappings=None):
     else:
         body = basic_body
 
-    # Creates an index with mappings, ignoring if it already exists
+    # Creates an index with mappings, ignoring if it already exists.
+    # TODO error already exist is not ignored on ignore=400
     result = es.indices.create(index=indexname, body=body, ignore=400)
     if 'error' in result:
-        log.error("Error on create index: %s" % result)
+        log.error("Error on create index %s: %s" % (indexname, result))
     else:
         log.info("New index created without errors: %s" % indexname)
 
