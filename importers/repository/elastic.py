@@ -33,7 +33,6 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                 '_id': doc_id,
                 '_source': False
             }
-            print(document)
             if deleted_index:
                 tombstone = {
                     'id': doc_id,
