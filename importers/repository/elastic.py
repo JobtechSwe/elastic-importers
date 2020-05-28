@@ -18,6 +18,8 @@ else:
 
 
 def _bulk_generator(documents, indexname, idkey, deleted_index):
+
+    log.debug("(_bulk_generator) index: %s, idkey: %s, deleted_index: %s" % (indexname, idkey, deleted_index))
     for document in documents:
         if "concept_id" in document:
             doc_id = float(document["concept_id"])
@@ -231,10 +233,13 @@ def create_index(indexname, extra_mappings=None):
     else:
         body = basic_body
 
-    # Creates an index with mappings, ignoring if it already exists
+    # Creates an index with mappings, ignoring if it already exists.
+    # TODO error already exist is not ignored on ignore=400
     result = es.indices.create(index=indexname, body=body, ignore=400)
     if 'error' in result:
-        log.error("Error on create index: %s" % result)
+        log.error("Error on create index %s: %s" % (indexname, result))
+    else:
+        log.info("New index created without errors: %s" % indexname)
 
 
 def add_indices_to_alias(indexlist, aliasname):
@@ -243,6 +248,7 @@ def add_indices_to_alias(indexlist, aliasname):
             {"add": {"indices": indexlist, "alias": aliasname}}
         ]
     })
+    log.info("add_indices_to_alias. Index names: %s. Alias name: %s" % (indexlist, aliasname))
     return response
 
 
@@ -257,47 +263,7 @@ def update_alias(indexnames, old_indexlist, aliasname):
 
     actions["actions"].append(
         {"add": {"indices": indexnames, "alias": aliasname}})
+    log.info("update_alias. Index names: %s. Old removed indices: %s. Alias name: %s" % (indexnames, old_indexlist, aliasname))
+    log.debug("update_alias. Actions: %s" % actions)
     es.indices.update_aliases(body=actions)
 
-#used in auranest and 2 integration tests
-def get_glitch_jobtechjobs_ids(max_items=None):
-    '''
-    Gets ids for ads that lacks "removedAt" but has
-    a deadline in the past.
-    '''
-    query = {
-        "query": {
-            "bool": {
-                "must_not": [
-                    {
-                        "exists": {
-                            "field": "source.removedAt"
-                        }
-                    }
-                ],
-                "must": [
-                    {
-                        "exists": {
-                            "field": "application.deadline"
-                        }
-                    },
-                    {
-                        "range": {
-                            "application.deadline": {
-                                "lt": "now/m"
-                            }
-                        }
-                    }
-                ]
-            }
-        }}
-    doc_counter = 0
-
-    ids = []
-    for doc in scan(es, query=query, index=settings.ES_AURANEST_INDEX,
-                    size=1000):
-        doc_counter += 1
-        if max_items and doc_counter > max_items:
-            break
-        ids.append(doc['_source']['id'])
-    return ids

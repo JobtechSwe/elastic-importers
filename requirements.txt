@@ -1,13 +1,8 @@
-urllib3==1.24.2
-requests
-elasticsearch
-psycopg2-binary
-zeep
-python-dateutil
-pytest
-pytest-runner
-pytest-envfiles
 git+https://github.com/JobtechSwe/valuestore-module.git
 git+https://github.com/JobtechSwe/jobtech-common.git
+requests
+elasticsearch
+python-dateutil
+pytest
 flashtext
 beautifulsoup4
