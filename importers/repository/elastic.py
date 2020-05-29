@@ -22,10 +22,9 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
     log.debug("(_bulk_generator) index: %s, idkey: %s, deleted_index: %s" % (indexname, idkey, deleted_index))
     for document in documents:
         if "concept_id" in document:
-            doc_id = float(document["concept_id"])
+            doc_id = document["concept_id"]
         else:
-            doc_id = float('-'.join([document[key]
-                               for key in idkey])) \
+            doc_id = '-'.join([document[key] for key in idkey]) \
                 if isinstance(idkey, list) else document[idkey]
 
         if document.get('removed', False):
