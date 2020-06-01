@@ -14,9 +14,8 @@ logo_cache = {}
 
 
 def bulk_fetch_ad_details(ad_batch):
-    parallelism = int(settings.LA_DETAILS_PARALLELISM)
-    log.info(
-        'Multithreaded fetch ad details with %s processes' % str(parallelism))
+    parallelism = settings.LA_DETAILS_PARALLELISM
+    log.info('Multithreaded fetch ad details with %s processes' % str(parallelism))
 
     global counter
     counter = Value('i', 0)

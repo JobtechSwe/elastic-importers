@@ -22,13 +22,13 @@ ENRICHER_PARAM_DOC_TEXT = 'doc_text'
 ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
 # legacy name starts with PG
-PG_BATCH_SIZE = os.getenv('PG_BATCH_SIZE', 2000)
+PG_BATCH_SIZE = int(os.getenv('PG_BATCH_SIZE', 2000))
 
 LA_FEED_URL = os.getenv('LA_FEED_URL')
 LA_BOOTSTRAP_FEED_URL = os.getenv('LA_BOOTSTRAP_FEED_URL')
 LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
-LA_DETAILS_PARALLELISM = os.getenv('LA_DETAILS_PARALLELISM', 8)
-LA_ANNONS_MAX_TRY = os.getenv('LA_ANNONS_MAX_TRY', 10)
+LA_DETAILS_PARALLELISM = int(os.getenv('LA_DETAILS_PARALLELISM', 8))
+LA_ANNONS_MAX_TRY = int(os.getenv('LA_ANNONS_MAX_TRY', 10))
 # End from loaders
 
 platsannons_deleted_mappings = {

@@ -80,7 +80,7 @@ def start(es_index=None):
 
 def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
     doc_counter = 0
-    nr_of_items_per_batch = int(settings.PG_BATCH_SIZE)
+    nr_of_items_per_batch = settings.PG_BATCH_SIZE
     nr_of_items_per_batch = min(nr_of_items_per_batch, len(ad_ids))
     if nr_of_items_per_batch < 1:
         log.error("Failed to retrieve any ads. Exit!")
@@ -99,7 +99,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
                    if not raw_ad.get('removed', False)]
         doc_counter += len(raw_ads)
 
-        log.info(f'Fetched batch of ads  (id, updatedAt): '
+        log.info(f'Fetched batch of ads (id, updatedAt): '
                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
 
         _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted)
