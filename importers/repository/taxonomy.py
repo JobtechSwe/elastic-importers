@@ -21,13 +21,17 @@ def get_entity(taxtype, taxid, not_found_response=None):
         try:
             value = ge(elastic.es, taxtype, taxid, not_found_response)
         except RequestError:
-            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id_ {taxid}')
+            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id:_{taxid}')
             value = not_found_response
+            log.info("(get_entity) set value: %s" % str(not_found_response))
         if value:
             tax_value_cache[key] = value
         else:
             tax_value_cache[key] = {}
-    return dict(tax_value_cache[key])
+            log.warning("(get_entity) set tax_value_cache[key]: %s[%s] empty/{}" % (tax_value_cache, key))
+    cached = dict(tax_value_cache.get(key, {}))
+    log.debug("(get_entity) returns cached: %s" % cached)
+    return cached
 
 
 def get_concept_by_legacy_id(taxtype, legacy_id, not_found_response=None):
@@ -36,12 +40,14 @@ def get_concept_by_legacy_id(taxtype, legacy_id, not_found_response=None):
         try:
             value = fcbla(elastic.es, taxtype, legacy_id, not_found_response)
         except RequestError:
-            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id_ {legacy_id}')
+            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id: {legacy_id}')
             value = not_found_response
+            log.info("(get_concept_by_legacy_id) set value: %s" % str(not_found_response))
         if value:
             tax_value_cache[key] = value
         else:
             tax_value_cache[key] = {}
+            log.warning("(get_concept_by_legacy_id) set tax_value_cache[key]: %s[%s] empty/{}" % (tax_value_cache, key))
     cached = dict(tax_value_cache.get(key, {}))
-    log.info("(get_concept_by_legacy_id) returns cached: %s" % cached)
+    log.debug("(get_concept_by_legacy_id) returns cached: %s" % cached)
     return cached

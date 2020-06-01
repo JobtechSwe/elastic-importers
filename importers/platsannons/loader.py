@@ -57,7 +57,7 @@ def bulk_fetch_ad_details(ad_batch):
 
 def load_details_from_la(ad_meta):
     fail_count = 0
-    fail_max = 10
+    fail_max = settings.LA_ANNONS_MAX_TRY
     ad_id = ad_meta['annonsId']
     if ad_meta.get('avpublicerad', False):
         log.info("Ad is avpublicerad, preparing to remove it: %s" % ad_id)
@@ -93,12 +93,11 @@ def load_details_from_la(ad_meta):
         except requests.exceptions.ConnectionError as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning(
-                "Unable to load data from: %s - Connection error, try: %d"
-                % (detail_url_la, fail_count))
+            log.warning("Unable to load data from: %s - Connection error, try: %d"
+                        % (detail_url_la, fail_count))
             if fail_count >= fail_max:
-                log.error("Failed to continue loading data from: %s - "
-                          "Connection error: %s Exit!" % (detail_url_la, e))
+                log.error("Failed to continue loading data from: %s - Connection error: %s Exit!"
+                          % (detail_url_la, e))
                 sys.exit(1)
         except requests.exceptions.Timeout as e:
             fail_count += 1
@@ -106,19 +105,18 @@ def load_details_from_la(ad_meta):
             log.warning("Unable to load data from: %s - Timeout, try: %d"
                         % (detail_url_la, fail_count))
             if fail_count >= fail_max:
-                log.error("Failed to continue loading data from: %s - "
-                          "Timeout: %s Exit!" % (detail_url_la, e))
+                log.error("Failed to continue loading data from: %s - Timeout: %s Exit!"
+                          % (detail_url_la, e))
                 sys.exit(1)
         except requests.exceptions.RequestException as e:
             fail_count += 1
             time.sleep(0.3)
-            log.warning(
-                "Unable to fetch data at: %s - ambiguous exception, try: %d"
-                % (detail_url_la, fail_count))
+            log.warning("Unable to fetch data at: %s, try: %d"
+                        % (detail_url_la, fail_count))
             if fail_count >= fail_max:
                 log.error(
-                    "Failed to fetch data at: %s - ambiguous exception, skipping: %s"
-                    % (detail_url_la, e))
+                    "Failed to fetch data at: %s after tries: %d, skipping: %s"
+                    % (detail_url_la, fail_max, e))
                 raise e
 
 

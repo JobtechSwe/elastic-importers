@@ -24,12 +24,11 @@ ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 # legacy name starts with PG
 PG_BATCH_SIZE = os.getenv('PG_BATCH_SIZE', 2000)
 
-LOADER_START_DATE = os.getenv('LOADER_START_DATE', '2018-01-01')
-
 LA_FEED_URL = os.getenv('LA_FEED_URL')
 LA_BOOTSTRAP_FEED_URL = os.getenv('LA_BOOTSTRAP_FEED_URL')
 LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
 LA_DETAILS_PARALLELISM = os.getenv('LA_DETAILS_PARALLELISM', 8)
+LA_ANNONS_MAX_TRY = os.getenv('LA_ANNONS_MAX_TRY', 10)
 # End from loaders
 
 platsannons_deleted_mappings = {
