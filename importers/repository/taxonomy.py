@@ -43,4 +43,5 @@ def get_concept_by_legacy_id(taxtype, legacy_id, not_found_response=None):
         else:
             tax_value_cache[key] = {}
     cached = dict(tax_value_cache.get(key, {}))
+    log.info("(get_concept_by_legacy_id) returns cached: %s" % cached)
     return cached
