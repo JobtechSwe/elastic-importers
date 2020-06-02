@@ -272,8 +272,9 @@ def _build_wp_address(arbplatsmessage):
     latitud = None
     if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
         kommunkod = arbplatsmessage.get('kommun', {}).get('varde', {})
-        kommun_concept_id = taxonomy.get_concept_by_legacy_id('kommun',
-                                                              kommunkod)['concept_id']
+        kommun_temp = taxonomy.get_concept_by_legacy_id('kommun', kommunkod)
+        if kommun_temp:
+            kommun_concept_id = kommun_temp['concept_id']
         kommun = arbplatsmessage.get('kommun', {}).get('namn', {})
     if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
         lanskod = arbplatsmessage.get('lan', {}).get('varde', {})
