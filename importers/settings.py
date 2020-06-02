@@ -29,6 +29,8 @@ LA_BOOTSTRAP_FEED_URL = os.getenv('LA_BOOTSTRAP_FEED_URL')
 LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
 LA_DETAILS_PARALLELISM = int(os.getenv('LA_DETAILS_PARALLELISM', 8))
 LA_ANNONS_MAX_TRY = int(os.getenv('LA_ANNONS_MAX_TRY', 10))
+LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
+
 # End from loaders
 
 platsannons_deleted_mappings = {
@@ -448,3 +450,4 @@ ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_TRAIT', 0.5)
 
 COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
+COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))

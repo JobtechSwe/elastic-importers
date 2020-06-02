@@ -75,8 +75,8 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
 
 def bulk_index(documents, indexname, deleted_index=None, idkey='id'):
     action_iterator = _bulk_generator(documents, indexname, idkey, deleted_index)
-    log.info("(bulk_index) action iterator: %s" % action_iterator)
     result = bulk(es, action_iterator, request_timeout=30, raise_on_error=True, yield_ok=False)
+    log.info("(bulk_index) result: %s" % result[0])
     return result[0]
 
 

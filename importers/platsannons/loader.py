@@ -75,7 +75,7 @@ def load_details_from_la(ad_meta):
     detail_url_la = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:
-            r = requests.get(detail_url_la, timeout=10)
+            r = requests.get(detail_url_la, timeout=settings.LA_ANNONS_TIMEOUT)
             r.raise_for_status()
             ad = r.json()
             if ad:
@@ -166,7 +166,7 @@ def find_correct_logo_url(workplace_id, org_number):
         if workplace_id and int(workplace_id) > 0:
             possible_logo_url = "%sarbetsplatser/%s/logotyper/logo.png" \
                                 % (settings.COMPANY_LOGO_BASE_URL, workplace_id)
-            r = requests.head(possible_logo_url, timeout=10)
+            r = requests.head(possible_logo_url, timeout=settings.COMPANY_LOGO_TIMEOUT)
             if r.status_code == 200:
                 logo_url = possible_logo_url
                 cache_logo = True
@@ -174,7 +174,7 @@ def find_correct_logo_url(workplace_id, org_number):
         if not logo_url and org_number:
             possible_logo_url = '%sorganisation/%s/logotyper/logo.png' \
                                 % (settings.COMPANY_LOGO_BASE_URL, org_number)
-            r = requests.head(possible_logo_url, timeout=10)
+            r = requests.head(possible_logo_url, timeout=settings.COMPANY_LOGO_TIMEOUT)
             if r.status_code == 200:
                 logo_url = possible_logo_url
                 cache_logo = True
