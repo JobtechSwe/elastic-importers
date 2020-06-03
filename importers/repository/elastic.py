@@ -2,7 +2,7 @@ import logging
 import certifi
 import time
 from ssl import create_default_context
-from elasticsearch.helpers import bulk, scan, BulkIndexError
+from elasticsearch.helpers import bulk, scan
 from elasticsearch import Elasticsearch
 from importers import settings
 
@@ -18,7 +18,6 @@ else:
 
 
 def _bulk_generator(documents, indexname, idkey, deleted_index):
-
     log.debug("(_bulk_generator) index: %s, idkey: %s, deleted_index: %s" % (indexname, idkey, deleted_index))
     for document in documents:
         if "concept_id" in document:
@@ -47,7 +46,7 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'publication_date': None,
                     'last_publication_date': None,
                 }
-                #yield remove_statement
+                # yield remove_statement
                 yield {
                     '_index': indexname,
                     '_id': doc_id,
@@ -129,7 +128,7 @@ def find_missing_ad_ids(ad_ids, es_index):
     indexed_ids = []
     for ad in ads:
         indexed_ids.append(ad['_id'])
-    missing_ad_ids = set(ad_ids)-set(indexed_ids)
+    missing_ad_ids = set(ad_ids) - set(indexed_ids)
     if not refresh_success:
         log.warning(f"Found: {len(missing_ad_ids)} missing ads from index: {es_index}")
         return 0
@@ -205,7 +204,7 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
         put_alias([es_index], read_alias)
     if stream_alias and not alias_exists(stream_alias):
         log.info("Setting up alias %s for indices %s" % (
-                 stream_alias, (es_index, deleted_index)))
+            stream_alias, (es_index, deleted_index)))
         put_alias([es_index, deleted_index], stream_alias)
 
     current_index = write_alias or es_index
@@ -263,7 +262,7 @@ def update_alias(indexnames, old_indexlist, aliasname):
 
     actions["actions"].append(
         {"add": {"indices": indexnames, "alias": aliasname}})
-    log.info("update_alias. Index names: %s. Old removed indices: %s. Alias name: %s" % (indexnames, old_indexlist, aliasname))
+    log.info("update_alias. Index names: %s. Old removed indices: %s. Alias name: %s" % (
+        indexnames, old_indexlist, aliasname))
     log.debug("update_alias. Actions: %s" % actions)
     es.indices.update_aliases(body=actions)
-
