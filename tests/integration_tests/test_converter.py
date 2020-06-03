@@ -26,6 +26,7 @@ def test_expand_taxonomy_value(annons_key, message_key, message_dict):
         assert d is None
 
 @pytest.mark.skip(reason="Temporarily disabled")
+# after conversion 'annons' has keys in English, but test looks for keys in Swedish (e.g 'rubrik')
 @pytest.mark.integration
 def test_convert_message(msg):
     # see msg fixture in conftest.py
