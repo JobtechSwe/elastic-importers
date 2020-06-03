@@ -59,15 +59,25 @@ def start(es_index=None):
     # Load list of updated ad ids
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)
     number_of_ids_to_load = len(ad_ids)
-    while len(ad_ids) > 0:
-        log.info('Fetching details for %s ads...' % len(ad_ids))
+    number_of_ids_missing_fix = -1
+    while number_of_ids_to_load > 0:
+        log.info('Fetching details for %s ads...' % number_of_ids_to_load)
         _load_and_process_ads(ad_ids, es_index, es_index_deleted)
         log.info("Verifying that all ads have been indexed")
         ad_ids = _find_missing_ids_and_create_loadinglist(ad_ids, es_index)
-        if len(ad_ids) > 0:
-            log.warning("There are still %d ads unaccounted for. Trying again ..." % len(ad_ids))
+        number_of_ids_to_load = len(ad_ids)
+
+        if number_of_ids_missing_fix == number_of_ids_to_load:
+            log.error("Missing ads amount is same as before: %d" % number_of_ids_to_load)
+            log.error("No more trying to fetch. Check these ads: %s" % ad_ids)
+            break
+        if number_of_ids_to_load > 0:
+            number_of_ids_missing_fix = number_of_ids_to_load
+            log.info("Missing ads: %s" % ad_ids)
+            log.warning("There are still missing ads: %d. Trying again ..." % number_of_ids_to_load)
         else:
-            log.info("No ads unaccounted for.")
+            log.info("No missing ads to load.")
+            break
 
     elapsed_time = time.time() - start_time
     m, s = divmod(elapsed_time, 60)
