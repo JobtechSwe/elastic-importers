@@ -21,14 +21,14 @@ def get_entity(taxtype, taxid, not_found_response=None):
         try:
             value = ge(elastic.es, taxtype, taxid, not_found_response)
         except RequestError:
-            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id:_{taxid}')
+            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id: {taxid}')
             value = not_found_response
             log.info("(get_entity) set value: %s" % str(not_found_response))
         if value:
             tax_value_cache[key] = value
         else:
             tax_value_cache[key] = {}
-            log.warning("(get_entity) set tax_value_cache[key]: %s[%s] empty/{}" % (tax_value_cache, key))
+            log.warning("(get_entity) set empty{} to tax_value_cache[key]: %s[%s]" % (tax_value_cache, key))
     cached = dict(tax_value_cache.get(key, {}))
     log.debug("(get_entity) returns cached: %s" % cached)
     return cached
