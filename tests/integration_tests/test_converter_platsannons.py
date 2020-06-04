@@ -1,10 +1,8 @@
 import os
 import sys
-from pprint import pprint
 import json
 
 import pytest
-
 
 currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
@@ -12,7 +10,6 @@ currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
 def get_source_ads_from_file():
     with open(currentdir + 'test_resources/platsannonser_source_test_import.json') as f:
         result = json.load(f)
-        # pprint(result)
         return result['testannonser']
 
 
@@ -23,7 +20,6 @@ def get_target_ads_from_file():
         return result['hits']['hits']
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_platsannons_conversion():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -42,32 +38,20 @@ def assert_ad_properties(annons_id, source_ads, target_ads):
     from importers.platsannons import converter
     print('Testing convert_message for id: %s' % annons_id)
     source_ad = get_source_ad(annons_id, source_ads)
-    # pprint(source_ad)
     target_ad = get_target_ad(annons_id, target_ads)
-    # pprint(target_ad)
-    message_envelope = {}
-    # message_envelope['annons'] = source_ad
     message_envelope = source_ad
 
     message_envelope['version'] = 1
     message_envelope['timestamp'] = target_ad['timestamp']
-    # pprint(message_envelope)
     conv_ad = converter.convert_ad(message_envelope)
-    # pprint(conv_ad)
-    # pprint(target_ad)
+
     for key, val in target_ad.items():
-        # print(key)
-        # if key not in ['publiceringskanaler', 'status', 'timestamp', 'keywords_enriched_binary', 'keywords']:
-        # if key not in ['avpublicerad']:
         if key not in ['keywords', 'timestamp', 'employer']:
-            # print(key)
             assert key in conv_ad.keys()
             assert type(val) == type(conv_ad[key])
             assert val == conv_ad[key]
         elif key == 'keywords':
-            # print('keywords', conv_ad['keywords'])
             company_node = conv_ad['keywords']['extracted']['employer']
-            # print('company_node', company_node)
             assert 'fazer food services' in company_node
             assert 'gateau' in company_node
             assert 'fazer food services ab' not in company_node
@@ -106,7 +90,6 @@ def assert_ad_properties(annons_id, source_ads, target_ads):
         assert conv_ad[removed_date_key] is None
 
 
-# @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 def test_corrupt_platsannons():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
@@ -115,14 +98,11 @@ def test_corrupt_platsannons():
 
     annons_id = '20159374'
     source_ad = get_source_ad(annons_id, source_ads)
-    # target_ad = get_target_ad(annons_id, target_ads)
     message_envelope = source_ad
 
     message_envelope['version'] = 1
     message_envelope['timestamp'] = 1539958052330
-    # pprint(message_envelope)
     conv_ad = converter.convert_ad(message_envelope)
-    # pprint(conv_ad)
 
     assert len(conv_ad['must_have']['languages']) == 0
     assert len(conv_ad['must_have']['skills']) == 0

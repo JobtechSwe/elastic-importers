@@ -7,10 +7,9 @@ log = logging.getLogger(__name__)
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize("parsing_date", ['180924-00:00', '20180924T',
-                                          'mon sep 24', '00:00:00'])
-@pytest.mark.parametrize("not_parsing_date", ['20180101f', '2099-13-32',
-                                              '18-09-24:01:01', '', None, []])
+@pytest.mark.parametrize("parsing_date", ['180924-00:00', '20180924T', 'mon sep 24', '00:00:00'])
+@pytest.mark.parametrize("not_parsing_date", ['20180101f', '2099-13-32', '18-09-24:01:01', '', None, []])
+@pytest.mark.skip("Exceptions pollute log")
 def test_isodate(parsing_date, not_parsing_date):
     print('==================', sys._getframe().f_code.co_name, '================== ')
     if not not_parsing_date:
@@ -78,31 +77,31 @@ def test_create_employer_name(employer, expected):
                          expected_employer_count, expected_employers",
                          [
                              ({
-                                 "workplace_address": {
-                                     "city": "Stockholm",
-                                     "municipality": "Stockholm",
-                                     "region": "Stockholms län",
-                                     "country": "Sverige"
-                                 },
-                                 "employer": {
-                                     "name": "TestByrån Obfuscatica Stockholm AB",
-                                     "workplace": "TestByrån Obfuscatica AB"
-                                 }
-                             }, 3, ['stockholm', 'stockholms län', 'sverige'],
-                                 1, ['testbyrån obfuscatica']),
+                                  "workplace_address": {
+                                      "city": "Stockholm",
+                                      "municipality": "Stockholm",
+                                      "region": "Stockholms län",
+                                      "country": "Sverige"
+                                  },
+                                  "employer": {
+                                      "name": "TestByrån Obfuscatica Stockholm AB",
+                                      "workplace": "TestByrån Obfuscatica AB"
+                                  }
+                              }, 3, ['stockholm', 'stockholms län', 'sverige'],
+                              1, ['testbyrån obfuscatica']),
                              ({
-                                 "workplace_address": {
-                                     "city": "",
-                                     "municipality": "Stockholm",
-                                     "region": "Stockholms län",
-                                     "country": "Sverige"
-                                 },
-                                 "employer": {
-                                     "name": "TestByrån Obfuscatica Stockholm AB",
-                                     "workplace": "AB TestByrån Obfuscatica"
-                                 }
-                             }, 3, ['stockholm', 'stockholms län', 'sverige'],
-                                 1, ['testbyrån obfuscatica']),
+                                  "workplace_address": {
+                                      "city": "",
+                                      "municipality": "Stockholm",
+                                      "region": "Stockholms län",
+                                      "country": "Sverige"
+                                  },
+                                  "employer": {
+                                      "name": "TestByrån Obfuscatica Stockholm AB",
+                                      "workplace": "AB TestByrån Obfuscatica"
+                                  }
+                              }, 3, ['stockholm', 'stockholms län', 'sverige'],
+                              1, ['testbyrån obfuscatica']),
                          ])
 def test_extract_keywords(fake_ad, expected_location_count, expected_locations,
                           expected_employer_count, expected_employers):
@@ -111,10 +110,8 @@ def test_extract_keywords(fake_ad, expected_location_count, expected_locations,
 
     for location in expected_locations:
         assert location in enriched_ad['keywords']['extracted']['location']
-    assert len(enriched_ad['keywords']['extracted']['location']) \
-        == expected_location_count
+    assert len(enriched_ad['keywords']['extracted']['location']) == expected_location_count
 
     for employer in expected_employers:
         assert employer in enriched_ad['keywords']['extracted']['employer']
-    assert len(enriched_ad['keywords']['extracted']['employer']) \
-        == expected_employer_count
+    assert len(enriched_ad['keywords']['extracted']['employer']) == expected_employer_count

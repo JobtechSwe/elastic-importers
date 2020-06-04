@@ -1,15 +1,19 @@
-import pytest, sys, logging
+import sys
+import logging
+import pytest
 from importers.platsannons import converter
 from importers.repository import taxonomy
 
 log = logging.getLogger(__name__)
+
 
 @pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 @pytest.mark.parametrize("annons_key", ['anstallningstyp', '', None, 'sprak'])
 @pytest.mark.parametrize("message_key", ['anstallningTyp', 'mkey', '', None, 'sprak'])
 @pytest.mark.parametrize("message_dict", [{"anstallningTyp": {"varde": "1"}}, {"anstallningTyp": {"varde": "2"}},
-                                          {'': {'varde': 'v2'}}, {'mkey': {'EJvarde': 'v1'}}, {}, None, {"sprak": {"varde": "424"}}])
+                                          {'': {'varde': 'v2'}}, {'mkey': {'EJvarde': 'v1'}}, {}, None,
+                                          {"sprak": {"varde": "424"}}])
 def test_expand_taxonomy_value(annons_key, message_key, message_dict):
     print('============================', sys._getframe().f_code.co_name, '============================ ')
     d = converter._expand_taxonomy_value(annons_key, message_key, message_dict)
@@ -25,7 +29,9 @@ def test_expand_taxonomy_value(annons_key, message_key, message_dict):
     else:
         assert d is None
 
+
 @pytest.mark.skip(reason="Temporarily disabled")
+# after conversion 'annons' has keys in English, but test looks for keys in Swedish (e.g 'rubrik')
 @pytest.mark.integration
 def test_convert_message(msg):
     # see msg fixture in conftest.py
@@ -48,7 +54,8 @@ def test_convert_message(msg):
             'annonstext': message.get('annonstext'),
         }
         assert annons['arbetsplats_id'] == message.get('arbetsplatsId')
-        assert annons['anstallningstyp'] == converter._expand_taxonomy_value('anstallningstyp', 'anstallningTyp', message)
+        assert annons['anstallningstyp'] == converter._expand_taxonomy_value('anstallningstyp', 'anstallningTyp',
+                                                                             message)
         assert annons['lonetyp'] == converter._expand_taxonomy_value('lonetyp', 'lonTyp', message)
         assert annons['varaktighet'] == converter._expand_taxonomy_value('varaktighet', 'varaktighetTyp', message)
         assert annons['arbetstidstyp'] == converter._expand_taxonomy_value('arbetstidstyp', 'arbetstidTyp', message)

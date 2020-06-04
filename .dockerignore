@@ -1,2 +1,16 @@
+.dockerignore
+.project
+.coverage
+.idea
+.eggs
+*.egg-info
 tests/__pycache__
+__pycache__
 .pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.git
+.gitignore
+.DS_Store

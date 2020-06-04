@@ -19,37 +19,26 @@ ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 ENRICHER_PARAM_DOC_ID = 'doc_id'
 ENRICHER_PARAM_DOC_HEADLINE = 'doc_headline'
 ENRICHER_PARAM_DOC_TEXT = 'doc_text'
-
 ENRICHER_PROCESSES = int(os.getenv("ENRICHER_PROCESSES", 8))
 
-# From loaders
-PG_HOST = os.getenv('PG_HOST')
-PG_PORT = os.getenv('PG_PORT', 5432)
-PG_DBNAME = os.getenv('PG_DBNAME')
-PG_USER = os.getenv('PG_USER')
-PG_PASSWORD = os.getenv('PG_PASSWORD')
-PG_BATCH_SIZE = os.getenv('PG_BATCH_SIZE', 2000)
-# PG_AURANEST_TABLE = os.getenv('PG_AURANEST_TABLE', 'auranest')
-PG_PLATSANNONS_TABLE = os.getenv('PG_PLATSANNONS_TABLE', 'platsannons_la')
-PG_SSLMODE = os.getenv('PG_SSLMODE', 'require')
-
-# AURANEST_FEED_URL = os.getenv('AURANEST_FEED_URL')
-# AURANEST_DETAILS_URL = os.getenv('AURANEST_DETAILS_URL')
-# AURANEST_USER = os.getenv('AURANEST_USER')
-# AURANEST_PASSWORD = os.getenv('AURANEST_PASSWORD')
-# AURANEST_EXPIRE_PATH = 'source.removedAt'
-
-LOADER_START_DATE = os.getenv('LOADER_START_DATE', '2018-01-01')
+# legacy name starts with PG
+PG_BATCH_SIZE = int(os.getenv('PG_BATCH_SIZE', 2000))
 
 LA_FEED_URL = os.getenv('LA_FEED_URL')
 LA_BOOTSTRAP_FEED_URL = os.getenv('LA_BOOTSTRAP_FEED_URL')
 LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
-LA_DETAILS_PARALLELISM = os.getenv('LA_DETAILS_PARALLELISM', 8)
+LA_DETAILS_PARALLELISM = int(os.getenv('LA_DETAILS_PARALLELISM', 8))
+LA_ANNONS_MAX_TRY = int(os.getenv('LA_ANNONS_MAX_TRY', 10))
+LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
+
 # End from loaders
 
 platsannons_deleted_mappings = {
     "mappings": {
         "properties": {
+            "id": {
+                "type": "keyword"
+            },
             "publication_date": {
                 "type": "date",
                 "null_value": "1970-01-01"
@@ -140,6 +129,7 @@ platsannons_mappings = {
                     "mappings": [
                         ". => ",
                         ", => \\u0020",
+                        "\\u00A0 => \\u0020",
                         ": => ",
                         "! => "
                     ]
@@ -445,7 +435,7 @@ platsannons_mappings = {
 }
 
 
-# For berikning (platsannonser och auranest)
+# For berikning (platsannonser)
 URL_ENRICH_TEXTDOCS_SERVICE = \
     os.getenv('URL_ENRICH_TEXTDOCS_SERVICE',
               'https://textdoc-enrichments.dev.services.jtech.se'
@@ -460,3 +450,4 @@ ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_TRAIT', 0.5)
 
 COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
+COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))

@@ -2,7 +2,7 @@ import logging
 import certifi
 import time
 from ssl import create_default_context
-from elasticsearch.helpers import bulk, scan, BulkIndexError
+from elasticsearch.helpers import bulk, scan
 from elasticsearch import Elasticsearch
 from importers import settings
 
@@ -18,12 +18,12 @@ else:
 
 
 def _bulk_generator(documents, indexname, idkey, deleted_index):
+    log.debug("(_bulk_generator) index: %s, idkey: %s, deleted_index: %s" % (indexname, idkey, deleted_index))
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
         else:
-            doc_id = '-'.join([document[key]
-                               for key in idkey]) \
+            doc_id = '-'.join([document[key] for key in idkey]) \
                 if isinstance(idkey, list) else document[idkey]
 
         if document.get('removed', False):
@@ -42,7 +42,7 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'publication_date': None,
                     'last_publication_date': None,
                 }
-                #yield remove_statement
+                # yield remove_statement
                 yield {
                     '_index': indexname,
                     '_id': doc_id,
@@ -69,8 +69,9 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
 
 
 def bulk_index(documents, indexname, deleted_index=None, idkey='id'):
-    result = bulk(es, _bulk_generator(documents, indexname, idkey, deleted_index),
-                  request_timeout=30, raise_on_error=True, yield_ok=False)
+    action_iterator = _bulk_generator(documents, indexname, idkey, deleted_index)
+    result = bulk(es, action_iterator, request_timeout=30, raise_on_error=True, yield_ok=False)
+    log.info("(bulk_index) result: %s" % result[0])
     return result[0]
 
 
@@ -111,7 +112,7 @@ def find_missing_ad_ids(ad_ids, es_index):
         refresh_success = True
     except Exception as e:
         refresh_success = False
-        log.warn("Refresh operation failed when trying to find missing ads: %s" % str(e))
+        log.warning("Refresh operation failed when trying to find missing ads: %s" % str(e))
     missing_ads_dsl = {
         "query": {
             "ids": {
@@ -123,9 +124,9 @@ def find_missing_ad_ids(ad_ids, es_index):
     indexed_ids = []
     for ad in ads:
         indexed_ids.append(ad['_id'])
-    missing_ad_ids = set(ad_ids)-set(indexed_ids)
+    missing_ad_ids = set(ad_ids) - set(indexed_ids)
     if not refresh_success:
-        log.warn(f"Found: {len(missing_ad_ids)} missing ads from index: {es_index}")
+        log.warning(f"Found: {len(missing_ad_ids)} missing ads from index: {es_index}")
         return 0
     else:
         return missing_ad_ids
@@ -137,7 +138,7 @@ def document_count(es_index):
         es.indices.refresh(es_index)
         num_doc_elastic = es.cat.count(es_index, params={"format": "json"})[0]['count']
     except Exception as e:
-        log.warn("Operation failed when trying to count ads: %s" % str(e))
+        log.warning("Operation failed when trying to count ads: %s" % str(e))
         num_doc_elastic = None
     return num_doc_elastic
 
@@ -199,7 +200,7 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
         put_alias([es_index], read_alias)
     if stream_alias and not alias_exists(stream_alias):
         log.info("Setting up alias %s for indices %s" % (
-                 stream_alias, (es_index, deleted_index)))
+            stream_alias, (es_index, deleted_index)))
         put_alias([es_index, deleted_index], stream_alias)
 
     current_index = write_alias or es_index
@@ -227,10 +228,13 @@ def create_index(indexname, extra_mappings=None):
     else:
         body = basic_body
 
-    # Creates an index with mappings, ignoring if it already exists
+    # Creates an index with mappings, ignoring if it already exists.
+    # TODO error already exist is not ignored on ignore=400
     result = es.indices.create(index=indexname, body=body, ignore=400)
     if 'error' in result:
-        log.error("Error on create index: %s" % result)
+        log.error("Error on create index %s: %s" % (indexname, result))
+    else:
+        log.info("New index created without errors: %s" % indexname)
 
 
 def add_indices_to_alias(indexlist, aliasname):
@@ -239,6 +243,7 @@ def add_indices_to_alias(indexlist, aliasname):
             {"add": {"indices": indexlist, "alias": aliasname}}
         ]
     })
+    log.info("add_indices_to_alias. Index names: %s. Alias name: %s" % (indexlist, aliasname))
     return response
 
 
@@ -253,47 +258,7 @@ def update_alias(indexnames, old_indexlist, aliasname):
 
     actions["actions"].append(
         {"add": {"indices": indexnames, "alias": aliasname}})
+    log.info("update_alias. Index names: %s. Old removed indices: %s. Alias name: %s" % (
+        indexnames, old_indexlist, aliasname))
+    log.debug("update_alias. Actions: %s" % actions)
     es.indices.update_aliases(body=actions)
-
-#used in auranest and 2 integration tests
-def get_glitch_jobtechjobs_ids(max_items=None):
-    '''
-    Gets ids for ads that lacks "removedAt" but has
-    a deadline in the past.
-    '''
-    query = {
-        "query": {
-            "bool": {
-                "must_not": [
-                    {
-                        "exists": {
-                            "field": "source.removedAt"
-                        }
-                    }
-                ],
-                "must": [
-                    {
-                        "exists": {
-                            "field": "application.deadline"
-                        }
-                    },
-                    {
-                        "range": {
-                            "application.deadline": {
-                                "lt": "now/m"
-                            }
-                        }
-                    }
-                ]
-            }
-        }}
-    doc_counter = 0
-
-    ids = []
-    for doc in scan(es, query=query, index=settings.ES_AURANEST_INDEX,
-                    size=1000):
-        doc_counter += 1
-        if max_items and doc_counter > max_items:
-            break
-        ids.append(doc['_source']['id'])
-    return ids

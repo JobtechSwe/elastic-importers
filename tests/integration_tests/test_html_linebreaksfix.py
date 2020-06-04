@@ -14,10 +14,11 @@ indexname = 'platsannons-read'
 
 context = create_default_context(cafile=certifi.where())
 
+
 def create_dev_client():
     es_dev = Elasticsearch([os.getenv('ES_HOST')], port=int(os.getenv('ES_PORT')),
-                            use_ssl=True, scheme='https', ssl_context=context,
-                            http_auth=(os.getenv('ES_USER'), os.getenv('ES_PWD')))
+                           use_ssl=True, scheme='https', ssl_context=context,
+                           http_auth=(os.getenv('ES_USER'), os.getenv('ES_PWD')))
     return es_dev
 
 
@@ -51,10 +52,8 @@ def test_missing_description_text():
         dev_doc = doc['_source']
         if dev_doc['description']['text'] == '' or dev_doc['description']['text'] is None:
             dev_missing_description_ids.append(dev_doc['id'])
-    # pprint(dev_missing_description_ids)
 
     assert len(dev_missing_description_ids) == 0
-
 
 
 if __name__ == '__main__':
