@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 from dateutil import parser
 from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
@@ -28,6 +29,7 @@ def _isodate(bad_date):
 
 def convert_ad(message):
     annons = dict()
+    start_time = int(time.time() * 1000)
     annons['id'] = message.get('annonsId')
     annons['external_id'] = message.get('externtAnnonsId')
     annons['headline'] = message.get('annonsrubrik')
@@ -162,6 +164,7 @@ def convert_ad(message):
     annons['timestamp'] = message.get('updatedAt')
     annons['logo_url'] = message.get('logo_url')
     # Extract labels as keywords for easier searching
+    log.debug("Convert one ads take %d milliseconds." % (int(time.time() * 1000) - start_time))
     return _add_keywords(annons)
 
 
