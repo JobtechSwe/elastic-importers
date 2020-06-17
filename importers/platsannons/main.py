@@ -120,9 +120,6 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
     return doc_counter
 
 
-
-
-
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     # Loop over raw-list, convert and enrich into cooked-list
     log.info("Convering ads to proper format ...")
