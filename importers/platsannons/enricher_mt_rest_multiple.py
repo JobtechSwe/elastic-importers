@@ -131,7 +131,7 @@ def execute_calls(batch_indatas, parallelism):
                     # += operation is not atomic, so we need to get a lock:
                     with counter.get_lock():
                         counter.value += 1
-                        if counter.value % 100 == 0:
+                        if counter.value % 1000 == 0:
                             log.info("enrichtextdocuments - Processed %s docs"
                                      % (str(counter.value)))
             except Exception as exc:
