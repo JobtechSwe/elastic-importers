@@ -50,10 +50,7 @@ def start(es_index=None):
     es_index, es_index_deleted = _setup_index(es_index)
     log.info("Starting ad import into index: %s" % es_index)
     last_timestamp = _check_last_timestamp(es_index)
-    # add 1 msec to skip loading last ad
-    if last_timestamp:
-        last_timestamp = last_timestamp + 1
-    log.debug("Timestamp to load from: %d" % last_timestamp)
+    log.info("Timestamp to load from: %d" % last_timestamp)
 
     if not settings.LA_FEED_URL:
         log.error("LA_FEED_URL is not set. Exit!")
@@ -121,9 +118,6 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
 
     return doc_counter
-
-
-
 
 
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
