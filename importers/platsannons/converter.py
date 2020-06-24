@@ -378,7 +378,7 @@ def get_concept_as_annons_value_with_weight(taxtype, id, weight=None):
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, id))
     except RequestError:
-        log.warning(f'Request failed with argtype: {taxtype} and legacy_id: {id}')
+        log.warning(f'Request failed with argtype: {taxtype} and legacy_id or concept_id: {id}')
     return weighted_concept
 
 
@@ -392,6 +392,7 @@ def parse_driving_licence(message):
         if taxkortkort:
             taxkorkort_list.append({
                 "concept_id": taxkortkort.get('concept_id', None),
+                "legacy_ams_taxonomy_id": taxkortkort.get('legacy_ams_taxonomy_id', None),
                 "label": taxkortkort.get('label', None)
             })
     return taxkorkort_list
