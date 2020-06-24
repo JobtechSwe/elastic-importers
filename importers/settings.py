@@ -33,6 +33,8 @@ LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
 LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', None)
 LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 
+CHANGE_TO_LAV2 = os.getenv('CHANGE_TO_LAV2', False)
+
 # End from loaders
 
 platsannons_deleted_mappings = {
