@@ -525,5 +525,5 @@ def _extract_taxonomy_label(label):
         else:
             return [word.lower().strip() for word in re.split(r'/|, | och ', label)]
     except AttributeError:
-        print('extract fail (%s)' % label)
+        log.warning('(extract_taxonomy_label) extract fail for: %s' % label)
     return []
