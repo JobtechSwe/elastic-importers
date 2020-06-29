@@ -383,14 +383,14 @@ def parse_driving_licence(message):
     taxkorkort_list = []
     for kkort in message.get('korkort'):
         if settings.LA_ANNONS_V2:
-            taxkortkort = taxonomy.get_legacy_by_concept_id('korkort', kkort['varde'])
+            taxkorkort = taxonomy.get_legacy_by_concept_id('korkort', kkort['varde'])
         else:
-            taxkortkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
-        if taxkortkort:
+            taxkorkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
+        if taxkorkort:
             taxkorkort_list.append({
-                "concept_id": taxkortkort.get('concept_id', None),
-                "legacy_ams_taxonomy_id": taxkortkort.get('legacy_ams_taxonomy_id', None),
-                "label": taxkortkort.get('label', None)
+                "concept_id": taxkorkort.get('concept_id', None),
+                "legacy_ams_taxonomy_id": taxkorkort.get('legacy_ams_taxonomy_id', None),
+                "label": taxkorkort.get('label', None)
             })
     return taxkorkort_list
 
