@@ -31,8 +31,6 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
         if not doc_text:
             log.debug(
                 "No document data to enrich -  empty description for id: %s, moving on to the next one." % doc_id)
-            log.info("No document data to enrich -  empty description for id: "
-                      "%s, moving on to the next one." % doc_id)
             continue
         if doc_id == '':
             log.error("Value error - no id, headline: %s" % str(doc_headline))
@@ -131,7 +129,7 @@ def execute_calls(batch_indatas, parallelism):
                     # += operation is not atomic, so we need to get a lock:
                     with counter.get_lock():
                         counter.value += 1
-                        if counter.value % 100 == 0:
+                        if counter.value % 1000 == 0:
                             log.info("enrichtextdocuments - Processed %s docs"
                                      % (str(counter.value)))
             except Exception as exc:

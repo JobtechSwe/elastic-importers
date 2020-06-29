@@ -34,10 +34,13 @@ def _setup_index(es_index):
 
 
 def _check_last_timestamp(es_index):
-    last_timestamp = elastic.get_last_timestamp(es_index)
-    log.info("Index: %s Last timestamp: %d (%s)" % (es_index, last_timestamp,
-                                                    datetime.fromtimestamp(last_timestamp
-                                                                           / 1000)))
+    last_timestamp = elastic.get_last_timestamp(es_index) if not settings.LA_LAST_TIMESTAMP_MANUAL else settings.LA_LAST_TIMESTAMP
+    if not settings.LA_LAST_TIMESTAMP_MANUAL:
+        log.info("Index: %s Last timestamp: %d (%s)" % (es_index, last_timestamp,
+                                                    datetime.fromtimestamp(last_timestamp / 1000)))
+    else:
+        log.warning("Index: %s Last timestamp set MANUALLY: %d (%s)"
+                 % (es_index, last_timestamp, datetime.fromtimestamp(last_timestamp / 1000)))
     return last_timestamp
 
 

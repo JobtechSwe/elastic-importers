@@ -30,6 +30,10 @@ LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
 LA_DETAILS_PARALLELISM = int(os.getenv('LA_DETAILS_PARALLELISM', 8))
 LA_ANNONS_MAX_TRY = int(os.getenv('LA_ANNONS_MAX_TRY', 10))
 LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
+LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', None)
+LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
+# trigger to use ad format with v2 (concept_id)
+LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', False)
 
 # End from loaders
 
