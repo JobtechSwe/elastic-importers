@@ -65,7 +65,9 @@ def load_details_from_la(ad_meta):
                                      time.localtime(
                                          ad_meta.get('uppdateradTid') / 1000))
 
-        return {'annonsId': ad_id, 'id': ad_id, 'removed': True,
+        return {'annonsId': ad_id,
+                'id': ad_id,
+                'removed': True,
                 'avpublicerad': True,
                 'avpubliceringsdatum': removed_date,
                 'removed_date': removed_date,

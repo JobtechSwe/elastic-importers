@@ -39,12 +39,3 @@ def dump_json(file_name, data):
         json.dump(data, fout, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-# todo: remove function below if it isn't used by anyone?
-"""
-def open_json(file_name):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open(dir_path + "/" + file_name, "r") as fin:
-        data = json.load(fin)
-        for k, v in data.items():
-            print(k, v)
-"""

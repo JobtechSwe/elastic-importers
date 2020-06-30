@@ -20,6 +20,7 @@ def grouper(n, iterable):
 
 tags_display_block = ['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
 
+
 def clean_html(text):
     if text is None:
         cleaned_text = ''
@@ -39,6 +40,7 @@ def clean_html(text):
         cleaned_text = cleaned_text.strip()
 
     return cleaned_text
+
 
 def _add_linebreak_for_tag_name(tag_name, replacement_before, replacement_after, soup):
     parent_tags = soup.find_all(tag_name, recursive=True)

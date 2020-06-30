@@ -16,8 +16,8 @@ RETRIES = 10
 
 
 def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
-    log.info('Running enrich with %s processes' % str(parallelism))
-    log.info('Enriching: %s documents calling: %s' % (len(annonser), settings.URL_ENRICH_TEXTDOCS_SERVICE))
+    len_annonser = len(annonser)
+    log.info(f'Enriching docs: {len_annonser} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} processes: {parallelism}')
 
     global counter
     counter = Value('i', 0)
@@ -29,10 +29,7 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
         doc_headline = get_doc_headline_input(annons)
         doc_text = annons.get('description', {}).get('text_formatted', '')
         if not doc_text:
-            log.debug(
-                "No document data to enrich -  empty description for id: %s, moving on to the next one." % doc_id)
-            log.info("No document data to enrich -  empty description for id: "
-                      "%s, moving on to the next one." % doc_id)
+            log.debug("No enrich - empty description for id: %s, moving on to the next one." % doc_id)
             continue
         if doc_id == '':
             log.error("Value error - no id, headline: %s" % str(doc_headline))
@@ -46,12 +43,12 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
 
         annonser_input_data.append(input_doc_params)
 
-    nr_of_items_per_batch = len(annonser) // parallelism
+    nr_of_items_per_batch = len_annonser // parallelism
     nr_of_items_per_batch = int(math.ceil(nr_of_items_per_batch / 1000.0)) * 1000
-    nr_of_items_per_batch = min(nr_of_items_per_batch, len(annonser), 100)
+    nr_of_items_per_batch = min(nr_of_items_per_batch, len_annonser, 100)
     if nr_of_items_per_batch == 0:
-        nr_of_items_per_batch = len(annonser)
-    log.info('nr_of_items_per_batch: %s' % nr_of_items_per_batch)
+        nr_of_items_per_batch = len_annonser
+    log.info('Items per batch: %s' % nr_of_items_per_batch)
 
     annons_batches = grouper(nr_of_items_per_batch, annonser_input_data)
 
@@ -64,7 +61,7 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
         batch_indatas.append(batch_indata)
 
     enrich_results_data = execute_calls(batch_indatas, parallelism)
-    log.info('Enriched %s/%s documents' % (len(enrich_results_data), len(annonser)))
+    log.info('Enriched %s/%s documents' % (len(enrich_results_data), len_annonser))
 
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
@@ -131,7 +128,7 @@ def execute_calls(batch_indatas, parallelism):
                     # += operation is not atomic, so we need to get a lock:
                     with counter.get_lock():
                         counter.value += 1
-                        if counter.value % 100 == 0:
+                        if counter.value % 1000 == 0:
                             log.info("enrichtextdocuments - Processed %s docs"
                                      % (str(counter.value)))
             except Exception as exc:
