@@ -165,7 +165,7 @@ def convert_ad(message):
     annons['timestamp'] = message.get('updatedAt')
     annons['logo_url'] = message.get('logo_url')
     # Extract labels as keywords for easier searching
-    log.info("Convert ad: %s took: %d milliseconds." % (annons['id'], int(time.time() * 1000) - start_time))
+    log.debug("Convert ad: %s took: %d milliseconds." % (annons['id'], int(time.time() * 1000) - start_time))
     return _add_keywords(annons)
 
 
