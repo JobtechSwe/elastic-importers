@@ -10,7 +10,7 @@ from importers.platsannons.converter import get_null_safe_value
 
 log = logging.getLogger(__name__)
 
-timeout_enrich_api = 90
+TIMEOUT_ENRICH_API = 90
 counter = None
 RETRIES = 10
 
@@ -108,19 +108,18 @@ def get_enrich_result(batch_indata, timeout):
             time.sleep(0.3)
         else:  # no error
             return r.json()
-    log.error(f"get_enrich_result() failed after {RETRIES} retries with error: {e}" )
+    log.error(f"get_enrich_result() failed after {RETRIES} retries with error: {e}")
     raise e
 
 
 def execute_calls(batch_indatas, parallelism):
-    global timeout_enrich_api
     global counter
     enriched_output = {}
     # We can use a with statement to ensure threads are cleaned up promptly
     with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
         # Start the load operations and mark each future with its URL
         future_to_enrich_result = {executor.submit(get_enrich_result, batch_indata,
-                                                   timeout_enrich_api): batch_indata
+                                                   TIMEOUT_ENRICH_API): batch_indata
                                    for batch_indata in batch_indatas}
         for future in concurrent.futures.as_completed(future_to_enrich_result):
             try:
