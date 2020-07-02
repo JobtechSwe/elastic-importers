@@ -236,11 +236,15 @@ def _build_contacts(kontaktpersoner):
 def _set_occupations(annons, message):
     if 'yrkesroll' in message:
         if settings.LA_ANNONS_V2:
+            log.debug('l2')
             yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll',
                                                           {}).get('varde'))
         else:
+            log.debug('old')
+            log.debug(message.get('yrkesroll', {}).get('varde'))
             yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll', message.get('yrkesroll',
                                                           {}).get('varde'))
+            log.debug(yrkesroll)
         if yrkesroll and 'parent' in yrkesroll:
             yrkesgrupp = yrkesroll.get('parent')
             yrkesomrade = yrkesgrupp.get('parent')
