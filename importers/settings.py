@@ -33,9 +33,24 @@ LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
 LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', None)
 LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 # trigger to use ad format with v2 (concept_id)
-LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', False)
+LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', 'false').lower() == 'true'
 
-# End from loaders
+# For berikning (platsannonser)
+URL_ENRICH_TEXTDOCS_SERVICE = \
+    os.getenv('URL_ENRICH_TEXTDOCS_SERVICE',
+              'https://textdoc-enrichments.dev.services.jtech.se'
+              '/enrichtextdocuments')
+API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
+#    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
+#              'http://localhost:6357/enrichtextdocumentsbinary')
+ENRICH_THRESHOLD_OCCUPATION = os.getenv('ENRICH_THRESHOLD_OCCUPATION', 0.8)
+ENRICH_THRESHOLD_SKILL = os.getenv('ENRICH_THRESHOLD_SKILL', 0.5)
+ENRICH_THRESHOLD_GEO = os.getenv('ENRICH_THRESHOLD_GEO', 0.7)
+ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_TRAIT', 0.5)
+
+COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
+                                  'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
+COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))
 
 platsannons_deleted_mappings = {
     "mappings": {
@@ -438,20 +453,3 @@ platsannons_mappings = {
     }
 }
 
-
-# For berikning (platsannonser)
-URL_ENRICH_TEXTDOCS_SERVICE = \
-    os.getenv('URL_ENRICH_TEXTDOCS_SERVICE',
-              'https://textdoc-enrichments.dev.services.jtech.se'
-              '/enrichtextdocuments')
-API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
-#    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
-#              'http://localhost:6357/enrichtextdocumentsbinary')
-ENRICH_THRESHOLD_OCCUPATION = os.getenv('ENRICH_THRESHOLD_OCCUPATION', 0.8)
-ENRICH_THRESHOLD_SKILL = os.getenv('ENRICH_THRESHOLD_SKILL', 0.5)
-ENRICH_THRESHOLD_GEO = os.getenv('ENRICH_THRESHOLD_GEO', 0.7)
-ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_TRAIT', 0.5)
-
-COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
-                                  'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
-COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))

@@ -236,15 +236,14 @@ def _build_contacts(kontaktpersoner):
 def _set_occupations(annons, message):
     if 'yrkesroll' in message:
         if settings.LA_ANNONS_V2:
-            log.debug('l2')
+            log.debug('NB! Env var to use la v2')
             yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll',
                                                           {}).get('varde'))
         else:
-            log.debug('old')
-            log.debug(message.get('yrkesroll', {}).get('varde'))
-            yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll', message.get('yrkesroll',
-                                                          {}).get('varde'))
-            log.debug(yrkesroll)
+            log.debug('Env var to use la v1')
+            yrkesroll_varde = message.get('yrkesroll', {}).get('varde')
+            yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll', yrkesroll_varde)
+            log.debug(f'Get: {yrkesroll} for: {yrkesroll_varde}')
         if yrkesroll and 'parent' in yrkesroll:
             yrkesgrupp = yrkesroll.get('parent')
             yrkesomrade = yrkesgrupp.get('parent')
@@ -261,11 +260,9 @@ def _set_occupations(annons, message):
                                           'legacy_ams_taxonomy_id':
                                               yrkesomrade['legacy_ams_taxonomy_id']}
         elif not yrkesroll:
-            log.warning('Taxonomy value (1) not found for "yrkesroll" (%s)'
-                        % message['yrkesroll'])
+            log.warning(f"Taxonomy value not found for: {message['yrkesroll']}")
         else:  # yrkesroll is not None and 'parent' not in yrkesroll
-            log.warning('Parent not found for yrkesroll %s (%s)' %
-                        (message['yrkesroll'], yrkesroll))
+            log.warning(f"Parent not found for yrkesroll: {message['yrkesroll']} ({yrkesroll})")
 
 
 def _build_wp_address(arbplatsmessage):
