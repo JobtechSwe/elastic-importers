@@ -27,6 +27,7 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                 if isinstance(idkey, list) else document[idkey]
 
         if document.get('removed', False):
+            #TODO following is not in use:
             remove_statement = {
                 '_op_type': 'delete',
                 '_index': indexname,
