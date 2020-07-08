@@ -1,6 +1,6 @@
 import os
 
-ES_HOST = os.getenv("ES_HOST", "localhost")
+ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
 ES_PORT = os.getenv("ES_PORT", 9200)
 ES_USER = os.getenv("ES_USER")
 ES_PWD = os.getenv("ES_PWD")
@@ -10,8 +10,7 @@ WRITE_INDEX_SUFFIX = '-write'
 READ_INDEX_SUFFIX = '-read'
 DELETED_INDEX_SUFFIX = '-deleted'
 STREAM_INDEX_SUFFIX = '-stream'
-ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX',
-                             os.getenv('ES_ANNONS', 'platsannons'))
+ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX', os.getenv('ES_ANNONS', 'platsannons'))
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 
 # Parameter names corresponding to
@@ -36,13 +35,9 @@ LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', 'false').lower() == 'true'
 
 # For berikning (platsannonser)
-URL_ENRICH_TEXTDOCS_SERVICE = \
-    os.getenv('URL_ENRICH_TEXTDOCS_SERVICE',
-              'https://textdoc-enrichments.dev.services.jtech.se'
-              '/enrichtextdocuments')
+URL_ENRICH = 'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments'
+URL_ENRICH_TEXTDOCS_SERVICE = os.getenv('URL_ENRICH_TEXTDOCS_SERVICE', URL_ENRICH)
 API_KEY_ENRICH_TEXTDOCS = os.getenv("API_KEY_ENRICH_TEXTDOCS", '')
-#    os.getenv('URL_ENRICH_TEXTDOCS_BINARY_SERVICE',
-#              'http://localhost:6357/enrichtextdocumentsbinary')
 ENRICH_THRESHOLD_OCCUPATION = os.getenv('ENRICH_THRESHOLD_OCCUPATION', 0.8)
 ENRICH_THRESHOLD_SKILL = os.getenv('ENRICH_THRESHOLD_SKILL', 0.5)
 ENRICH_THRESHOLD_GEO = os.getenv('ENRICH_THRESHOLD_GEO', 0.7)
@@ -118,15 +113,15 @@ platsannons_mappings = {
                     "max_gram": 30
                 },
                 "custom_shingle": {
-                     "type": "shingle",
-                     "min_shingle_size": 2,
-                     "max_shingle_size": 3,
-                     "output_unigrams": True
+                    "type": "shingle",
+                    "min_shingle_size": 2,
+                    "max_shingle_size": 3,
+                    "output_unigrams": True
                 },
                 "my_char_filter": {
-                     "type": "pattern_replace",
-                     "pattern": " ",
-                     "replacement": ""
+                    "type": "pattern_replace",
+                    "pattern": " ",
+                    "replacement": ""
                 },
                 "shingle": {
                     "type": "shingle",
@@ -452,4 +447,3 @@ platsannons_mappings = {
         }
     }
 }
-
