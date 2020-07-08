@@ -90,7 +90,7 @@ def get_last_timestamp(indexname):
     hits = response['hits']['hits']
     if hits:
         last_timestamp = hits[0]["_source"]["timestamp"]
-        log.info(f'Last timestamp id: {hits[0]["_source"]["id"]}')
+        log.info(f'Last timestamp id: {hits[0]["_id"]}')
     else:
         last_timestamp = 0
     return last_timestamp
