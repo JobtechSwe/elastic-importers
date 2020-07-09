@@ -15,7 +15,7 @@ logo_cache = {}
 
 def bulk_fetch_ad_details(ad_batch):
     parallelism = settings.LA_DETAILS_PARALLELISM
-    log.info('Multithreaded fetch ad details with %s processes' % str(parallelism))
+    log.info(f'Threaded fetch ad details with: {parallelism} processes, batch: {len(ad_batch)}')
 
     global counter
     counter = Value('i', 0)
@@ -43,13 +43,9 @@ def bulk_fetch_ad_details(ad_batch):
                             (str(counter.value)))
             except requests.exceptions.HTTPError as exc:
                 # status_code = exc.response.status_code
-                error_message = 'Fetch ad details call generated an exception: %s' % \
-                                (str(exc))
-                log.error(error_message)
+                log.error(f'Fetch ad details call generated an exception: {exc}')
             except Exception as exc:
-                error_message = 'Fetch ad details call generated an exception: %s' % \
-                                (str(exc))
-                log.error(error_message)
+                log.error(f'Fetch ad details call generated an exception: {exc}')
 
     return result_output
 
