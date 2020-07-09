@@ -3,6 +3,7 @@ from multiprocessing import Value
 import requests
 import math
 import time
+import sys
 import concurrent.futures
 from importers import settings
 from importers.common import grouper
@@ -108,8 +109,8 @@ def get_enrich_result(batch_indata, timeout):
             time.sleep(0.3)
         else:  # no error
             return r.json()
-    log.error(f"get_enrich_result() failed after {RETRIES} retries with error: {e}")
-    raise e
+    log.error(f"get_enrich_result failed after: {RETRIES} retries with error. Exit!")
+    sys.exit(1)
 
 
 def execute_calls(batch_indatas, parallelism):
