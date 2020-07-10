@@ -16,9 +16,10 @@ counter = None
 RETRIES = 10
 
 
-def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
+def enrich(annonser):
     len_annonser = len(annonser)
-    log.info(f'Enriching docs: {len_annonser} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} processes: {parallelism}')
+    parallelism = settings.ENRICHER_PROCESSES if len_annonser > 99 else 1
+    log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
 
     global counter
     counter = Value('i', 0)
