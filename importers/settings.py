@@ -87,14 +87,6 @@ platsannons_mappings = {
                     "filter": ["lowercase", "reverse", "edgengram_filter", "reverse"],
                     "char_filter": ["punctuation_filter"]
                 },
-                "bigram_combiner": {
-                    "tokenizer": "standard",
-                    "filter": [
-                        "lowercase",
-                        "custom_shingle",
-                        "my_char_filter"
-                    ]
-                },
                 "trigram": {
                     "type": "custom",
                     "tokenizer": "standard",
@@ -111,17 +103,6 @@ platsannons_mappings = {
                     "type": "edge_ngram",
                     "min_gram": 3,
                     "max_gram": 30
-                },
-                "custom_shingle": {
-                    "type": "shingle",
-                    "min_shingle_size": 2,
-                    "max_shingle_size": 3,
-                    "output_unigrams": True
-                },
-                "my_char_filter": {
-                    "type": "pattern_replace",
-                    "pattern": " ",
-                    "replacement": ""
                 },
                 "shingle": {
                     "type": "shingle",
@@ -431,6 +412,13 @@ platsannons_mappings = {
                     "coordinates": {
                         "type": "geo_point",
                         "ignore_malformed": True
+                    }
+                }
+            },
+            "application_details": {
+                "properties": {
+                    "reference": {
+                        "type": "text"
                     }
                 }
             },
