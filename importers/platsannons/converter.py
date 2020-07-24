@@ -79,7 +79,6 @@ def convert_ad(message):
     annons['application_details'] = {
         'information': message.get('informationAnsokningssatt'),
         'reference': message.get('referens'),
-        # 'reference': str(message.get('referens')),
         'email': message.get('ansokningssattEpost'),
         'via_af': message.get('ansokningssattViaAF'),
         'url': message.get('ansokningssattWebbadress'),

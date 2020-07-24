@@ -16,7 +16,7 @@ logo_cache = {}
 def bulk_fetch_ad_details(ad_batch):
     len_ad_batch = len(ad_batch)
     parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 99 else 1
-    log.info(f'Threaded fetch ad details with processes: {parallelism}, batch: {len_ad_batch}')
+    log.info(f'Fetch ad details. Processes: {parallelism}, batch len: {len_ad_batch}')
 
     global counter
     counter = Value('i', 0)
@@ -35,7 +35,7 @@ def bulk_fetch_ad_details(ad_batch):
                 # += operation is not atomic, so we need to get a lock for counter:
                 with counter.get_lock():
                     counter.value += 1
-                    if counter.value % 100 == 0:
+                    if counter.value % 500 == 0:
                         log.info(f"Threaded fetch ad details. Processed docs: {str(counter.value)}")
             except requests.exceptions.HTTPError as exc:
                 # status_code = exc.response.status_code
