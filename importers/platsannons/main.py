@@ -8,8 +8,7 @@ from jobtech.common.customlogging import configure_logging
 from importers import settings
 from importers.platsannons import loader, converter, enricher_mt_rest_multiple as enricher
 from importers.repository import elastic
-from importers.indexmaint.main import (set_platsannons_read_alias,
-                                       set_platsannons_write_alias)
+from importers.indexmaint.main import (set_platsannons_read_alias, set_platsannons_write_alias)
 
 configure_logging([__name__.split('.')[0], 'importers'])
 log = logging.getLogger(__name__)
@@ -24,23 +23,24 @@ def _setup_index(es_index):
                                                        settings.ES_ANNONS_PREFIX,
                                                        settings.platsannons_mappings,
                                                        settings.platsannons_deleted_mappings)
-        log.info('Starting importer %s with PG_BATCH_SIZE: %s for index %s'
-                 % ('af-platsannons', settings.PG_BATCH_SIZE, es_index))
-        log.info('Index for removed items: %s' % delete_index)
+        log.info(f'Starting importer with batch: {settings.PG_BATCH_SIZE} for index: {es_index}')
+        log.info(f'Index for removed items: {delete_index}')
     except Exception as e:
-        log.error("Elastic operations failed. Exit! %s" % str(e))
+        log.error(f"Elastic operations failed. Exit! {e}")
         sys.exit(1)
     return es_index, delete_index
 
 
 def _check_last_timestamp(es_index):
-    last_timestamp = elastic.get_last_timestamp(es_index) if not settings.LA_LAST_TIMESTAMP_MANUAL else settings.LA_LAST_TIMESTAMP
     if not settings.LA_LAST_TIMESTAMP_MANUAL:
+        last_timestamp = elastic.get_last_timestamp(es_index)
         log.info("Index: %s Last timestamp: %d (%s)" % (es_index, last_timestamp,
-                                                    datetime.fromtimestamp(last_timestamp / 1000)))
+                                                        datetime.fromtimestamp(
+                                                            last_timestamp / 1000)))
     else:
+        last_timestamp = settings.LA_LAST_TIMESTAMP
         log.warning("Index: %s Last timestamp set MANUALLY: %d (%s)"
-                 % (es_index, last_timestamp, datetime.fromtimestamp(last_timestamp / 1000)))
+                    % (es_index, last_timestamp, datetime.fromtimestamp(last_timestamp / 1000)))
     return last_timestamp
 
 
@@ -85,17 +85,18 @@ def start(es_index=None):
 
     num_doc_elastic = elastic.document_count(es_index)
     if num_doc_elastic:
-        log.info("All done! Elastic reports a total of %s indexed documents." % num_doc_elastic)
+        log.info(f"All done! Index: {es_index} has: {num_doc_elastic} indexed documents.")
 
 
 def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
     doc_counter = 0
+    len_ads = len(ad_ids)
     nr_of_items_per_batch = settings.PG_BATCH_SIZE
-    nr_of_items_per_batch = min(nr_of_items_per_batch, len(ad_ids))
+    nr_of_items_per_batch = min(nr_of_items_per_batch, len_ads)
     if nr_of_items_per_batch < 1:
         log.error("Failed to retrieve any ads. Exit!")
         sys.exit(1)
-    nr_of_batches = math.ceil(len(ad_ids) / nr_of_items_per_batch)
+    nr_of_batches = math.ceil(len_ads / nr_of_items_per_batch)
     # Partition list into manageable chunks
     ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
     processed_ads_total = 0
@@ -115,19 +116,18 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted)
         processed_ads_total = processed_ads_total + len(ad_batch)
 
-        log.info('Processed %s/%s ads' % (processed_ads_total, len(ad_ids)))
+        log.info('Processed %s/%s ads' % (processed_ads_total, len_ads))
 
     return doc_counter
 
 
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     # Loop over raw-list, convert and enrich into cooked-list
-    log.info("Convering ads to proper format ...")
-    converted_ads = [converter.convert_ad(raw_ad)
-                     for raw_ad in raw_ads]
+    log.info(f"Converting: {len(raw_ads)} ads to proper format ...")
+    converted_ads = [converter.convert_ad(raw_ad) for raw_ad in raw_ads]
     log.info("Enriching ads with ML ...")
     enriched_ads = enricher.enrich(converted_ads)
-    log.info("Indexing: %d enriched documents into: %s" % (len(enriched_ads), es_index))
+    log.info(f"Indexing: {len(enriched_ads)} enriched documents into: {es_index}")
     # Bulk save cooked-list to elastic
     num_indexed = elastic.bulk_index(enriched_ads, es_index, deleted_index)
     return num_indexed
@@ -148,7 +148,7 @@ def _grouper(n, iterable):
 def start_daily_index():
     new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX,
                                 datetime.now().strftime('%Y%m%d-%H.%M'))
-    log.info("Start creating new daily index: %s" % new_index_name)
+    log.info(f"Start creating new daily index: {new_index_name}")
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)

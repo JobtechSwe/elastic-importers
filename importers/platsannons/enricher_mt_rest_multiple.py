@@ -3,6 +3,7 @@ from multiprocessing import Value
 import requests
 import math
 import time
+import sys
 import concurrent.futures
 from importers import settings
 from importers.common import grouper
@@ -15,9 +16,10 @@ counter = None
 RETRIES = 10
 
 
-def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
+def enrich(annonser):
     len_annonser = len(annonser)
-    log.info(f'Enriching docs: {len_annonser} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} processes: {parallelism}')
+    parallelism = settings.ENRICHER_PROCESSES if len_annonser > 99 else 1
+    log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
 
     global counter
     counter = Value('i', 0)
@@ -56,6 +58,8 @@ def enrich(annonser, parallelism=settings.ENRICHER_PROCESSES):
     for i, annons_batch in enumerate(annons_batches):
         annons_batch_indatas = [annons_indata for annons_indata in annons_batch]
         batch_indata = {
+            "include_terms_info": True,
+            "include_sentences": True,
             "documents_input": annons_batch_indatas
         }
         batch_indatas.append(batch_indata)
@@ -106,8 +110,8 @@ def get_enrich_result(batch_indata, timeout):
             time.sleep(0.3)
         else:  # no error
             return r.json()
-    log.error(f"get_enrich_result() failed after {RETRIES} retries with error: {e}")
-    raise e
+    log.error(f"get_enrich_result failed after: {RETRIES} retries with error. Exit!")
+    sys.exit(1)
 
 
 def execute_calls(batch_indatas, parallelism):

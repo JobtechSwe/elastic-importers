@@ -15,6 +15,7 @@ if settings.ES_USER and settings.ES_PWD:
                        http_auth=(settings.ES_USER, settings.ES_PWD), timeout=60)
 else:
     es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}], timeout=60)
+log.info(f"Elastic object set using host: {settings.ES_HOST}:{settings.ES_PORT}")
 
 
 def _bulk_generator(documents, indexname, idkey, deleted_index):
@@ -27,6 +28,7 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                 if isinstance(idkey, list) else document[idkey]
 
         if document.get('removed', False):
+            #TODO following is not in use:
             remove_statement = {
                 '_op_type': 'delete',
                 '_index': indexname,
@@ -71,7 +73,7 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
 def bulk_index(documents, indexname, deleted_index=None, idkey='id'):
     action_iterator = _bulk_generator(documents, indexname, idkey, deleted_index)
     result = bulk(es, action_iterator, request_timeout=30, raise_on_error=True, yield_ok=False)
-    log.info("(bulk_index) result: %s" % result[0])
+    log.info(f"(bulk_index) result: {result[0]}")
     return result[0]
 
 
@@ -86,7 +88,12 @@ def get_last_timestamp(indexname):
                              }
                          })
     hits = response['hits']['hits']
-    return hits[0]['_source']['timestamp'] if hits else 0
+    if hits:
+        last_timestamp = hits[0]["_source"]["timestamp"]
+        log.info(f'Last timestamp id: {hits[0]["_id"]}')
+    else:
+        last_timestamp = 0
+    return last_timestamp
 
 
 def get_ids_with_timestamp(ts, indexname):
@@ -179,28 +186,26 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
     write_alias = None
     read_alias = None
     stream_alias = None
-    deleted_index = "%s%s" % (settings.ES_ANNONS_PREFIX,
-                              settings.DELETED_INDEX_SUFFIX)
+    deleted_index = "%s%s" % (settings.ES_ANNONS_PREFIX, settings.DELETED_INDEX_SUFFIX)
     if not es_index:
         es_index = default_index
         write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
         read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
         stream_alias = "%s%s" % (es_index, settings.STREAM_INDEX_SUFFIX)
     if not index_exists(deleted_index):
-        log.info("Creating index %s" % deleted_index)
+        log.info(f"Creating index: {deleted_index}")
         create_index(deleted_index, mappings_deleted)
     if not index_exists(es_index):
-        log.info("Creating index %s" % es_index)
+        log.info(f"Creating index: {es_index}")
         create_index(es_index, mappings)
     if write_alias and not alias_exists(write_alias):
-        log.info("Setting up alias %s for index %s" % (write_alias, es_index))
+        log.info(f"Setting up alias: {write_alias} for index {es_index}")
         put_alias([es_index], write_alias)
     if read_alias and not alias_exists(read_alias):
-        log.info("Setting up alias %s for index %s" % (read_alias, es_index))
+        log.info(f"Setting up alias: {read_alias} for index {es_index}")
         put_alias([es_index], read_alias)
     if stream_alias and not alias_exists(stream_alias):
-        log.info("Setting up alias %s for indices %s" % (
-            stream_alias, (es_index, deleted_index)))
+        log.info(f"Setting up alias: {stream_alias} for indices: {es_index}, {deleted_index}")
         put_alias([es_index, deleted_index], stream_alias)
 
     current_index = write_alias or es_index
@@ -221,8 +226,7 @@ def create_index(indexname, extra_mappings=None):
     if extra_mappings:
         body = extra_mappings
         if 'mappings' in body:
-            body.get('mappings', {}) \
-                .get('properties', {})['timestamp'] = {'type': 'long'}
+            body.get("mappings", {}).get("properties", {})["timestamp"] = {"type": "long"}
         else:
             body.update(basic_body)
     else:
@@ -232,9 +236,9 @@ def create_index(indexname, extra_mappings=None):
     # TODO error already exist is not ignored on ignore=400
     result = es.indices.create(index=indexname, body=body, ignore=400)
     if 'error' in result:
-        log.error("Error on create index %s: %s" % (indexname, result))
+        log.error(f"Error on create index {indexname}: {result}")
     else:
-        log.info("New index created without errors: %s" % indexname)
+        log.info(f"New index created without errors: {indexname} with body: {body}")
 
 
 def add_indices_to_alias(indexlist, aliasname):
@@ -243,22 +247,18 @@ def add_indices_to_alias(indexlist, aliasname):
             {"add": {"indices": indexlist, "alias": aliasname}}
         ]
     })
-    log.info("add_indices_to_alias. Index names: %s. Alias name: %s" % (indexlist, aliasname))
+    log.info(f"add_indices_to_alias. Indices: {indexlist}, alias: {aliasname}")
     return response
 
 
 def update_alias(indexnames, old_indexlist, aliasname):
     actions = {
-        "actions": [
-        ]
+        "actions": []
     }
     for index in old_indexlist:
-        actions["actions"].append({"remove": {"index": index,
-                                              "alias": aliasname}})
+        actions["actions"].append({"remove": {"index": index, "alias": aliasname}})
 
-    actions["actions"].append(
-        {"add": {"indices": indexnames, "alias": aliasname}})
-    log.info("update_alias. Index names: %s. Old removed indices: %s. Alias name: %s" % (
-        indexnames, old_indexlist, aliasname))
-    log.debug("update_alias. Actions: %s" % actions)
+    actions["actions"].append({"add": {"indices": indexnames, "alias": aliasname}})
     es.indices.update_aliases(body=actions)
+    log.info(f"update_alias. Added: {indexnames}, removed: {old_indexlist}, alias name: {aliasname}")
+    log.debug(f"update_alias. Actions: {actions}")
