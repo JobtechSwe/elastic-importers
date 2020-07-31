@@ -57,7 +57,8 @@ def start(es_index=None):
 
     # Load list of updated ad ids
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)
-    number_of_ids_to_load, number_total = len(ad_ids)
+    number_total = len(ad_ids)
+    number_of_ids_to_load = number_total
     # variable to skip endless loop of fetching missing ads:
     number_of_ids_missing_fix = -1
     while number_of_ids_to_load > 0:
