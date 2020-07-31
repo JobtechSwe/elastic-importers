@@ -34,9 +34,8 @@ def _setup_index(es_index):
 def _check_last_timestamp(es_index):
     if not settings.LA_LAST_TIMESTAMP_MANUAL:
         last_timestamp = elastic.get_last_timestamp(es_index)
-        log.info("Index: %s Last timestamp: %d (%s)" % (es_index, last_timestamp,
-                                                        datetime.fromtimestamp(
-                                                            last_timestamp / 1000)))
+        log.info("Index: %s Last timestamp: %d (%s)"
+                 % (es_index, last_timestamp, datetime.fromtimestamp(last_timestamp / 1000)))
     else:
         last_timestamp = settings.LA_LAST_TIMESTAMP
         log.warning("Index: %s Last timestamp set MANUALLY: %d (%s)"
@@ -58,30 +57,31 @@ def start(es_index=None):
 
     # Load list of updated ad ids
     ad_ids = loader.load_list_of_updated_ads(last_timestamp)
-    number_of_ids_to_load = len(ad_ids)
+    number_of_ids_to_load, number_total = len(ad_ids)
+    # variable to skip endless loop of fetching missing ads:
     number_of_ids_missing_fix = -1
     while number_of_ids_to_load > 0:
-        log.info('Fetching details for %s ads...' % number_of_ids_to_load)
+        log.info(f'Fetching details for ads: {number_of_ids_to_load}')
         _load_and_process_ads(ad_ids, es_index, es_index_deleted)
-        log.info("Verifying that all ads have been indexed")
+        log.info(f"Verifying that all ads were indexed in: {es_index}")
         ad_ids = _find_missing_ids_and_create_loadinglist(ad_ids, es_index)
         number_of_ids_to_load = len(ad_ids)
 
         if number_of_ids_missing_fix == number_of_ids_to_load:
-            log.error("Missing ads amount is same as before: %d" % number_of_ids_to_load)
-            log.error("No more trying to fetch. Check these ads: %s" % ad_ids)
+            log.error(f"Missing ads amount is same as before: {number_of_ids_to_load}")
+            log.error(f"No more trying to fetch. Check these ads: {ad_ids}")
             break
         if number_of_ids_to_load > 0:
             number_of_ids_missing_fix = number_of_ids_to_load
-            log.info("Missing ads: %s" % ad_ids)
-            log.warning("There are still missing ads: %d. Trying again ..." % number_of_ids_to_load)
+            log.info(f"Missing ads: {ad_ids}")
+            log.warning(f"Still missing ads: {number_of_ids_to_load}. Trying again...")
         else:
             log.info("No missing ads to load.")
             break
 
     elapsed_time = time.time() - start_time
     m, s = divmod(elapsed_time, 60)
-    log.info("Processed %d docs in: %d minutes %5.2f seconds." % (number_of_ids_to_load, m, s))
+    log.info("Processed %d docs in: %d minutes %5.2f seconds." % (number_total, m, s))
 
     num_doc_elastic = elastic.document_count(es_index)
     if num_doc_elastic:
@@ -116,7 +116,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted)
         processed_ads_total = processed_ads_total + len(ad_batch)
 
-        log.info('Processed %s/%s ads' % (processed_ads_total, len_ads))
+        log.info(f'Processed ads: {processed_ads_total}/{len_ads}')
 
     return doc_counter
 

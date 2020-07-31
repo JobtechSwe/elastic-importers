@@ -19,7 +19,7 @@ log.info(f"Elastic object set using host: {settings.ES_HOST}:{settings.ES_PORT}"
 
 
 def _bulk_generator(documents, indexname, idkey, deleted_index):
-    log.debug("(_bulk_generator) index: %s, idkey: %s, deleted_index: %s" % (indexname, idkey, deleted_index))
+    log.debug(f"(_bulk_generator) index: {indexname}, idkey: {idkey}, deleted_index: {deleted_index}")
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
@@ -28,13 +28,6 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                 if isinstance(idkey, list) else document[idkey]
 
         if document.get('removed', False):
-            #TODO following is not in use:
-            remove_statement = {
-                '_op_type': 'delete',
-                '_index': indexname,
-                '_id': doc_id,
-                '_source': False
-            }
             if deleted_index:
                 tombstone = {
                     'id': doc_id,
@@ -44,7 +37,6 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'publication_date': None,
                     'last_publication_date': None,
                 }
-                # yield remove_statement
                 yield {
                     '_index': indexname,
                     '_id': doc_id,
@@ -56,7 +48,6 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     '_source': tombstone,
                 }
             else:
-                # yield remove_statement
                 yield {
                     '_index': indexname,
                     '_id': doc_id,
@@ -119,7 +110,7 @@ def find_missing_ad_ids(ad_ids, es_index):
         refresh_success = True
     except Exception as e:
         refresh_success = False
-        log.warning("Refresh operation failed when trying to find missing ads: %s" % str(e))
+        log.warning(f"Refresh operation failed when trying to find missing ads: {e}")
     missing_ads_dsl = {
         "query": {
             "ids": {
@@ -145,7 +136,7 @@ def document_count(es_index):
         es.indices.refresh(es_index)
         num_doc_elastic = es.cat.count(es_index, params={"format": "json"})[0]['count']
     except Exception as e:
-        log.warning("Operation failed when trying to count ads: %s" % str(e))
+        log.warning(f"Operation failed when trying to count ads: {e}")
         num_doc_elastic = None
     return num_doc_elastic
 
@@ -161,12 +152,10 @@ def index_exists(indexname):
         except Exception as e:
             if fail_count > 1:
                 # Elastic has its own failure management, so > 1 is enough.
-                log.error("Elastic not available after try: %d .Stop trying. %s"
-                          % (fail_count, str(e)))
+                log.error(f"Elastic not available after try: {fail_count}. Stop trying. {e}")
                 raise e
-            log.warning("Elasticsearch currently not available. Waiting ...")
-            log.warning("Connection failed: %s" % str(e))
             fail_count += 1
+            log.warning(f"Connection fail: {fail_count} for index: {indexname} with {e}")
             time.sleep(1)
 
 
@@ -192,6 +181,7 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
         write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
         read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
         stream_alias = "%s%s" % (es_index, settings.STREAM_INDEX_SUFFIX)
+        log.info(f'Setup alias based on default index: {default_index}. Write: {write_alias} Read: {read_alias} Stream: {stream_alias}')
     if not index_exists(deleted_index):
         log.info(f"Creating index: {deleted_index}")
         create_index(deleted_index, mappings_deleted)
