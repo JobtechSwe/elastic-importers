@@ -29,9 +29,9 @@ def use_city_info_get_workplace_address_info_from_taxonomy(city):
             'municipality': value.get('label', ''),
             'region_code': value.get('parent', '').get('legacy_ams_taxonomy_id', ''),
             'region_concept_id': value.get('parent', '').get('concept_id', ''),
-            'region':  value.get('parent', '').get('label', ''),
+            'region': value.get('parent', '').get('label', ''),
             'country_code': "199",
-            'country_concept_id':"i46j_HmG_v64",
-            'country':"Sverige",
+            'country_concept_id': "i46j_HmG_v64",
+            'country': "Sverige",
         }
     return workplace_address
