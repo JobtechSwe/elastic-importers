@@ -1,6 +1,7 @@
 from importers.repository import elastic
 from valuestore.taxonomy import get_term as gt, get_entity as ge, find_concept_by_legacy_ams_taxonomy_id as \
-    fcbla, find_legacy_ams_taxonomy_id_by_concept_id as flatc ,find_info_by_city_name as fibcn
+    fcbla, find_legacy_ams_taxonomy_id_by_concept_id as flatc , find_info_by_label_name_and_type as filt ,\
+    find_info_by_label_name as fibln
 from elasticsearch import RequestError
 import logging
 
@@ -74,14 +75,27 @@ def get_legacy_by_concept_id(taxtype, concept_id, not_found_response=None):
     return cached
 
 
-# use city need to get all taxonomy info
-def get_info_by_city_name(city, not_found_response=None):
+# use name need to get all taxonomy info
+def get_info_by_label_name_and_type(name, info_type, not_found_response=None):
     value = None
-    if city:
+    if name:
         try:
-            value = fibcn(elastic.es, city, not_found_response)
+            value = filt(elastic.es, name, info_type, not_found_response)
         except RequestError:
             log.warning('Taxonomy RequestError for request with city name: {city}')
             value = not_found_response
             log.info("(find_info_by_city_name) set value: %s" % str(not_found_response))
+    return value
+
+
+# use name to get all taxonomy info
+def get_info_by_name(name, not_found_response=None):
+    value = None
+    if name:
+        try:
+            value = fibln(elastic.es, name, not_found_response)
+        except RequestError:
+            log.warning('Taxonomy RequestError for request with name: name}')
+            value = not_found_response
+            log.info("(find_info_by_name) set value: %s" % str(not_found_response))
     return value
