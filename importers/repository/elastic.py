@@ -10,9 +10,11 @@ log = logging.getLogger(__name__)
 
 if settings.ES_USER and settings.ES_PWD:
     context = create_default_context(cafile=certifi.where())
+    print('kaishi')
     es = Elasticsearch([settings.ES_HOST], port=settings.ES_PORT,
                        use_ssl=True, scheme='https', ssl_context=context,
                        http_auth=(settings.ES_USER, settings.ES_PWD), timeout=60)
+    print('ranhou')
 else:
     es = Elasticsearch([{'host': settings.ES_HOST, 'port': settings.ES_PORT}], timeout=60)
 log.info(f"Elastic object set using host: {settings.ES_HOST}:{settings.ES_PORT}")
@@ -146,7 +148,12 @@ def index_exists(indexname):
     fail_count = 0
     while not es_available:
         try:
+            print('start')
+            print(indexname)
+            print(es)
+            print(es.index)
             result = es.indices.exists(index=[indexname])
+            print('end')
             es_available = True
             return result
         except Exception as e:
