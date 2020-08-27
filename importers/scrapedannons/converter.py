@@ -1,5 +1,8 @@
 from importers.repository.taxonomy import get_info_by_label_name_and_type, get_info_by_name
+import logging
 
+
+log = logging.getLogger(__name__)
 
 def use_location_info_get_all_workplace_address_info_from_taxonomy(location):
     value = get_info_by_name(location)
@@ -80,6 +83,7 @@ def convert_ad(ad_meta):
     original_job_post = ad_meta.get('originalJobPosting', '')
     if original_job_post:
         description_text = original_job_post.get('description', '')
+        log.info(f"id: {annons['id']} Description: {description_text}")
         description_text_formatted = "<p>" + description_text.replace("\n", "<br>") + "</p>"
         annons['originalJobPosting'] = {
             'identifier': original_job_post.get('identifier', ''),
