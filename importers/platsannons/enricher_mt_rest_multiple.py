@@ -35,11 +35,11 @@ def enrich(annonser, scraped=False, typeahead=True):
             doc_text = annons.get('description', {}).get('text_formatted', '')
 
         if not doc_text:
-            log.debug("No enrich - empty description for id: %s, moving on to the next one." % doc_id)
+            log.debug(f"No enrich - empty description for id: {doc_id}, moving on to the next one.")
             continue
         if doc_id == '':
-            log.error("Value error - no id, headline: %s" % str(doc_headline))
-            raise ValueError('Document has no id, enrichment is not possible, headline: ' % doc_headline)
+            log.error(f"Value error - no id, enrichment is not possible. Headline: {doc_headline}")
+            raise ValueError
 
         input_doc_params = {
             settings.ENRICHER_PARAM_DOC_ID: doc_id,
@@ -54,7 +54,7 @@ def enrich(annonser, scraped=False, typeahead=True):
     nr_of_items_per_batch = min(nr_of_items_per_batch, len_annonser, 100)
     if nr_of_items_per_batch == 0:
         nr_of_items_per_batch = len_annonser
-    log.info('Items per batch: %s' % nr_of_items_per_batch)
+    log.info(f'Items per batch: {nr_of_items_per_batch}')
 
     annons_batches = grouper(nr_of_items_per_batch, annonser_input_data)
 

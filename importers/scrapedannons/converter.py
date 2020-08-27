@@ -84,7 +84,7 @@ def convert_ad(ad_meta):
     if original_job_post:
         description_text = original_job_post.get('description', '')
         log.info(f"id: {annons['id']} Description: {description_text}")
-        description_text_formatted = "<p>" + description_text.replace("\n", "<br>") + "</p>"
+        description_text_formatted = "<p>" + description_text[0].replace("\n", "<br>") + "</p>"
         annons['originalJobPosting'] = {
             'identifier': original_job_post.get('identifier', ''),
             'title': original_job_post.get('title', ''),
