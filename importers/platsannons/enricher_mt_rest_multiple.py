@@ -70,7 +70,7 @@ def enrich(annonser, scraped=False, typeahead=True):
 
     enrich_results_data = execute_calls(batch_indatas, parallelism)
     log.info('Enriched %s/%s documents' % (len(enrich_results_data), len_annonser))
-
+    log.info('Typeahead terms will be not enriched!') if not typeahead else None
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
         if doc_id in enrich_results_data:
@@ -136,11 +136,10 @@ def execute_calls(batch_indatas, parallelism):
                     with counter.get_lock():
                         counter.value += 1
                         if counter.value % 1000 == 0:
-                            log.info("enrichtextdocuments - Processed %s docs"
-                                     % (str(counter.value)))
-            except Exception as exc:
-                log.error('Enrichment call generated an exception: %s' % (str(exc)))
-                raise exc
+                            log.info(f'enrichtextdocuments - Processed docs: {counter.value}')
+            except Exception as e:
+                log.error(f'Enrichment call generated an exception: {e}')
+                raise
 
     return enriched_output
 
@@ -150,10 +149,7 @@ def enrich_doc(annons, enriched_output, typeahead):
         annons['keywords'] = {}
 
     process_enriched_candidates(annons, enriched_output)
-    if typeahead:
-        process_enriched_candidates_typeahead_terms(annons, enriched_output)
-    else:
-        log.info('Typeahead terms are not enriched!')
+    process_enriched_candidates_typeahead_terms(annons, enriched_output) if typeahead else None
 
     return annons
 
