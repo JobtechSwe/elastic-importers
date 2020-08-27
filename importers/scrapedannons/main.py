@@ -25,7 +25,7 @@ def _setup_index(es_index):
             es_index,
             settings.ES_SCRAPED_ANNONS_PREFIX,
             settings.scrapedannons_mappings)
-        log.info(f'Starting importer with batch: {settings.PG_BATCH_SIZE} for index: {es_index}')
+        log.info(f'Starting importer with batch: {settings.PG_BATCH_SIZE} for index: {es_index[0]}')
     except Exception as e:
         log.error(f"Elastic operations failed. Exit! {e}")
         sys.exit(1)
