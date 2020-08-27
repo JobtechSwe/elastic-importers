@@ -14,18 +14,6 @@ ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX', os.getenv('ES_ANNONS', 'platsann
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 
 
-# For scraped platsannonser
-ES_SCRAPED_ANNONS_PREFIX = os.getenv('ES_SCRAPED_ANNONS_INDEX', os.getenv('ES_SCRAPED_ANNONS', 'scrapedannons'))
-ES_ONEPARTNERGROUP = os.getenv('ONE_PARTNER_GROUP')
-
-participants_ids = {
-    'onepartnergroup': '001',
-}
-
-participants_webs = {
-    'onepartnergroup': ES_ONEPARTNERGROUP,
-}
-
 # Parameter names corresponding to
 # narvaltextdocenrichments.textdocenrichments.NarvalEnricher
 ENRICHER_PARAM_DOC_ID = 'doc_id'
@@ -449,8 +437,8 @@ platsannons_mappings = {
     }
 }
 
-#scrapedannons
-SCRAPEDANNONS = os.getenv('SCRAPEDANNONS', 'false').lower() == 'true'
+## For scraped platsannonser
+ES_SCRAPED_ANNONS_PREFIX = os.getenv('ES_SCRAPED_ANNONS_INDEX', os.getenv('ES_SCRAPED_ANNONS', 'scrapedannons'))
 
 scrapedannons_mappings = {
     "settings": {
