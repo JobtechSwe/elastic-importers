@@ -37,8 +37,7 @@ def _grouper(n, iterable):
     return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
-def _convert_and_save_to_elastic(raw_ads, es_index):
-    log.info(f"Converting: {len(raw_ads)} ads to proper format ...")
+def _enrich_and_save_to_elastic(raw_ads, es_index):
     log.info("Enriching ads with ML ...")
     enriched_ads = enricher.enrich(raw_ads, scraped=True, typeahead=False)
     log.info(f"Indexing: {len(enriched_ads)} enriched documents into: {es_index}")
@@ -60,16 +59,16 @@ def bulk_fetch_ad_details(ad_batch, es_index):
             if ad_meta.get('id', ''):
                 detailed_result = convert_ad(ad_meta)
                 result_output.append(detailed_result)
-    _convert_and_save_to_elastic(result_output, es_index)
+    log.info(f"Converted: {len(result_output)} ads to proper format ...")
+    _enrich_and_save_to_elastic(result_output, es_index)
 
     return result_output
 
 
 def open_the_file(es_index):
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    # file_name = 'test_data.json'
-    file_name = 'ads_20200514_hash_sorted_100mb.json'
-    with open(dir_path + "/resources/" + file_name, 'r', encoding='utf-8') as data_file:
+    log.info(f"File to be loaded: {settings.SCRAPED_FILE}")
+    with open(dir_path + "/resources/" + settings.SCRAPED_FILE, 'r', encoding='utf-8') as data_file:
         data = json.load(data_file)
         ads = bulk_fetch_ad_details(data, es_index)
     return ads
