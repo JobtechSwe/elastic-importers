@@ -30,8 +30,7 @@ def enrich(annonser, scraped=False, typeahead=True):
         doc_id = str(annons.get('id', ''))
         doc_headline = get_doc_headline_input(annons)
         if scraped:
-            # doc_text = annons.get('originalJobPosting', {}).get('description', {}).get('text_formatted', '')
-            doc_text = annons.get('originalJobPosting', {}).get('description', {}).get('text', '')
+            doc_text = annons.get('originalJobPosting', {}).get('description', {}).get('text_formatted', '')
         else:
             doc_text = annons.get('description', {}).get('text_formatted', '')
 
