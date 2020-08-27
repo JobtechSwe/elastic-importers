@@ -18,7 +18,7 @@ RETRIES = 10
 
 def enrich(annonser, scraped=False):
     len_annonser = len(annonser)
-    parallelism = settings.ENRICHER_PROCESSES if len_annonser > 99 else 1
+    parallelism = settings.ENRICHER_PROCESSES if len_annonser > 100 else 1
     log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
 
     global counter

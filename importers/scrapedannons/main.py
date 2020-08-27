@@ -12,6 +12,9 @@ from jobtech.common.customlogging import configure_logging, os, json
 from importers.repository import elastic
 from importers.platsannons import enricher_mt_rest_multiple as enricher
 
+configure_logging([__name__.split('.')[0], 'importers'])
+log = logging.getLogger(__name__)
+
 
 def _setup_index(es_index):
     if len(sys.argv) > 1:
@@ -46,7 +49,7 @@ def _convert_and_save_to_elastic(raw_ads, es_index):
 
 def bulk_fetch_ad_details(ad_batch, es_index):
     len_ad_batch = len(ad_batch)
-    parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 99 else 1
+    parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 100 else 1
     log.info(f'Fetch ad details. Processes: {parallelism}, batch len: {len_ad_batch}')
 
     global counter
