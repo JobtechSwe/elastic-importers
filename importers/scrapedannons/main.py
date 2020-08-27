@@ -65,9 +65,8 @@ def bulk_fetch_ad_details(ad_batch, es_index):
 def open_the_file(es_index):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     file_name = 'test_data.json'
-    enc = 'utf-8'
-    with open(dir_path + "/resources/" + file_name, 'r', encoding=enc) as fil:
-        data = json.load(fil.read())
+    with open(dir_path + "/resources/" + file_name, 'r', encoding='utf-8') as data_file:
+        data = json.load(data_file)
         ads = bulk_fetch_ad_details(data, es_index)
     return ads
 
