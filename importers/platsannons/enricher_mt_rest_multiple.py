@@ -16,7 +16,7 @@ counter = None
 RETRIES = 10
 
 
-def enrich(annonser, scraped=False):
+def enrich(annonser, scraped=False, typeahead=True):
     len_annonser = len(annonser)
     parallelism = settings.ENRICHER_PROCESSES if len_annonser > 100 else 1
     log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
@@ -75,7 +75,7 @@ def enrich(annonser, scraped=False):
         doc_id = str(annons.get('id', ''))
         if doc_id in enrich_results_data:
             enriched_output = enrich_results_data[doc_id]
-            enrich_doc(annons, enriched_output)
+            enrich_doc(annons, enriched_output, typeahead)
 
     return annonser
 
@@ -145,12 +145,15 @@ def execute_calls(batch_indatas, parallelism):
     return enriched_output
 
 
-def enrich_doc(annons, enriched_output):
+def enrich_doc(annons, enriched_output, typeahead):
     if 'keywords' not in annons:
         annons['keywords'] = {}
 
     process_enriched_candidates(annons, enriched_output)
-    process_enriched_candidates_typeahead_terms(annons, enriched_output)
+    if typeahead:
+        process_enriched_candidates_typeahead_terms(annons, enriched_output)
+    else:
+        log.info('Typeahead terms are not enriched!')
 
     return annons
 
