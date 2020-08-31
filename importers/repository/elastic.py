@@ -36,6 +36,10 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'timestamp': document.get('timestamp'),
                     'publication_date': None,
                     'last_publication_date': None,
+                    'occupation': document.get('occupation'),
+                    'occupation_group': document.get('occupation_group'),
+                    'occupation_field': document.get('occupation_field'),
+                    'workplace_address': document.get('workplace_address')
                 }
                 yield {
                     '_index': indexname,
