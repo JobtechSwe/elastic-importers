@@ -6,6 +6,7 @@ from multiprocessing import Value
 
 import requests
 from importers import settings
+from importers.repository import elastic
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def bulk_fetch_ad_details(ad_batch):
     with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
         # Start the load operations
         future_to_fetch_result = {
-            executor.submit(load_details_from_la, ad_data): ad_data
+            executor.submit(load_ad_details, ad_data): ad_data
             for ad_data in ad_batch
         }
         for future in concurrent.futures.as_completed(future_to_fetch_result):
@@ -45,8 +46,7 @@ def bulk_fetch_ad_details(ad_batch):
 
     return result_output
 
-
-def load_details_from_la(ad_meta):
+def load_ad_details(ad_meta):
     fail_count = 0
     fail_max = settings.LA_ANNONS_MAX_TRY
     ad_id = ad_meta['annonsId']
@@ -54,6 +54,54 @@ def load_details_from_la(ad_meta):
         log.info(f"Ad is avpublicerad, preparing to remove it: {ad_id}")
         removed_date = ad_meta.get('avpubliceringsdatum') or \
                        time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(ad_meta.get('uppdateradTid') / 1000))
+
+        #LOCATION_LIST = ['region', 'city', 'country', 'municipality']
+        occupation = None
+        occupation_field = None
+        occupation_group = None
+        workplace_address = None
+        ad_from_elastic = elastic.get_ad_by_id(ad_id)
+        if ad_from_elastic is not None:
+            occupation = ad_from_elastic.get('occupation')
+            occupation_field = ad_from_elastic.get('occupation_field')
+            occupation_group = ad_from_elastic.get('occupation_group')
+            workplace_address = ad_from_elastic.get('workplace_address')
+
+        # ad_from_elastic = {
+        #     "occupation": {
+        #         "concept_id": "rM7G_ge7_XhP",
+        #         "label": "Barnskötare",
+        #         "legacy_ams_taxonomy_id": "5716"
+        #     },
+        #     "occupation_group": {
+        #         "concept_id": "Hi9c_iTe_gHH",
+        #         "label": "Barnskötare",
+        #         "legacy_ams_taxonomy_id": "5311"
+        #     },
+        #     "occupation_field": {
+        #         "concept_id": "GazW_2TU_kJw",
+        #         "label": "Socialt arbete",
+        #         "legacy_ams_taxonomy_id": "16"
+        #     },
+        #     "workplace_address" : {
+        #         "municipality_code" : "1280",
+        #         "municipality_concept_id" : "oYPt_yRA_Smm",
+        #         "municipality" : "Malmö",
+        #         "region_code" : "12",
+        #         "region_concept_id" : "CaRE_1nn_cSU",
+        #         "region" : "Skåne län",
+        #         "country_code" : "199",
+        #         "country_concept_id" : "i46j_HmG_v64",
+        #         "country" : "Sverige",
+        #         "street_address" : '',
+        #         "postcode" : '',
+        #         "city" : '',
+        #         "coordinates" : [
+        #             13.003822,
+        #             55.60498
+        #         ]
+        #     }
+        # }
 
         return {'annonsId': ad_id,
                 'id': ad_id,
@@ -63,7 +111,14 @@ def load_details_from_la(ad_meta):
                 'removed_date': removed_date,
                 'uppdateradTid': ad_meta.get('uppdateradTid'),
                 'updatedAt': ad_meta.get('uppdateradTid'),
-                'timestamp': ad_meta.get('uppdateradTid')}
+                'timestamp': ad_meta.get('uppdateradTid'),
+                'removed_ad_filter': {
+                'occupation': occupation,
+                'occupation_field': occupation_field,
+                'occupations_group': occupation_group,
+                'workplace_address': workplace_address}
+                }
+
     detail_url_la = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:
