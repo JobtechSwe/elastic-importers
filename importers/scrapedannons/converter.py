@@ -83,6 +83,8 @@ def convert_ad(ad_meta):
     original_job_post = ad_meta.get('originalJobPosting', '')
     if original_job_post:
         description_text = original_job_post.get('description', '')
+        if type(description_text) == list:
+            description_text = description_text[0]
         log.info(f"id: {annons['id']} Description: {description_text}")
         description_text_formatted = "<p>" + description_text.replace("\n", "<br>") + "</p>"
         annons['originalJobPosting'] = {
@@ -95,17 +97,6 @@ def convert_ad(ad_meta):
             'url': original_job_post.get('url', ''),
             'sameAs': original_job_post.get('sameAs', '')
         }
-        annons['originalJobPosting']['jobLocation'] = {}
-        if original_job_post.get('jobLocation', ''):
-            # not purity data
-            if type(original_job_post.get('jobLocation', '')) is dict:
-                annons['originalJobPosting']['jobLocation'] = {
-                    'address': original_job_post.get('jobLocation', '').get('address', '')
-                }
-            else:
-                annons['originalJobPosting']['jobLocation'] = {
-                    'address': original_job_post.get('jobLocation', '')[0].get('address', '')
-                }
     return annons
 
 
