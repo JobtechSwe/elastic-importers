@@ -29,23 +29,27 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
 
         if document.get('removed', False):
             if deleted_index:
-                if 'removed_ad_filter' in document:
-                    removed_ad_filter = document.get('removed_ad_filter')
-                    occupation = removed_ad_filter.get('occupation', None)
-                    occupation_group = removed_ad_filter.get('occupation_group', None)
-                    occupation_field = removed_ad_filter.get('occupation_field', None)
-                    workplace_address = removed_ad_filter.get('workplace_address', None)
+
                 tombstone = {
                     'id': doc_id,
                     'removed': True,
                     'removed_date': document.get('removed_date'),
                     'timestamp': document.get('timestamp'),
-                    'publication_date': None,
                     'last_publication_date': None,
-                    'occupation': occupation,
-                    'occupation_group': occupation_group,
-                    'occupation_field': occupation_field,
-                    'workplace_address': workplace_address
+                    'occupation': {
+                        'concept_id': document.get('removed_ad_filter', {}).get('occupation_concept_id')
+                    } ,
+                    'occupation_group': {
+                        'concept_id': document.get('removed_ad_filter', {}).get('occupation_group_concept_id')
+                    },
+                    'occupation_field': {
+                        'concept_id': document.get('removed_ad_filter', {}).get('occupation_field_concept_id')
+                    },
+                    'workplace_address': {
+                        'municipality_concept_id': document.get('removed_ad_filter', {}).get('municipality_concept_id'),
+                        'region_concept_id': document.get('removed_ad_filter', {}).get('region_concept_id'),
+                        'country_concept_id': document.get('removed_ad_filter', {}).get('country_concept_id')
+                    }
                 }
                 yield {
                     '_index': indexname,

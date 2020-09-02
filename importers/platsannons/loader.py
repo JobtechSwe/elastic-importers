@@ -49,59 +49,35 @@ def bulk_fetch_ad_details(ad_batch):
 def load_ad_details(ad_meta):
     fail_count = 0
     fail_max = settings.LA_ANNONS_MAX_TRY
+    # TODO Refactor remove ad part to function
     ad_id = ad_meta['annonsId']
     if ad_meta.get('avpublicerad', False):
         log.info(f"Ad is avpublicerad, preparing to remove it: {ad_id}")
         removed_date = ad_meta.get('avpubliceringsdatum') or \
                        time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(ad_meta.get('uppdateradTid') / 1000))
 
-        #LOCATION_LIST = ['region', 'city', 'country', 'municipality']
-        occupation = None
-        occupation_field = None
-        occupation_group = None
-        workplace_address = None
+        occupation_concept_id = None
+        occupation_group_concept_id = None
+        occupation_field_concept_id = None
+        municipality_concept_id = None
+        region_concept_id = None
+        country_concept_id = None
         ad_from_elastic = elastic.get_ad_by_id(ad_id)
         if ad_from_elastic is not None:
             occupation = ad_from_elastic.get('occupation')
+            if occupation is not None:
+                occupation_concept_id = occupation.get('concept_id')
             occupation_field = ad_from_elastic.get('occupation_field')
+            if occupation_field is not None:
+                occupation_field_concept_id = occupation_field.get('concept_id')
             occupation_group = ad_from_elastic.get('occupation_group')
+            if occupation_group is not None:
+                occupation_group_concept_id = occupation_group.get('concept_id')
             workplace_address = ad_from_elastic.get('workplace_address')
-
-        # ad_from_elastic = {
-        #     "occupation": {
-        #         "concept_id": "rM7G_ge7_XhP",
-        #         "label": "Barnskötare",
-        #         "legacy_ams_taxonomy_id": "5716"
-        #     },
-        #     "occupation_group": {
-        #         "concept_id": "Hi9c_iTe_gHH",
-        #         "label": "Barnskötare",
-        #         "legacy_ams_taxonomy_id": "5311"
-        #     },
-        #     "occupation_field": {
-        #         "concept_id": "GazW_2TU_kJw",
-        #         "label": "Socialt arbete",
-        #         "legacy_ams_taxonomy_id": "16"
-        #     },
-        #     "workplace_address" : {
-        #         "municipality_code" : "1280",
-        #         "municipality_concept_id" : "oYPt_yRA_Smm",
-        #         "municipality" : "Malmö",
-        #         "region_code" : "12",
-        #         "region_concept_id" : "CaRE_1nn_cSU",
-        #         "region" : "Skåne län",
-        #         "country_code" : "199",
-        #         "country_concept_id" : "i46j_HmG_v64",
-        #         "country" : "Sverige",
-        #         "street_address" : '',
-        #         "postcode" : '',
-        #         "city" : '',
-        #         "coordinates" : [
-        #             13.003822,
-        #             55.60498
-        #         ]
-        #     }
-        # }
+            if workplace_address is not None:
+                municipality_concept_id = workplace_address.get('municipality_concept_id')
+                region_concept_id = workplace_address.get('region_concept_id')
+                country_concept_id = workplace_address.get('country_concept_id')
 
         return {'annonsId': ad_id,
                 'id': ad_id,
@@ -113,10 +89,12 @@ def load_ad_details(ad_meta):
                 'updatedAt': ad_meta.get('uppdateradTid'),
                 'timestamp': ad_meta.get('uppdateradTid'),
                 'removed_ad_filter': {
-                'occupation': occupation,
-                'occupation_field': occupation_field,
-                'occupations_group': occupation_group,
-                'workplace_address': workplace_address}
+                'occupation_concept_id': occupation_concept_id,
+                'occupation_field_concept_id': occupation_field_concept_id,
+                'occupation_group_concept_id': occupation_group_concept_id,
+                'municipality_concept_id': municipality_concept_id,
+                'region_concept_id': region_concept_id,
+                'country_concept_id': country_concept_id }
                 }
 
     detail_url_la = settings.LA_DETAILS_URL + str(ad_id)
