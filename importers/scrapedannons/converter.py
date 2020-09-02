@@ -13,21 +13,24 @@ def use_location_info_get_all_workplace_address_info_from_taxonomy(location):
     country = None
     country_concept_id = None
 
+    if value and value.get('type') == 'place':
+        value = value.get('parent', {})
+
     if value and value.get('type') == 'municipality':
         municipality = value.get('label')
         municipality_concept_id = value.get('concept_id')
-        value_parent = value.get('parent', '')
+        value_parent = value.get('parent', {})
         if value_parent:
             region = value_parent.get('label')
             region_concept_id = value_parent.get('concept_id')
-            value_grandmom = value_parent.get('parent', '')
+            value_grandmom = value_parent.get('parent', {})
             if value_grandmom:
                 country = value_grandmom.get('label')
                 country_concept_id = value_grandmom.get('concept_id')
     elif value and value.get('type') == 'region':
         region = value.get('label')
         region_concept_id = value.get('concept_id')
-        value_parent = value.get('parent', '')
+        value_parent = value.get('parent', {})
         if value_parent:
             country = value_parent.get('label')
             country_concept_id = value_parent.get('concept_id')
