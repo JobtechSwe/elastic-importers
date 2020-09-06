@@ -669,26 +669,6 @@ scrapedannons_mappings = {
                                         "type": "completion"
                                     }
                                 }
-                            },
-                            "compound": {
-                                "type": "text",
-                                "fields": {
-                                    "raw": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
-                                    },
-                                    "trigram": {
-                                        "type": "text",
-                                        "analyzer": "trigram"
-                                    },
-                                    "reverse": {
-                                        "type": "text",
-                                        "analyzer": "reverse"
-                                    },
-                                }
                             }
                         }
                     },
@@ -742,27 +722,7 @@ scrapedannons_mappings = {
                                         "type": "completion"
                                     }
                                 }
-                            },
-                            "compound": {
-                                "type": "text",
-                                "fields": {
-                                    "raw": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
-                                    },
-                                    "trigram": {
-                                        "type": "text",
-                                        "analyzer": "trigram"
-                                    },
-                                    "reverse": {
-                                        "type": "text",
-                                        "analyzer": "reverse"
-                                    },
-                                }
-                            },
+                            }
                         }
                     },
                     "extracted": {
