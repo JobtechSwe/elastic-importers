@@ -568,49 +568,6 @@ scrapedannons_mappings = {
                             }
                         }
                     },
-                    "employmentType": {
-                        "type": "text",
-                    },
-                    "relevantOccupation": {
-                        "type": "text",
-                    },
-                    "occupationalCategory": {
-                        "type": "text"
-                    },
-                    "jobLocation": {
-                        "type": "object",
-                        "properties": {
-                            "address": {
-                                "type": "text",
-                            },
-                        }
-                    },
-                    "hiringOrganization": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "text",
-                            },
-                            "address": {
-                                "type": "text",
-                            },
-                            "description": {
-                                "type": "text"
-                            }
-                        }
-                    },
-                    "educationRequirements": {
-                        "type": "text"
-                    },
-                    "skills": {
-                        "type": "text"
-                    },
-                    "datePosted": {
-                        "type": "date"
-                    },
-                    "validThrough": {
-                        "type": "date"
-                    },
                     "url": {
                         "type": "keyword"
                     }
