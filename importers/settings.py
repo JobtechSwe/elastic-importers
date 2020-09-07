@@ -628,9 +628,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             },
@@ -640,9 +637,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             },
@@ -652,9 +646,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             },
@@ -664,9 +655,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             }
@@ -681,9 +669,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             },
@@ -693,9 +678,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             },
@@ -705,9 +687,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             },
@@ -717,9 +696,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             }
@@ -761,9 +737,6 @@ scrapedannons_mappings = {
                                     "raw": {
                                         "type": "keyword",
                                         "ignore_above": 256
-                                    },
-                                    "suggest": {
-                                        "type": "completion"
                                     }
                                 }
                             }
