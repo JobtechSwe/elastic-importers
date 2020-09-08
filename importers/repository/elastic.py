@@ -29,13 +29,27 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
 
         if document.get('removed', False):
             if deleted_index:
+
                 tombstone = {
                     'id': doc_id,
                     'removed': True,
                     'removed_date': document.get('removed_date'),
                     'timestamp': document.get('timestamp'),
-                    'publication_date': None,
                     'last_publication_date': None,
+                    'occupation': {
+                        'concept_id': document.get('removed_ad_filter', {}).get('occupation_concept_id')
+                    } ,
+                    'occupation_group': {
+                        'concept_id': document.get('removed_ad_filter', {}).get('occupation_group_concept_id')
+                    },
+                    'occupation_field': {
+                        'concept_id': document.get('removed_ad_filter', {}).get('occupation_field_concept_id')
+                    },
+                    'workplace_address': {
+                        'municipality_concept_id': document.get('removed_ad_filter', {}).get('municipality_concept_id'),
+                        'region_concept_id': document.get('removed_ad_filter', {}).get('region_concept_id'),
+                        'country_concept_id': document.get('removed_ad_filter', {}).get('country_concept_id')
+                    }
                 }
                 yield {
                     '_index': indexname,
@@ -86,6 +100,24 @@ def get_last_timestamp(indexname):
         last_timestamp = 0
     return last_timestamp
 
+def get_ad_by_id(id, indexname=settings.ES_ANNONS_INDEX):
+    response = es.search(index=indexname,
+                         body={
+                             "query": {
+                                 "bool": {
+                                     "must": [{
+                                         "term": {
+                                             "id": id
+                                         }
+                                     }]
+                                 }
+                             }
+                         })
+    hits = response['hits']['hits']
+    ad = None
+    if hits:
+        ad = hits[0]['_source']
+    return ad
 
 def get_ids_with_timestamp(ts, indexname):
     # Possible failure if there are more than "size" documents with the same timestamp

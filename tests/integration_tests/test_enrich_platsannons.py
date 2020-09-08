@@ -1,7 +1,7 @@
 import os
 import sys
 import pytest
-from importers.platsannons.loader import load_details_from_la
+from importers.platsannons.loader import load_ad_details
 from importers.platsannons import converter, enricher_mt_rest_multiple as enricher
 
 
@@ -14,7 +14,7 @@ def test_get_and_enrich_ad_details():
     annons_id = 23888740
     ad_meta = {'annonsId': annons_id, 'avpublicerad': False, 'uppdateradTid': 1582272745821}
 
-    ad_detail = load_details_from_la(ad_meta=ad_meta)
+    ad_detail = load_ad_details(ad_meta=ad_meta)
     ad_details = {}
     ad_details[annons_id] = ad_detail
     converted_ads = [converter.convert_ad(ad) for ad in ad_details.values()]
