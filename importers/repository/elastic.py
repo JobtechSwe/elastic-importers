@@ -36,6 +36,7 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'removed_date': document.get('removed_date'),
                     'timestamp': document.get('timestamp'),
                     'last_publication_date': None,
+                    'publication_date': None,
                     'occupation': {
                         'concept_id': document.get('removed_ad_filter', {}).get('occupation_concept_id')
                     } ,
