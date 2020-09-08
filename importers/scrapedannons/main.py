@@ -80,7 +80,6 @@ def start(es_index=None):
     log.info("Starting ad import into index")
     ad_ids = open_the_file(es_index)
     number_total = len(ad_ids)
-
     elapsed_time = time.time() - start_time
     m, s = divmod(elapsed_time, 60)
     log.info("Processed %d docs in: %d minutes %5.2f seconds." % (number_total, m, s))

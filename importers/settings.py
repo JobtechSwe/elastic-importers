@@ -514,12 +514,6 @@ scrapedannons_mappings = {
             "id": {
                 "type": "keyword",
             },
-            "yrke": {
-                "type": "text",
-            },
-            "ort": {
-                "type": "text",
-            },
             "hashsum": {
                 "type": "text",
             },
@@ -545,27 +539,6 @@ scrapedannons_mappings = {
                                 "analyzer": "wildcard_suffix",
                                 "search_analyzer": "simple_word_splitter"
                             },
-                        }
-                    },
-                    "description": {
-                        "type": "object",
-                        "properties": {
-                            "text": {
-                                "type": "text",
-                                "analyzer": "simple_word_splitter",
-                                "fields": {
-                                    "prefix": {
-                                        "type": "text",
-                                        "analyzer": "wildcard_prefix",
-                                        "search_analyzer": "simple_word_splitter"
-                                    },
-                                    "suffix": {
-                                        "type": "text",
-                                        "analyzer": "wildcard_suffix",
-                                        "search_analyzer": "simple_word_splitter"
-                                    },
-                                }
-                            }
                         }
                     },
                     "url": {
