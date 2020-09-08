@@ -41,6 +41,9 @@ def _enrich_and_save_to_elastic(raw_ads, es_index):
     log.info("Enriching ads with ML ...")
     enriched_ads = enricher.enrich(raw_ads, scraped=True, typeahead=False)
     log.info(f"Indexing: {len(enriched_ads)} enriched documents into: {es_index}")
+    # Delete enriched ads description part
+    for enriched_ad in enriched_ads:
+        del enriched_ad['originalJobPosting']['description']
     # Bulk save cooked-list to elastic
     num_indexed = elastic.bulk_index(enriched_ads, es_index)
     return num_indexed
