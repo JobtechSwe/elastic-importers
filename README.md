@@ -29,7 +29,7 @@ The application is entirely configured using environment variables.
 | LA_BOOTSTRAP_FEED_URL | http://localhost:5000/sokningar/publiceradeannonser| REST feed API for all currently available job ads | import-platsannonser-daily |
 | LA_DETAILS_URL | http://localhost:5000/annonser/ | REST feed API job ad details (i.e. the entire job ad) | import-platsannonser, import-platsannonser-daily |
 | LA_DETAILS_PARALLELISM | 8 | Limits how many simultaneous threads are run for loading ad details | import-platsannonser, import-platsannonser-daily |
-| URL_ENRICH_TEXTDOCS_SERVICE | https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments | Endpoint for ML enrichment of job ads |import-platsannonser, import-platsannonser-daily|
+| URL_ENRICH_TEXTDOCS_SERVICE | https://jobad-enrichments-internal-test-api.jobtechdev.se/enrichtextdocuments | Endpoint for ML enrichment of job ads |import-platsannonser, import-platsannonser-daily|
 | API_KEY_ENRICH_TEXTDOCS | | API key to use for enrichment | import-platsannonser, import-platsannonser-daily |
 | COMPANY_LOGO_BASE_URL | https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/ | Endpoint to check for available company logo associated with job ad | import-platsannonser, import-platsannonser-daily|
 
@@ -61,6 +61,10 @@ This script is typically run every few minutes by cron.
 Creates a new index for platsannonser according to the configured ```ES_ANNONS_INDEX``` environment variable, with todays date and hour as a suffix, and starts a full load into that index.
 After successfull import, new "-read" and "-write" aliases are pointed to the new index.
 This is run every night to create a fresh index and make sure no ads are missed by ```import-platsannonser```.
+
+### import-scrapedannonser
+Imports scraped ads from a file defined in the environment variable 'SCRAPED_FILE' default value is 'test_data.json' (scrapedannons\resources)
+
 
 ## Test
 
