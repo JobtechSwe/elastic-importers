@@ -1,5 +1,6 @@
 import concurrent.futures
 import itertools
+import math
 import sys
 import time
 import logging
@@ -49,23 +50,28 @@ def _enrich_and_save_to_elastic(raw_ads, es_index):
     return num_indexed
 
 
-def bulk_fetch_ad_details(ad_batch, es_index):
-    len_ad_batch = len(ad_batch)
+def bulk_fetch_ad_details(ad_ids, es_index):
+    len_ad_batch = len(ad_ids)
     parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 100 else 1
     log.info(f'Fetch ad details. Processes: {parallelism}, batch len: {len_ad_batch}')
+    len_ads = len(ad_ids)
+    nr_of_items_per_batch = min(500, len_ads)
+    if nr_of_items_per_batch < 1:
+        log.error("Failed to retrieve any ads. Exit!")
+        sys.exit(1)
 
-    global counter
-    counter = Value('i', 0)
-    result_output = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
-        for ad_meta in ad_batch:
-            if ad_meta.get('id', ''):
-                detailed_result = convert_ad(ad_meta)
+    ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
+
+    for i, ad_batch in enumerate(ad_batches):
+        result_output = []
+        for ad in ad_batch:
+            if ad.get('id', ''):
+                detailed_result = convert_ad(ad)
                 result_output.append(detailed_result)
-    log.info(f"Converted: {len(result_output)} ads to proper format ...")
-    _enrich_and_save_to_elastic(result_output, es_index)
+        log.info(f"Converted: {len(result_output)} ads to proper format ...")
+        _enrich_and_save_to_elastic(result_output, es_index)
 
-    return result_output
+    return len_ads
 
 
 def open_the_file(es_index):

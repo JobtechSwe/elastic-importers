@@ -1,4 +1,4 @@
-from importers.repository.taxonomy import get_info_by_label_name_and_type, get_info_by_name
+from importers.repository.taxonomy import get_info_by_label_name_and_type, get_info_by_name, get_concept_by_legacy_id
 import logging
 
 log = logging.getLogger(__name__)
@@ -53,34 +53,19 @@ def convert_ad(ad_meta):
     annons['id'] = str(ad_meta.get('id', ''))
     location = ad_meta.get('ort', '')
     annons['workplace_address'] = use_location_info_get_all_workplace_address_info_from_taxonomy(location)
-    occupation_info = get_info_by_label_name_and_type(ad_meta.get('yrke', ''), 'occupation-name')
-    occupation = None
-    occupation_concept_id = None
+    occupation_info = get_concept_by_legacy_id('group', ad_meta.get('ssyk', ''))
     occupation_group = None
     occupation_group_concept_id = None
-    occupation_field = None
-    occupation_field_concept_id = None
 
     if occupation_info:
-        occupation = occupation_info.get('label', '')
-        occupation_concept_id = occupation_info.get('concept_id', '')
-        occupation_group = occupation_info.get('parent', '').get('label', '')
-        occupation_group_concept_id = occupation_info.get('parent', '').get('concept_id', '')
-        occupation_field = occupation_info.get('parent', '').get('parent', '').get('label', '')
-        occupation_field_concept_id = occupation_info.get('parent', '').get('parent', '').get('concept_id', '')
+        occupation_group = occupation_info.get('label', '')
+        occupation_group_concept_id = occupation_info.get('concept_id', '')
 
-    annons['occupation'] = {
-        'label': occupation,
-        'concept_id': occupation_concept_id
-    }
     annons['occupation_group'] = {
         'label': occupation_group,
         'concept_id': occupation_group_concept_id
     }
-    annons['occupation_field'] = {
-        'label': occupation_field,
-        'concept_id': occupation_field_concept_id
-    }
+
     annons['hashsum'] = ad_meta.get('hashsum', '')
     annons['originalJobPosting'] = {}
     original_job_post = ad_meta.get('originalJobPosting', '')

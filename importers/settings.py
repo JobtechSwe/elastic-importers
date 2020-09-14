@@ -440,7 +440,7 @@ platsannons_mappings = {
 ## For scraped platsannonser
 ES_SCRAPED_ANNONS_PREFIX = os.getenv('ES_SCRAPED_ANNONS_INDEX', os.getenv('ES_SCRAPED_ANNONS', 'scrapedannons'))
 # ads_20200514_hash_sorted_100mb.json
-SCRAPED_FILE = os.getenv('SCRAPED_FILE', 'test_data.json')
+SCRAPED_FILE = os.getenv('SCRAPED_FILE', 'test_data_new.json')
 
 scrapedannons_mappings = {
     "settings": {
