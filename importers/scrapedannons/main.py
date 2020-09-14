@@ -77,8 +77,11 @@ def bulk_fetch_ad_details(ad_ids, es_index):
 def open_the_file(es_index):
     dir_path = os.path.dirname(os.path.realpath(__file__))
     log.info(f"File to be loaded: {settings.SCRAPED_FILE}")
+
+    data = []
     with open(dir_path + "/resources/" + settings.SCRAPED_FILE, 'r', encoding='utf-8') as data_file:
-        data = json.load(data_file)
+        for item in data_file.readlines():
+            data.append(json.loads(item))
         ads = bulk_fetch_ad_details(data, es_index)
     return ads
 
