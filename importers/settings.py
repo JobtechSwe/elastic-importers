@@ -64,21 +64,11 @@ platsannons_deleted_mappings = {
             },
             "workplace_address": {
                 "properties": {
-                    "municipality_code": {
-                        "type": "keyword",
-                    },
                     "municipality_concept_id": {
-                        "type": "keyword",
-                    },
-                    "region_code": {
                         "type": "keyword",
                     },
                     "region_concept_id": {
                         "type": "keyword",
-                    },
-                    "country_code": {
-                        "type": "keyword",
-                        "null_value": "199"
                     },
                     "country_concept_id": {
                         "type": "keyword",
