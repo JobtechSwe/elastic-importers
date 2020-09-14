@@ -46,6 +46,7 @@ def bulk_fetch_ad_details(ad_batch):
 
     return result_output
 
+
 def load_ad_to_remove(unpublished_ad_meta):
     # Populate an unpublished ad with details
     ad_id = unpublished_ad_meta['annonsId']
@@ -93,6 +94,7 @@ def load_ad_to_remove(unpublished_ad_meta):
                 'region_concept_id': region_concept_id,
                 'country_concept_id': country_concept_id }
             }
+
 
 def load_ad_details(ad_meta):
     fail_count = 0
@@ -156,8 +158,8 @@ def _clean_sensitive_data(ad, detail_url):
 
 def load_list_of_updated_ads(timestamp=0):
     items = []
-    feed_url = settings.LA_BOOTSTRAP_FEED_URL \
-        if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)
+    feed_url = settings.LA_BOOTSTRAP_FEED_URL
+        #if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)
     log.info(f"Loading updates from endpoint: {feed_url}")
     try:
         r = requests.get(feed_url, timeout=60)
