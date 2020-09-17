@@ -50,7 +50,7 @@ def use_location_info_get_all_workplace_address_info_from_taxonomy(location):
 
 def convert_ad(ad_meta):
     annons = dict()
-    annons['id'] = str(ad_meta.get('id', ''))
+    annons['id'] = ad_meta.get('id', '')
     location = ad_meta.get('ort', '')
     annons['workplace_address'] = use_location_info_get_all_workplace_address_info_from_taxonomy(location)
     occupation_info = get_concept_by_legacy_id('group', ad_meta.get('ssyk', ''))
