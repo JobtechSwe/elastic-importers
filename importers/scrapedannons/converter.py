@@ -56,14 +56,25 @@ def convert_ad(ad_meta):
     occupation_info = get_concept_by_legacy_id('group', ad_meta.get('ssyk', ''))
     occupation_group = None
     occupation_group_concept_id = None
+    occupation_field = None
+    occupation_field_concept_id = None
 
     if occupation_info:
         occupation_group = occupation_info.get('label', '')
         occupation_group_concept_id = occupation_info.get('concept_id', '')
+        occupation_field_info = occupation_info.get('parent', {})
+        if occupation_field_info:
+            occupation_field = occupation_field_info.get('label', '')
+            occupation_field_concept_id = occupation_field_info.get('concept_id', '')
 
     annons['occupation_group'] = {
         'label': occupation_group,
         'concept_id': occupation_group_concept_id
+    }
+
+    annons['occupation_field'] = {
+        'label': occupation_field,
+        'concept_id': occupation_field_concept_id
     }
 
     annons['hashsum'] = ad_meta.get('hashsum', '')
