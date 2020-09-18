@@ -82,6 +82,10 @@ def convert_ad(ad_meta):
     original_job_post = ad_meta.get('originalJobPosting', '')
     if original_job_post:
         description_text = original_job_post.get('description', '')
+        description_text_list = description_text.split('.')
+        brief_text = ''
+        if description_text_list:
+            brief_text = '.'.join(description_text_list[:2]) + '.'
         if type(description_text) == list:
             description_text = description_text[0]
         log.info(f"id: {annons['id']} Description: {description_text}")
@@ -89,6 +93,7 @@ def convert_ad(ad_meta):
         annons['originalJobPosting'] = {
             'identifier': original_job_post.get('identifier', ''),
             'title': original_job_post.get('title', ''),
+            'brief': brief_text,
             'description': {
                 'text': description_text,
                 'text_formatted': description_text_formatted
