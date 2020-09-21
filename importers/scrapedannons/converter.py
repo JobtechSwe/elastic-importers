@@ -86,9 +86,10 @@ def convert_ad(ad_meta):
         brief_text = ''
         if description_text_list:
             brief_text = '.'.join(description_text_list[:2]) + '.'
+            log.debug(f"Set brief for id: {annons['id']} brief: {brief_text}")
         if type(description_text) == list:
             description_text = description_text[0]
-        log.info(f"id: {annons['id']} Description: {description_text}")
+            log.debug(f"Desc is a list for id: {annons['id']} Set desc as: {description_text}")
         description_text_formatted = "<p>" + description_text.replace("\n", "<br>") + "</p>"
         annons['originalJobPosting'] = {
             'identifier': original_job_post.get('identifier', ''),

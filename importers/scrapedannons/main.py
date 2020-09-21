@@ -52,8 +52,7 @@ def _enrich_and_save_to_elastic(raw_ads, es_index):
 
 def bulk_fetch_ad_details(ad_ids, es_index):
     len_ad_batch = len(ad_ids)
-    parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 100 else 1
-    log.info(f'Fetch ad details. Processes: {parallelism}, batch len: {len_ad_batch}')
+    log.info(f'Fetch ad details, batch len: {len_ad_batch}')
     len_ads = len(ad_ids)
     nr_of_items_per_batch = min(500, len_ads)
     if nr_of_items_per_batch < 1:
