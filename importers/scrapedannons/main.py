@@ -50,23 +50,24 @@ def _enrich_and_save_to_elastic(raw_ads, es_index):
     return num_indexed
 
 
-def bulk_fetch_ad_details(ad_ids, es_index):
-    len_ad_batch = len(ad_ids)
-    log.info(f'Fetch ad details, batch len: {len_ad_batch}')
-    len_ads = len(ad_ids)
+def convert_all_ads(ads, es_index):
+    len_ad_batch = len(ads)
+    parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 100 else 1
+    log.info(f'Fetch ad details. Processes: {parallelism}, batch len: {len_ad_batch}')
+    len_ads = len(ads)
     nr_of_items_per_batch = min(500, len_ads)
     if nr_of_items_per_batch < 1:
         log.error("Failed to retrieve any ads. Exit!")
         sys.exit(1)
 
-    ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
+    ad_batches = _grouper(nr_of_items_per_batch, ads)
 
     for i, ad_batch in enumerate(ad_batches):
         result_output = []
         for ad in ad_batch:
             if ad.get('id', ''):
-                detailed_result = convert_ad(ad)
-                result_output.append(detailed_result)
+                convert_result = convert_ad(ad)
+                result_output.append(convert_result)
         log.info(f"Converted: {len(result_output)} ads to proper format ...")
         _enrich_and_save_to_elastic(result_output, es_index)
 
@@ -81,7 +82,7 @@ def open_the_file(es_index):
     with open(dir_path + "/resources/" + settings.SCRAPED_FILE, 'r', encoding='utf-8') as data_file:
         for item in data_file.readlines():
             data.append(json.loads(item))
-        ads = bulk_fetch_ad_details(data, es_index)
+        ads = convert_all_ads(data, es_index)
     return ads
 
 
