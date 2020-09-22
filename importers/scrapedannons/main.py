@@ -51,10 +51,8 @@ def _enrich_and_save_to_elastic(raw_ads, es_index):
 
 
 def convert_all_ads(ads, es_index):
-    len_ad_batch = len(ads)
-    parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 100 else 1
-    log.info(f'Fetch ad details. Processes: {parallelism}, batch len: {len_ad_batch}')
     len_ads = len(ads)
+    log.info(f'Converting ad details with len: {len_ads}')
     nr_of_items_per_batch = min(500, len_ads)
     if nr_of_items_per_batch < 1:
         log.error("Failed to retrieve any ads. Exit!")
@@ -62,7 +60,7 @@ def convert_all_ads(ads, es_index):
 
     ad_batches = _grouper(nr_of_items_per_batch, ads)
 
-    for i, ad_batch in enumerate(ad_batches):
+    for ad_batch in enumerate(ad_batches):
         result_output = []
         for ad in ad_batch:
             if ad.get('id', ''):
