@@ -13,6 +13,7 @@ STREAM_INDEX_SUFFIX = '-stream'
 ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX', os.getenv('ES_ANNONS', 'platsannons'))
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 
+
 # Parameter names corresponding to
 # narvaltextdocenrichments.textdocenrichments.NarvalEnricher
 ENRICHER_PARAM_DOC_ID = 'doc_id'
@@ -29,7 +30,7 @@ LA_DETAILS_URL = os.getenv('LA_DETAILS_URL')
 LA_DETAILS_PARALLELISM = int(os.getenv('LA_DETAILS_PARALLELISM', 8))
 LA_ANNONS_MAX_TRY = int(os.getenv('LA_ANNONS_MAX_TRY', 10))
 LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
-LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', None)
+LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', 'false').lower() == 'true'
 LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 # trigger to use ad format with v2 (concept_id)
 LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', 'false').lower() == 'true'
@@ -60,6 +61,20 @@ platsannons_deleted_mappings = {
             "last_publication_date": {
                 "type": "date",
                 "null_value": "2100-12-31"
+            },
+            "workplace_address": {
+                "properties": {
+                    "municipality_concept_id": {
+                        "type": "keyword",
+                    },
+                    "region_concept_id": {
+                        "type": "keyword",
+                    },
+                    "country_concept_id": {
+                        "type": "keyword",
+                        "null_value": "i46j_HmG_v64"
+                    }
+                }
             },
         }
     }
@@ -432,6 +447,247 @@ platsannons_mappings = {
                     }
                 }
             }
+        }
+    }
+}
+
+## For scraped platsannonser
+ES_SCRAPED_ANNONS_PREFIX = os.getenv('ES_SCRAPED_ANNONS_INDEX', os.getenv('ES_SCRAPED_ANNONS', 'scrapedannons'))
+# ads_20200514_hash_sorted_100mb.json
+SCRAPED_FILE = os.getenv('SCRAPED_FILE', 'test_data_new.json')
+
+scrapedannons_mappings = {
+    "settings": {
+        "analysis": {
+            "analyzer": {
+                "simple_word_splitter": {
+                    "type": "custom",
+                    "tokenizer": "whitespace",
+                    "filter": ["lowercase"],
+                    "char_filter": ["punctuation_filter"]
+                },
+                "wildcard_prefix": {
+                    "type": "custom",
+                    "tokenizer": "whitespace",
+                    "filter": ["lowercase", "edgengram_filter"],
+                    "char_filter": ["punctuation_filter"]
+                },
+                "wildcard_suffix": {
+                    "type": "custom",
+                    "tokenizer": "whitespace",
+                    "filter": ["lowercase", "reverse", "edgengram_filter", "reverse"],
+                    "char_filter": ["punctuation_filter"]
+                },
+                "trigram": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["lowercase", "shingle", "swedish_stop", "swedish_keywords"]
+                },
+                "reverse": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": ["lowercase", "reverse", "swedish_stop", "swedish_keywords"]
+                }
+            },
+            "filter": {
+                "edgengram_filter": {
+                    "type": "edge_ngram",
+                    "min_gram": 3,
+                    "max_gram": 30
+                },
+                "shingle": {
+                    "type": "shingle",
+                    "min_shingle_size": 2,
+                    "max_shingle_size": 3
+                },
+                "swedish_stop": {
+                    "type": "stop",
+                    "stopwords": "_swedish_"
+                },
+                "swedish_keywords": {
+                    "type": "keyword_marker",
+                    "keywords": ["exempel"]
+                }
+            },
+            "char_filter": {
+                "punctuation_filter": {
+                    "type": "mapping",
+                    "mappings": [
+                        ". => ",
+                        ", => \\u0020",
+                        "\\u00A0 => \\u0020",
+                        ": => ",
+                        "! => "
+                    ]
+                }
+            }
+        }
+    },
+    "mappings": {
+        "properties": {
+            "id": {
+                "type": "keyword",
+            },
+            "hashsum": {
+                "type": "text",
+            },
+            "originalJobPosting": {
+                "properties": {
+                    "identifier": {
+                        "type": "keyword"
+                    },
+                    "title": {
+                        "type": "text",
+                        "fields": {
+                            "words": {
+                                "type": "text",
+                                "analyzer": "simple_word_splitter"
+                            },
+                            "prefix": {
+                                "type": "text",
+                                "analyzer": "wildcard_prefix",
+                                "search_analyzer": "simple_word_splitter"
+                            },
+                            "suffix": {
+                                "type": "text",
+                                "analyzer": "wildcard_suffix",
+                                "search_analyzer": "simple_word_splitter"
+                            },
+                        }
+                    },
+                    "url": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "keywords": {
+                "type": "object",
+                "properties": {
+                    "enriched": {
+                        "type": "object",
+                        "properties": {
+                            "occupation": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "skill": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "trait": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "location": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "enriched_typeahead_terms": {
+                        "type": "object",
+                        "properties": {
+                            "occupation": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "skill": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "trait": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "location": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "extracted": {
+                        "type": "object",
+                        "properties": {
+                            "occupation": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "skill": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "location": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            },
+                            "employer": {
+                                "type": "text",
+                                "fields": {
+                                    "raw": {
+                                        "type": "keyword",
+                                        "ignore_above": 256
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
         }
     }
 }

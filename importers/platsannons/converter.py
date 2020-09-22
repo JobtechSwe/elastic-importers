@@ -31,6 +31,9 @@ def _isodate(bad_date):
 def convert_ad(message):
     annons = dict()
     start_time = int(time.time() * 1000)
+    if 'removed_ad_filter' in message:
+        annons['removed_ad_filter'] = message.get('removed_ad_filter')
+
     annons['id'] = message.get('annonsId')
     annons['external_id'] = message.get('externtAnnonsId')
     annons['headline'] = message.get('annonsrubrik')

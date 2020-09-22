@@ -16,9 +16,9 @@ counter = None
 RETRIES = 10
 
 
-def enrich(annonser):
+def enrich(annonser, scraped=False, typeahead=True):
     len_annonser = len(annonser)
-    parallelism = settings.ENRICHER_PROCESSES if len_annonser > 99 else 1
+    parallelism = settings.ENRICHER_PROCESSES if len_annonser > 100 else 1
     log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
 
     global counter
@@ -29,13 +29,17 @@ def enrich(annonser):
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
         doc_headline = get_doc_headline_input(annons)
-        doc_text = annons.get('description', {}).get('text_formatted', '')
+        if scraped:
+            doc_text = annons.get('originalJobPosting', {}).get('description', {}).get('text_formatted', '')
+        else:
+            doc_text = annons.get('description', {}).get('text_formatted', '')
+
         if not doc_text:
-            log.debug("No enrich - empty description for id: %s, moving on to the next one." % doc_id)
+            log.debug(f"No enrich - empty description for id: {doc_id}, moving on to the next one.")
             continue
         if doc_id == '':
-            log.error("Value error - no id, headline: %s" % str(doc_headline))
-            raise ValueError('Document has no id, enrichment is not possible, headline: ' % doc_headline)
+            log.error(f"Value error - no id, enrichment is not possible. Headline: {doc_headline}")
+            raise ValueError
 
         input_doc_params = {
             settings.ENRICHER_PARAM_DOC_ID: doc_id,
@@ -50,7 +54,7 @@ def enrich(annonser):
     nr_of_items_per_batch = min(nr_of_items_per_batch, len_annonser, 100)
     if nr_of_items_per_batch == 0:
         nr_of_items_per_batch = len_annonser
-    log.info('Items per batch: %s' % nr_of_items_per_batch)
+    log.info(f'Items per batch: {nr_of_items_per_batch}')
 
     annons_batches = grouper(nr_of_items_per_batch, annonser_input_data)
 
@@ -66,12 +70,12 @@ def enrich(annonser):
 
     enrich_results_data = execute_calls(batch_indatas, parallelism)
     log.info('Enriched %s/%s documents' % (len(enrich_results_data), len_annonser))
-
+    log.info('Typeahead terms will be not enriched!') if not typeahead else None
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
         if doc_id in enrich_results_data:
             enriched_output = enrich_results_data[doc_id]
-            enrich_doc(annons, enriched_output)
+            enrich_doc(annons, enriched_output, typeahead)
 
     return annonser
 
@@ -132,21 +136,20 @@ def execute_calls(batch_indatas, parallelism):
                     with counter.get_lock():
                         counter.value += 1
                         if counter.value % 1000 == 0:
-                            log.info("enrichtextdocuments - Processed %s docs"
-                                     % (str(counter.value)))
-            except Exception as exc:
-                log.error('Enrichment call generated an exception: %s' % (str(exc)))
-                raise exc
+                            log.info(f'enrichtextdocuments - Processed docs: {counter.value}')
+            except Exception as e:
+                log.error(f'Enrichment call generated an exception: {e}')
+                raise
 
     return enriched_output
 
 
-def enrich_doc(annons, enriched_output):
+def enrich_doc(annons, enriched_output, typeahead):
     if 'keywords' not in annons:
         annons['keywords'] = {}
 
     process_enriched_candidates(annons, enriched_output)
-    process_enriched_candidates_typeahead_terms(annons, enriched_output)
+    process_enriched_candidates_typeahead_terms(annons, enriched_output) if typeahead else None
 
     return annons
 

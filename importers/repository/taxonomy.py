@@ -1,6 +1,7 @@
 from importers.repository import elastic
 from valuestore.taxonomy import get_term as gt, get_entity as ge, find_concept_by_legacy_ams_taxonomy_id as \
-    fcbla, find_legacy_ams_taxonomy_id_by_concept_id as flatc
+    fcbla, find_legacy_ams_taxonomy_id_by_concept_id as flatc , find_info_by_label_name_and_type as filt ,\
+    find_info_by_label_name as fibln
 from elasticsearch import RequestError
 import logging
 
@@ -22,9 +23,9 @@ def get_entity(taxtype, taxid, not_found_response=None):
         try:
             value = ge(elastic.es, taxtype, taxid, not_found_response)
         except RequestError:
-            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id: {taxid}')
+            log.warning(f'Taxonomy RequestError for request with arguments type: {taxtype} and id: {taxid}')
             value = not_found_response
-            log.info("(get_entity) set value: %s" % str(not_found_response))
+            log.info(f"(get_entity) set value: {value}")
         if value:
             tax_value_cache[key] = value
         else:
@@ -41,9 +42,9 @@ def get_concept_by_legacy_id(taxtype, legacy_id, not_found_response=None):
         try:
             value = fcbla(elastic.es, taxtype, legacy_id, not_found_response)
         except RequestError:
-            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id: {legacy_id}')
+            log.warning(f'Taxonomy RequestError for request with arguments type: {taxtype} and id: {legacy_id}')
             value = not_found_response
-            log.info("(get_concept_by_legacy_id) set value: %s" % str(not_found_response))
+            log.info(f"(get_concept_by_legacy_id) set value: {value}")
         if value:
             tax_value_cache[key] = value
         else:
@@ -59,8 +60,8 @@ def get_legacy_by_concept_id(taxtype, concept_id, not_found_response=None):
     if key not in tax_value_cache:
         try:
             value = flatc(elastic.es, taxtype, concept_id, not_found_response)
-        except RequestError:
-            log.warning('Taxonomy RequestError for request with arguments type: {taxtype} and id: {legacy_id}')
+        except RequestError as e:
+            log.warning(f'Taxonomy RequestError for request with arguments type: {taxtype} and id: {concept_id}. {e}')
             value = not_found_response
             log.info("(get_legacy_by_concept_id) set value: %s" % str(not_found_response))
         if value:
@@ -72,3 +73,29 @@ def get_legacy_by_concept_id(taxtype, concept_id, not_found_response=None):
     log.debug(concept_id, taxtype)
     log.debug("(get_legacy_by_concept_id) returns cached: %s" % cached)
     return cached
+
+
+# use name need to get all taxonomy info
+def get_info_by_label_name_and_type(name, info_type, not_found_response=None):
+    value = None
+    if name:
+        try:
+            value = filt(elastic.es, name, info_type, not_found_response)
+        except RequestError as e:
+            log.warning(f'Taxonomy RequestError for request with city name: {name}. {e}')
+            value = not_found_response
+            log.info(f"(find_info_by_city_name) set value: %s" % str(not_found_response))
+    return value
+
+
+# use name to get all taxonomy info
+def get_info_by_name(name, not_found_response=None):
+    value = None
+    if name:
+        try:
+            value = fibln(elastic.es, name, not_found_response)
+        except RequestError as e:
+            log.warning(f'Taxonomy RequestError for request with name: {name}. {e}')
+            value = not_found_response
+            log.info(f"(find_info_by_name) set value: {value}")
+    return value

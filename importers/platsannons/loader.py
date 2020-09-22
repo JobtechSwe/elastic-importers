@@ -6,6 +6,7 @@ from multiprocessing import Value
 
 import requests
 from importers import settings
+from importers.repository import elastic
 
 log = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ def bulk_fetch_ad_details(ad_batch):
     with concurrent.futures.ThreadPoolExecutor(max_workers=parallelism) as executor:
         # Start the load operations
         future_to_fetch_result = {
-            executor.submit(load_details_from_la, ad_data): ad_data
+            executor.submit(load_ad_details, ad_data): ad_data
             for ad_data in ad_batch
         }
         for future in concurrent.futures.as_completed(future_to_fetch_result):
@@ -46,24 +47,63 @@ def bulk_fetch_ad_details(ad_batch):
     return result_output
 
 
-def load_details_from_la(ad_meta):
+def load_ad_to_remove(unpublished_ad_meta):
+    # Populate an unpublished ad with details
+    ad_id = unpublished_ad_meta['annonsId']
+    log.info(f"Ad is avpublicerad, preparing to remove it: {ad_id}")
+    removed_date = unpublished_ad_meta.get('avpubliceringsdatum') or \
+                   time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(unpublished_ad_meta.get('uppdateradTid') / 1000))
+    occupation_concept_id = None
+    occupation_group_concept_id = None
+    occupation_field_concept_id = None
+    municipality_concept_id = None
+    region_concept_id = None
+    country_concept_id = None
+    # Fetch filtering details for unpublished ad from Elastic Search...
+    ad_from_elastic = elastic.get_ad_by_id(ad_id)
+    if ad_from_elastic is not None:
+        occupation = ad_from_elastic.get('occupation')
+        if occupation is not None:
+            occupation_concept_id = occupation.get('concept_id')
+        occupation_field = ad_from_elastic.get('occupation_field')
+        if occupation_field is not None:
+            occupation_field_concept_id = occupation_field.get('concept_id')
+        occupation_group = ad_from_elastic.get('occupation_group')
+        if occupation_group is not None:
+            occupation_group_concept_id = occupation_group.get('concept_id')
+        workplace_address = ad_from_elastic.get('workplace_address')
+        if workplace_address is not None:
+            municipality_concept_id = workplace_address.get('municipality_concept_id')
+            region_concept_id = workplace_address.get('region_concept_id')
+            country_concept_id = workplace_address.get('country_concept_id')
+
+    return {'annonsId': ad_id,
+            'id': ad_id,
+            'removed': True,
+            'avpublicerad': True,
+            'avpubliceringsdatum': removed_date,
+            'removed_date': removed_date,
+            'uppdateradTid': unpublished_ad_meta.get('uppdateradTid'),
+            'updatedAt': unpublished_ad_meta.get('uppdateradTid'),
+            'timestamp': unpublished_ad_meta.get('uppdateradTid'),
+            'removed_ad_filter': {
+                'occupation_concept_id': occupation_concept_id,
+                'occupation_field_concept_id': occupation_field_concept_id,
+                'occupation_group_concept_id': occupation_group_concept_id,
+                'municipality_concept_id': municipality_concept_id,
+                'region_concept_id': region_concept_id,
+                'country_concept_id': country_concept_id }
+            }
+
+
+def load_ad_details(ad_meta):
     fail_count = 0
     fail_max = settings.LA_ANNONS_MAX_TRY
     ad_id = ad_meta['annonsId']
+    # If ad is unpublished; handle it as removed...
     if ad_meta.get('avpublicerad', False):
-        log.info(f"Ad is avpublicerad, preparing to remove it: {ad_id}")
-        removed_date = ad_meta.get('avpubliceringsdatum') or \
-                       time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(ad_meta.get('uppdateradTid') / 1000))
+        return load_ad_to_remove(ad_meta)
 
-        return {'annonsId': ad_id,
-                'id': ad_id,
-                'removed': True,
-                'avpublicerad': True,
-                'avpubliceringsdatum': removed_date,
-                'removed_date': removed_date,
-                'uppdateradTid': ad_meta.get('uppdateradTid'),
-                'updatedAt': ad_meta.get('uppdateradTid'),
-                'timestamp': ad_meta.get('uppdateradTid')}
     detail_url_la = settings.LA_DETAILS_URL + str(ad_id)
     while True:
         try:
