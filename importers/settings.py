@@ -36,7 +36,7 @@ LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 # trigger to use ad format with v2 (concept_id)
 LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', 'true').lower() == 'true'
 if LA_ANNONS_V2:
-    LA_DETAILS_URL = re.sub(r"v\d", "v2", LA_DETAILS_URL)
+    LA_DETAILS_URL = re.sub(r"v\\d", "v2", LA_DETAILS_URL)
 
 # For berikning (platsannonser)
 URL_ENRICH = 'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments'
