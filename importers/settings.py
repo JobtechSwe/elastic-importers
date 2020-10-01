@@ -37,7 +37,7 @@ LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', 'true').lower() == 'true'
 
 LA_DETAILS_URL = re.sub(r"v\d", "v2", str(LA_DETAILS_URL)) if LA_ANNONS_V2 \
-    else LA_DETAILS_URL = re.sub(r"v\d", "v1", str(LA_DETAILS_URL))
+    else re.sub(r"v\d", "v1", str(LA_DETAILS_URL))
 
 # For berikning (platsannonser)
 URL_ENRICH = 'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments'
