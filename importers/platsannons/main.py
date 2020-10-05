@@ -110,7 +110,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         raw_ads = [raw_ad for raw_ad in list(ad_details.values())
                    if not raw_ad.get('removed', False)]
         doc_counter += len(raw_ads)
-
+        log.info(f'doc_counter=len(raw_ads): {doc_counter}')
         log.info(f'Fetched batch of ads (id, updatedAt): '
                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
 
