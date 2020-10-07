@@ -61,24 +61,24 @@ def load_ad_to_remove(unpublished_ad_meta):
     country_concept_id = None
     # Fetch filtering details for unpublished ad from Elastic Search...
     ad_from_elastic = elastic.get_ad_by_id(ad_id)
-    if ad_from_elastic is not None:
+    if ad_from_elastic:
         occupation = ad_from_elastic.get('occupation')
-        if occupation is not None:
+        if occupation:
             occupation_concept_id = occupation.get('concept_id')
         occupation_field = ad_from_elastic.get('occupation_field')
-        if occupation_field is not None:
+        if occupation_field:
             occupation_field_concept_id = occupation_field.get('concept_id')
         occupation_group = ad_from_elastic.get('occupation_group')
-        if occupation_group is not None:
+        if occupation_group:
             occupation_group_concept_id = occupation_group.get('concept_id')
         workplace_address = ad_from_elastic.get('workplace_address')
-        if workplace_address is not None:
+        if workplace_address:
             municipality_concept_id = workplace_address.get('municipality_concept_id')
             region_concept_id = workplace_address.get('region_concept_id')
             country_concept_id = workplace_address.get('country_concept_id')
     else:
-       ad_from_elastic = elastic.get_ad_by_id(ad_id)
-       log.info('Romove ads could fetch from elastic: %s, %s'%(ad_id, ad_from_elastic))
+        ad_from_elastic = elastic.get_ad_by_id(ad_id)
+        log.info(f'Remove ads could fetch from elastic. id: {ad_id} get_id: {ad_from_elastic}')
 
     return {'annonsId': ad_id,
             'id': ad_id,
