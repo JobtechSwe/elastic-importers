@@ -76,6 +76,9 @@ def load_ad_to_remove(unpublished_ad_meta):
             municipality_concept_id = workplace_address.get('municipality_concept_id')
             region_concept_id = workplace_address.get('region_concept_id')
             country_concept_id = workplace_address.get('country_concept_id')
+    else:
+       ad_from_elastic = elastic.get_ad_by_id(ad_id)
+       log.info('Romove ads could fetch from elastic: %s, %s'%(ad_id, ad_from_elastic))
 
     return {'annonsId': ad_id,
             'id': ad_id,
@@ -92,7 +95,7 @@ def load_ad_to_remove(unpublished_ad_meta):
                 'occupation_group_concept_id': occupation_group_concept_id,
                 'municipality_concept_id': municipality_concept_id,
                 'region_concept_id': region_concept_id,
-                'country_concept_id': country_concept_id }
+                'country_concept_id': country_concept_id}
             }
 
 
