@@ -164,15 +164,25 @@ def load_list_of_updated_ads(timestamp=0):
     feed_url = settings.LA_BOOTSTRAP_FEED_URL \
         if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)
     log.info(f"Loading updates from endpoint: {feed_url}")
-    try:
-        r = requests.get(feed_url, timeout=60)
-        r.raise_for_status()
-        json_result = r.json()
-        items = json_result.get('idLista', [])
-
-    except requests.exceptions.RequestException as e:
-        log.error(f"Failed to read from {feed_url} Error: {e}")
-
+    fail_count = 0
+    fail_max = settings.LA_ANNONS_MAX_TRY
+    while True:
+        try:
+            r = requests.get(feed_url, timeout=60)
+            r.raise_for_status()
+            json_result = r.json()
+            items = json_result.get('idLista', [])
+        # On fail, try again 10 times with 0.3 second delay
+        except (
+                requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+                requests.exceptions.RequestException) as e:
+            fail_count += 1
+            time.sleep(0.3)
+            log.warning(
+                f"Unable to load data from: {feed_url} Exception: {type(e).__name__} , try: {fail_count}")
+            if fail_count >= fail_max:
+                log.error(f"Failed to read from {feed_url} after: {fail_max}.")
+                raise e
     return items
 
 
