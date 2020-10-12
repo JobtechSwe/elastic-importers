@@ -172,6 +172,7 @@ def load_list_of_updated_ads(timestamp=0):
             r.raise_for_status()
             json_result = r.json()
             items = json_result.get('idLista', [])
+            return items
         # On fail, try again 10 times with 0.3 second delay
         except (
                 requests.exceptions.RequestException) as e:
@@ -182,7 +183,6 @@ def load_list_of_updated_ads(timestamp=0):
             if fail_count >= fail_max:
                 log.error(f"Failed to read from {feed_url} after: {fail_max}.")
                 raise e
-    return items
 
 
 def find_correct_logo_url(workplace_id, org_number):
