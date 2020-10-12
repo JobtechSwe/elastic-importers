@@ -174,8 +174,7 @@ def load_list_of_updated_ads(timestamp=0):
             items = json_result.get('idLista', [])
             return items
         # On fail, try again 10 times with 0.3 second delay
-        except (
-                requests.exceptions.RequestException) as e:
+        except requests.exceptions.RequestException as e:
             fail_count += 1
             time.sleep(0.3)
             log.warning(
