@@ -77,8 +77,7 @@ def load_ad_to_remove(unpublished_ad_meta):
             region_concept_id = workplace_address.get('region_concept_id')
             country_concept_id = workplace_address.get('country_concept_id')
     else:
-        ad_from_elastic = elastic.get_ad_by_id(ad_id)
-        log.info(f'Remove ads could fetch from elastic. id: {ad_id} get_id: {ad_from_elastic}')
+        log.info(f'Could not fetch details from Elastic for removed ad. Id: {ad_id}')
 
     return {'annonsId': ad_id,
             'id': ad_id,
