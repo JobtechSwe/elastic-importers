@@ -205,10 +205,12 @@ def _set_education(annons, message):
 def _get_default_scope_of_work(arbtid_typ):
     default_max_omf = None
     default_min_omf = None
-    if arbtid_typ == "1":
+    # If heltid...
+    if arbtid_typ == "6YE1_gAC_R2G":
         default_min_omf = 100
         default_max_omf = 100
-    elif arbtid_typ == "2" or arbtid_typ == "3":
+    # Elif deltid or heltid/deltid
+    elif arbtid_typ == "947z_JGS_Uk2" or arbtid_typ == "hGCt_6Ni_XPz":
         default_min_omf = 0
         default_max_omf = 100
     return default_min_omf, default_max_omf
