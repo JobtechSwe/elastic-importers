@@ -61,21 +61,23 @@ def load_ad_to_remove(unpublished_ad_meta):
     country_concept_id = None
     # Fetch filtering details for unpublished ad from Elastic Search...
     ad_from_elastic = elastic.get_ad_by_id(ad_id)
-    if ad_from_elastic is not None:
+    if ad_from_elastic:
         occupation = ad_from_elastic.get('occupation')
-        if occupation is not None:
+        if occupation:
             occupation_concept_id = occupation.get('concept_id')
         occupation_field = ad_from_elastic.get('occupation_field')
-        if occupation_field is not None:
+        if occupation_field:
             occupation_field_concept_id = occupation_field.get('concept_id')
         occupation_group = ad_from_elastic.get('occupation_group')
-        if occupation_group is not None:
+        if occupation_group:
             occupation_group_concept_id = occupation_group.get('concept_id')
         workplace_address = ad_from_elastic.get('workplace_address')
-        if workplace_address is not None:
+        if workplace_address:
             municipality_concept_id = workplace_address.get('municipality_concept_id')
             region_concept_id = workplace_address.get('region_concept_id')
             country_concept_id = workplace_address.get('country_concept_id')
+    else:
+        log.info(f'Could not fetch details from Elastic for removed ad. Id: {ad_id}')
 
     return {'annonsId': ad_id,
             'id': ad_id,
@@ -92,12 +94,12 @@ def load_ad_to_remove(unpublished_ad_meta):
                 'occupation_group_concept_id': occupation_group_concept_id,
                 'municipality_concept_id': municipality_concept_id,
                 'region_concept_id': region_concept_id,
-                'country_concept_id': country_concept_id }
+                'country_concept_id': country_concept_id}
             }
 
 
 def load_ad_details(ad_meta):
-    fail_count = 0
+    fail = 0
     fail_max = settings.LA_ANNONS_MAX_TRY
     ad_id = ad_meta['annonsId']
     # If ad is unpublished; handle it as removed...
@@ -120,26 +122,13 @@ def load_ad_details(ad_meta):
                 clean_ad = _cleanup_stringvalues(desensitized_ad)
                 return clean_ad
         # On fail, try again 10 times with 0.3 second delay
-        except requests.exceptions.ConnectionError as e:
-            fail_count += 1
-            time.sleep(0.3)
-            log.warning(f"Unable to load data from: {detail_url_la} Connection error, try: {fail_count}")
-            if fail_count >= fail_max:
-                log.error(f"Failed to load data from: {detail_url_la} after: {fail_max}. {e} Exit!")
-                sys.exit(1)
-        except requests.exceptions.Timeout as e:
-            fail_count += 1
-            time.sleep(0.3)
-            log.warning(f"Unable to load data from: {detail_url_la} Timeout, try: {fail_count}")
-            if fail_count >= fail_max:
-                log.error(f"Failed to load data from: {detail_url_la} after: {fail_max}. {e} Exit!")
-                sys.exit(1)
         except requests.exceptions.RequestException as e:
-            fail_count += 1
+            fail += 1
             time.sleep(0.3)
-            log.warning(f"Unable to fetch data at: {detail_url_la}, try: {fail_count}, {e}")
-            if fail_count >= fail_max:
-                log.error(f"Failed to fetch: {detail_url_la} after: {fail_max}, skipping. {e}")
+            log.warning(
+                f"Unable to load data from: {detail_url_la} Exception: {type(e).__name__}, try: {fail}")
+            if fail >= fail_max:
+                log.error(f"Failed to read from {detail_url_la} after: {fail_max}.")
                 raise e
 
 
@@ -157,24 +146,31 @@ def _clean_sensitive_data(ad, detail_url):
 
 
 def load_list_of_updated_ads(timestamp=0):
-    items = []
-    feed_url = settings.LA_BOOTSTRAP_FEED_URL \
-        if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)
+    feed_url = settings.LA_BOOTSTRAP_FEED_URL if timestamp == 0 else settings.LA_FEED_URL + str(timestamp)
     log.info(f"Loading updates from endpoint: {feed_url}")
-    try:
-        r = requests.get(feed_url, timeout=60)
-        r.raise_for_status()
-        json_result = r.json()
-        items = json_result.get('idLista', [])
-
-    except requests.exceptions.RequestException as e:
-        log.error(f"Failed to read from {feed_url} Error: {e}")
-
-    return items
+    fail = 0
+    fail_max = settings.LA_ANNONS_MAX_TRY
+    while True:
+        try:
+            r = requests.get(feed_url, timeout=60)
+            r.raise_for_status()
+            json_result = r.json()
+            items = json_result.get('idLista', [])
+            return items
+        # On fail, try again 10 times with 0.3 second delay
+        except requests.exceptions.RequestException as e:
+            fail += 1
+            time.sleep(0.3)
+            log.warning(
+                f"Unable to load data from: {feed_url} Exception: {type(e).__name__}, try: {fail}")
+            if fail >= fail_max:
+                log.error(f"Failed to read from {feed_url} after: {fail_max}.")
+                raise e
 
 
 def find_correct_logo_url(workplace_id, org_number):
     global logo_cache
+    logo_cache_flag = False
     logo_url = None
     cache_key = "%s-%s" % (str(workplace_id), str(org_number))
     if cache_key in logo_cache:
@@ -182,7 +178,6 @@ def find_correct_logo_url(workplace_id, org_number):
         log.debug(f"Returning cached logo for workplace-orgnr {cache_key}: {logo_url}")
         return logo_url
 
-    cache_logo = False
     try:
         if workplace_id and int(workplace_id) > 0:
             possible_logo_url = "%sarbetsplatser/%s/logotyper/logo.png" \
@@ -190,7 +185,7 @@ def find_correct_logo_url(workplace_id, org_number):
             r = requests.head(possible_logo_url, timeout=settings.COMPANY_LOGO_TIMEOUT)
             if r.status_code == 200:
                 logo_url = possible_logo_url
-                cache_logo = True
+                logo_cache_flag = True
 
         if not logo_url and org_number:
             possible_logo_url = '%sorganisation/%s/logotyper/logo.png' \
@@ -198,14 +193,11 @@ def find_correct_logo_url(workplace_id, org_number):
             r = requests.head(possible_logo_url, timeout=settings.COMPANY_LOGO_TIMEOUT)
             if r.status_code == 200:
                 logo_url = possible_logo_url
-                cache_logo = True
+                logo_cache_flag = True
+    except requests.exceptions.RequestException as e:
+        log.warning(f"Unable to load logo: {logo_url} Exception: {type(e).__name__}")
 
-    except requests.exceptions.ReadTimeout as e:
-        log.warning(f"Logo URL read timeout: {e}")
-    except requests.exceptions.ConnectionError as e:
-        log.warning(f"Logo URL connection error: {e}")
-
-    if cache_logo:
+    if logo_cache_flag:
         logo_cache[cache_key] = logo_url
 
     log.debug(f"Found logo url for workplace-orgnr {workplace_id}-{org_number}:{logo_url}")
