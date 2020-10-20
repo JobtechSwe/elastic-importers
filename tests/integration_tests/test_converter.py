@@ -7,7 +7,6 @@ from importers.repository import taxonomy
 log = logging.getLogger(__name__)
 
 
-@pytest.mark.skip(reason="Temporarily disabled")
 @pytest.mark.integration
 @pytest.mark.parametrize("annons_key", ['anstallningstyp', '', None, 'sprak'])
 @pytest.mark.parametrize("message_key", ['anstallningTyp', 'mkey', '', None, 'sprak'])
@@ -22,10 +21,10 @@ def test_expand_taxonomy_value(annons_key, message_key, message_dict):
         # message_dict is empty
         assert d is None
         return
-    message_value = message_dict.get(message_key, {}).get('varde')
+    message_value = message_dict.get(message_key, {}).get('label')
     if message_value:
-        assert d['kod'] == message_value
-        assert d['term'] == taxonomy.get_term(annons_key, message_value)
+        assert d['legacy_ams_taxonomy_id'] == message_value
+        assert d['label'] == taxonomy.get_term(annons_key, message_value)
     else:
         assert d is None
 

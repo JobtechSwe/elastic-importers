@@ -362,7 +362,7 @@ def get_null_safe_value(element, key, replacement_val):
 
 
 def _expand_taxonomy_value(annons_key, message_key, message_dict):
-    message_value = message_dict.get(message_key, {}).get('varde') \
+    message_value = message_dict.get(message_key, {}).get('value') \
         if message_dict else None
     if message_value:
         if settings.LA_ANNONS_V2:
