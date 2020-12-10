@@ -265,18 +265,18 @@ def _set_occupations(annons, message):
         if yrkesroll and 'parent' in yrkesroll:
             yrkesgrupp = yrkesroll.get('parent')
             yrkesomrade = yrkesgrupp.get('parent')
-            annons['occupation'] = {'concept_id': yrkesroll['concept_id'],
+            annons['occupation'] = [{'concept_id': yrkesroll['concept_id'],
                                     'label': yrkesroll['label'],
-                                    'legacy_ams_taxonomy_id':
-                                        yrkesroll['legacy_ams_taxonomy_id']}
-            annons['occupation_group'] = {'concept_id': yrkesgrupp['concept_id'],
+                                     'legacy_ams_taxonomy_id':
+                                         yrkesroll['legacy_ams_taxonomy_id']}]
+            annons['occupation_group'] = [{'concept_id': yrkesgrupp['concept_id'],
                                           'label': yrkesgrupp['label'],
-                                          'legacy_ams_taxonomy_id':
-                                              yrkesgrupp['legacy_ams_taxonomy_id']}
-            annons['occupation_field'] = {'concept_id': yrkesomrade['concept_id'],
+                                           'legacy_ams_taxonomy_id':
+                                               yrkesgrupp['legacy_ams_taxonomy_id']}]
+            annons['occupation_field'] = [{'concept_id': yrkesomrade['concept_id'],
                                           'label': yrkesomrade['label'],
-                                          'legacy_ams_taxonomy_id':
-                                              yrkesomrade['legacy_ams_taxonomy_id']}
+                                           'legacy_ams_taxonomy_id':
+                                               yrkesomrade['legacy_ams_taxonomy_id']}]
         elif not yrkesroll:
             log.warning(f"Taxonomy value not found for: {message['yrkesroll']}")
         else:  # yrkesroll is not None and 'parent' not in yrkesroll
