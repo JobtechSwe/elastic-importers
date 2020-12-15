@@ -28,7 +28,7 @@ def _isodate(bad_date):
         return None
 
 
-def convert_ad(message):
+def convert_ad(message, taxonomy_2):
     annons = dict()
     start_time = int(time.time() * 1000)
     if 'removed_ad_filter' in message:
@@ -95,7 +95,7 @@ def convert_ad(message):
     else:
         annons['driving_license_required'] = False
 
-    _set_occupations(annons, message)
+    _set_occupations(annons, message, taxonomy_2)
 
     annons['workplace_address'] = _build_wp_address(message.get('arbetsplatsadress', {}))
 
@@ -124,6 +124,17 @@ def convert_ad(message):
         'education_level': [],
     }
 
+    # not nice code, will change in future
+    skills = annons['must_have'].get('skills', [])
+    replaced_terms = []
+    if skills:
+        for skill in skills:
+            concept_id = skill.get('concept_id')
+            replaced_term = _check_and_add_replace_concept_id(concept_id, taxonomy_2)
+            if replaced_term:
+                replaced_terms.append(replaced_term)
+    annons['must_have']['skills'] += replaced_terms
+
     annons['nice_to_have'] = {
         'skills': [
             get_concept_as_annons_value_with_weight('kompetens',
@@ -151,6 +162,17 @@ def convert_ad(message):
         'education': [],
         'education_level': [],
     }
+
+    # not nice code, will change in future
+    skills = annons['nice_to_have'].get('skills', [])
+    replaced_terms = []
+    if skills:
+        for skill in skills:
+            concept_id = skill.get('concept_id')
+            replaced_term = _check_and_add_replace_concept_id(concept_id, taxonomy_2)
+            if replaced_term:
+                replaced_terms.append(replaced_term)
+    annons['nice_to_have']['skills'] += replaced_terms
 
     annons['application_contact'] = _build_contacts(message.get('kontaktpersoner', []))
 
@@ -251,7 +273,7 @@ def _build_contacts(kontaktpersoner):
     return appl_contact_list
 
 
-def _set_occupations(annons, message):
+def _set_occupations(annons, message, taxonomy_2):
     if 'yrkesroll' in message:
         if settings.LA_ANNONS_V2:
             log.debug('NB! Env var to use la v2')
@@ -269,6 +291,9 @@ def _set_occupations(annons, message):
                                     'label': yrkesroll['label'],
                                      'legacy_ams_taxonomy_id':
                                          yrkesroll['legacy_ams_taxonomy_id']}]
+            replaced_term = _check_and_add_replace_concept_id(yrkesroll['concept_id'], taxonomy_2)
+            if replaced_term:
+                annons['occupation'].append(replaced_term)
             annons['occupation_group'] = [{'concept_id': yrkesgrupp['concept_id'],
                                           'label': yrkesgrupp['label'],
                                            'legacy_ams_taxonomy_id':
@@ -281,6 +306,18 @@ def _set_occupations(annons, message):
             log.warning(f"Taxonomy value not found for: {message['yrkesroll']}")
         else:  # yrkesroll is not None and 'parent' not in yrkesroll
             log.warning(f"Parent not found for yrkesroll: {message['yrkesroll']} ({yrkesroll})")
+
+
+def _check_and_add_replace_concept_id(old_term_concept_id, taxonomy_2):
+    for item in taxonomy_2:
+        content = item.get("taxonomy/concept", {})
+        if old_term_concept_id == content.get("taxonomy/id"):
+            replaced_term = content.get("taxonomy/replaced-by")[0]
+            return {
+                'concept_id': replaced_term.get("taxonomy/id"),
+                'label': replaced_term.get('taxonomy/preferred-label'),
+                'legacy_ams_taxonomy_id': None}
+    return None
 
 
 def _build_wp_address(arbplatsmessage):

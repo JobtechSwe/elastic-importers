@@ -52,6 +52,10 @@ COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))
 
+#taxonomy replaced terms
+TAXONOMY_2_URL = os.getenv('TAXONOMY_2_URL')
+TAXONOMY_2_API_KEY = os.getenv('TAXONOMY_2_API_KEY')
+
 platsannons_deleted_mappings = {
     "mappings": {
         "properties": {
