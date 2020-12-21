@@ -1,22 +1,49 @@
 import pytest
 import sys
 import logging
+from dateutil.parser import ParserError
+from datetime import datetime
 from importers.platsannons import converter
 
 log = logging.getLogger(__name__)
+now = datetime.now()
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize("parsing_date", ['180924-00:00', '20180924T', 'mon sep 24', '00:00:00'])
-@pytest.mark.parametrize("not_parsing_date", ['20180101f', '2099-13-32', '18-09-24:01:01', '', None, []])
-@pytest.mark.skip("Exceptions pollute log")
-def test_isodate(parsing_date, not_parsing_date):
+@pytest.mark.parametrize("input_date, expected_result, expected_error",
+                         [('180924-00:00', '2024-09-18T00:00:00', None),
+                          ('20180924T', '2018-09-24T00:00:00', None),
+                          ('mon sep 24', f'{now.year}-09-24T00:00:00', None),
+                          ('sep 24', f'{now.year}-09-24T00:00:00', None),
+                          ('24', f'{now.year}-{now.month}-24T00:00:00', None),
+                          ('00:00:00', f'{now.year}-{now.month}-{now.day}T00:00:00', None),
+                          ('20180101f', None, ParserError),
+                          ('2099-13-32', None, ParserError),
+                          ('18-09-24:01:01', None, ParserError),
+                          (' ', None, ParserError),
+                          (None, None, TypeError),
+                          ([' '], None, TypeError),
+                          ([], None, TypeError),
+                          ({}, None, TypeError),
+                          ('XYZ', None, ParserError)
+                          ])
+def test_date_conversion(input_date, expected_result, expected_error):
     print('==================', sys._getframe().f_code.co_name, '================== ')
-    if not not_parsing_date:
-        assert converter._isodate(not_parsing_date) is None
-        return
-    assert converter._isodate(not_parsing_date) is None
-    assert converter._isodate(parsing_date) is not None
+    import dateutil
+    try:
+        converted_date = converter._date_parser(input_date)
+    except dateutil.parser.ParserError as e:
+        if expected_error == type(e):
+            return
+        else:
+            raise e
+    except TypeError as e:
+        if expected_error == type(e):
+            return
+        else:
+            raise e
+    else:
+        assert converted_date == expected_result
 
 
 @pytest.mark.unit

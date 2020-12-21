@@ -7,7 +7,6 @@ from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
 from importers.common import clean_html
 
-
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
 
@@ -17,14 +16,18 @@ MUST_HAVE_WEIGHT = 10
 NICE_TO_HAVE_WEIGHT = 5
 
 
-def _isodate(bad_date):
-    if not bad_date:
+def _date_parser(input_date):
+    date = parser.parse(input_date)
+    return date.isoformat()
+
+
+def _isodate(input_date):
+    if not input_date:
         return None
     try:
-        date = parser.parse(bad_date)
-        return date.isoformat()
+        return _date_parser(input_date)
     except ValueError as e:
-        log.error('Failed to parse %s as a valid date' % bad_date, e)
+        log.error('Failed to parse %s as a valid date' % input_date, e)
         return None
 
 
@@ -63,8 +66,8 @@ def convert_ad(message):
                                                           'arbetstidTyp', message)
     (default_min_omf,
      default_max_omf) = _get_default_scope_of_work(
-         message.get('arbetstidTyp', {}).get('varde')
-     )
+        message.get('arbetstidTyp', {}).get('varde')
+    )
     annons['scope_of_work'] = {
         'min': message.get('arbetstidOmfattningFran', default_min_omf),
         'max': message.get('arbetstidOmfattningTill', default_max_omf)
@@ -256,7 +259,7 @@ def _set_occupations(annons, message):
         if settings.LA_ANNONS_V2:
             log.debug('NB! Env var to use la v2')
             yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll',
-                                                          {}).get('varde'))
+                                                                                   {}).get('varde'))
         else:
             log.debug('Env var to use la v1')
             yrkesroll_varde = message.get('yrkesroll', {}).get('varde')
