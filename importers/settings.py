@@ -33,11 +33,8 @@ LA_ANNONS_MAX_TRY = int(os.getenv('LA_ANNONS_MAX_TRY', 10))
 LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
 LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', 'false').lower() == 'true'
 LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
-# trigger to use ad format with v2 (concept_id)
-LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', 'true').lower() == 'true'
 
-LA_DETAILS_URL = re.sub(r"v\d", "v2", str(LA_DETAILS_URL)) if LA_ANNONS_V2 \
-    else re.sub(r"v\d", "v1", str(LA_DETAILS_URL))
+LA_DETAILS_URL = re.sub(r"v\d", "v2", str(LA_DETAILS_URL))
 
 # For berikning (platsannonser)
 URL_ENRICH = 'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments'
@@ -51,6 +48,11 @@ ENRICH_THRESHOLD_TRAIT = os.getenv('ENRICH_THRESHOLD_TRAIT', 0.5)
 COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))
+
+#taxonomy replaced terms
+TAXONOMY_2_URL = os.getenv('TAXONOMY_2_URL')
+TAXONOMY_2_URL = 'https://taxonomy.api.jobtechdev.se/v1/taxonomy/main/replaced-by-changes?after-version=1'
+TAXONOMY_2_API_KEY = '111'
 
 platsannons_deleted_mappings = {
     "mappings": {
