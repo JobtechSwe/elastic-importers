@@ -209,14 +209,25 @@ def _get_default_scope_of_work(arbtid_typ):
     default_max_omf = None
     default_min_omf = None
 
-    # If heltid...
-    if arbtid_typ == "6YE1_gAC_R2G":
-        default_min_omf = 100
-        default_max_omf = 100
-    # Elif deltid or heltid/deltid
-    elif arbtid_typ == "947z_JGS_Uk2" or arbtid_typ == "hGCt_6Ni_XPz":
-        default_min_omf = 0
-        default_max_omf = 100
+    # If V2 with concept_ids...
+    if settings.LA_ANNONS_V2:
+        # If heltid...
+        if arbtid_typ == "6YE1_gAC_R2G":
+            default_min_omf = 100
+            default_max_omf = 100
+        # Elif deltid or heltid/deltid
+        elif arbtid_typ == "947z_JGS_Uk2" or arbtid_typ == "hGCt_6Ni_XPz":
+            default_min_omf = 0
+            default_max_omf = 100
+    else:
+        # If heltid...
+        if arbtid_typ == "1":
+            default_min_omf = 100
+            default_max_omf = 100
+        # Elif deltid or heltid/deltid
+        elif arbtid_typ == "2" or arbtid_typ == "3":
+            default_min_omf = 0
+            default_max_omf = 100
 
     return default_min_omf, default_max_omf
 
@@ -245,7 +256,15 @@ def _build_contacts(kontaktpersoner):
 
 def _set_occupations(annons, message):
     if 'yrkesroll' in message:
-        yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll', {}).get('varde'))
+        if settings.LA_ANNONS_V2:
+            log.debug('NB! Env var to use la v2')
+            yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll',
+                                                                                   {}).get('varde'))
+        else:
+            log.debug('Env var to use la v1')
+            yrkesroll_varde = message.get('yrkesroll', {}).get('varde')
+            yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll', yrkesroll_varde)
+            log.debug(f'Get: {yrkesroll} for: {yrkesroll_varde}')
         if yrkesroll and 'parent' in yrkesroll:
             yrkesgrupp = yrkesroll.get('parent')
             yrkesomrade = yrkesgrupp.get('parent')
@@ -280,19 +299,35 @@ def _build_wp_address(arbplatsmessage):
     longitud = None
     latitud = None
     if 'kommun' in arbplatsmessage and arbplatsmessage.get('kommun'):
-        kommun_concept_id = arbplatsmessage.get('kommun', {}).get('varde', {})
-        kommun_temp = taxonomy.get_legacy_by_concept_id('kommun', kommun_concept_id)
-        kommun_legacy_id = kommun_temp.get('legacy_ams_taxonomy_id', None)
+        if settings.LA_ANNONS_V2:
+            kommun_concept_id = arbplatsmessage.get('kommun', {}).get('varde', {})
+            kommun_temp = taxonomy.get_legacy_by_concept_id('kommun', kommun_concept_id)
+            kommun_legacy_id = kommun_temp.get('legacy_ams_taxonomy_id', None)
+        else:
+            kommun_legacy_id = arbplatsmessage.get('kommun', {}).get('varde', {})
+            kommun_temp = taxonomy.get_concept_by_legacy_id('kommun', kommun_legacy_id)
+            if kommun_temp:
+                kommun_concept_id = kommun_temp.get('concept_id', None)
         kommun = arbplatsmessage.get('kommun', {}).get('namn', {})
     if 'lan' in arbplatsmessage and arbplatsmessage.get('lan'):
-        lan_concept_id = arbplatsmessage.get('lan', {}).get('varde', {})
-        lan_temp = taxonomy.get_legacy_by_concept_id('lan', lan_concept_id)
-        lan_legacy_id = lan_temp.get('legacy_ams_taxonomy_id', None)
+        if settings.LA_ANNONS_V2:
+            lan_concept_id = arbplatsmessage.get('lan', {}).get('varde', {})
+            lan_temp = taxonomy.get_legacy_by_concept_id('lan', lan_concept_id)
+            lan_legacy_id = lan_temp.get('legacy_ams_taxonomy_id', None)
+        else:
+            lan_legacy_id = arbplatsmessage.get('lan', {}).get('varde', {})
+            lan_temp = taxonomy.get_concept_by_legacy_id('lan', lan_legacy_id)
+            lan_concept_id = lan_temp.get('concept_id', None)
         lansnamn = arbplatsmessage.get('lan', {}).get('namn', {})
     if 'land' in arbplatsmessage and arbplatsmessage.get('land'):
-        land_concept_id = arbplatsmessage.get('land', {}).get('varde', {})
-        land_temp = taxonomy.get_legacy_by_concept_id('land', land_concept_id)
-        land_legacy_id = land_temp.get('legacy_ams_taxonomy_id', None)
+        if settings.LA_ANNONS_V2:
+            land_concept_id = arbplatsmessage.get('land', {}).get('varde', {})
+            land_temp = taxonomy.get_legacy_by_concept_id('land', land_concept_id)
+            land_legacy_id = land_temp.get('legacy_ams_taxonomy_id', None)
+        else:
+            land_legacy_id = arbplatsmessage.get('land', {}).get('varde', {})
+            land_temp = taxonomy.get_concept_by_legacy_id('land', land_legacy_id)
+            land_concept_id = land_temp.get('concept_id', None)
         land = arbplatsmessage.get('land', {}).get('namn', {})
     if 'longitud' in arbplatsmessage and arbplatsmessage.get('longitud'):
         longitud = float(arbplatsmessage.get('longitud'))
@@ -330,7 +365,10 @@ def _expand_taxonomy_value(annons_key, message_key, message_dict):
     message_value = message_dict.get(message_key, {}).get('varde') \
         if message_dict else None
     if message_value:
-        concept = taxonomy.get_concept_by_legacy_id(annons_key, message_value)
+        if settings.LA_ANNONS_V2:
+            concept = taxonomy.get_legacy_by_concept_id(annons_key, message_value)
+        else:
+            concept = taxonomy.get_concept_by_legacy_id(annons_key, message_value)
         return {
             "concept_id": concept.get('concept_id', None),
             "label": concept.get('label', None),
@@ -347,7 +385,10 @@ def get_concept_as_annons_value_with_weight(taxtype, id, weight=None):
         'legacy_ams_taxonomy_id': None
     }
     try:
-        concept = taxonomy.get_legacy_by_concept_id(taxtype, id)
+        if settings.LA_ANNONS_V2:
+            concept = taxonomy.get_legacy_by_concept_id(taxtype, id)
+        else:
+            concept = taxonomy.get_concept_by_legacy_id(taxtype, id)
         weighted_concept['concept_id'] = concept.get('concept_id', None)
         weighted_concept['label'] = concept.get('label', None)
         weighted_concept['weight'] = weight
@@ -363,8 +404,10 @@ def get_concept_as_annons_value_with_weight(taxtype, id, weight=None):
 def parse_driving_licence(message):
     taxkorkort_list = []
     for kkort in message.get('korkort'):
-        taxkorkort = taxonomy.get_legacy_by_concept_id('korkort', kkort['varde'])
-
+        if settings.LA_ANNONS_V2:
+            taxkorkort = taxonomy.get_legacy_by_concept_id('korkort', kkort['varde'])
+        else:
+            taxkorkort = taxonomy.get_concept_by_legacy_id('korkort', kkort['varde'])
         if taxkorkort:
             taxkorkort_list.append({
                 "concept_id": taxkorkort.get('concept_id', None),

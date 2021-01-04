@@ -18,7 +18,7 @@ def bulk_fetch_ad_details(ad_batch):
     len_ad_batch = len(ad_batch)
     parallelism = settings.LA_DETAILS_PARALLELISM if len_ad_batch > 99 else 1
     log.info(f'Fetch ad details. Processes: {parallelism}, batch len: {len_ad_batch}')
-    log.info(f'Ad details base url: {settings.LA_DETAILS_URL}')
+    log.info(f'LA v2: {settings.LA_ANNONS_V2}, ad details base url: {settings.LA_DETAILS_URL}')
     global counter
     counter = Value('i', 0)
     result_output = {}
