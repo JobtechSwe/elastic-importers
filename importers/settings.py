@@ -398,6 +398,48 @@ platsannons_mappings = {
                     }
                 }
             },
+            "occupation": {
+                "type": "object",
+                "properties": {
+                    "concept_id": {
+                        "type": "keyword",
+                    },
+                    "label": {
+                        "type": "keyword",
+                    },
+                    "legacy_ams_taxonomy_id": {
+                        "type": "keyword",
+                    },
+                },
+            },
+            "occupation_group": {
+                "type": "object",
+                "properties": {
+                    "concept_id": {
+                        "type": "keyword",
+                    },
+                    "label": {
+                        "type": "keyword",
+                    },
+                    "legacy_ams_taxonomy_id": {
+                        "type": "keyword",
+                    },
+                },
+            },
+            "occupation_field": {
+                "type": "object",
+                "properties": {
+                    "concept_id": {
+                        "type": "keyword",
+                    },
+                    "label": {
+                        "type": "keyword",
+                    },
+                    "legacy_ams_taxonomy_id": {
+                        "type": "keyword",
+                    },
+                },
+            },
             "publication_date": {
                 "type": "date"
             },
