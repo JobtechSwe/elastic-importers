@@ -33,11 +33,8 @@ LA_ANNONS_MAX_TRY = int(os.getenv('LA_ANNONS_MAX_TRY', 10))
 LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
 LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', 'false').lower() == 'true'
 LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
-# trigger to use ad format with v2 (concept_id)
-LA_ANNONS_V2 = os.getenv('LA_ANNONS_V2', 'true').lower() == 'true'
 
-LA_DETAILS_URL = re.sub(r"v\d", "v2", str(LA_DETAILS_URL)) if LA_ANNONS_V2 \
-    else re.sub(r"v\d", "v1", str(LA_DETAILS_URL))
+
 
 # For berikning (platsannonser)
 URL_ENRICH = 'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments'
