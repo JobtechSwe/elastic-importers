@@ -6,17 +6,19 @@ from datetime import datetime
 from importers.platsannons import converter
 
 log = logging.getLogger(__name__)
-now = datetime.now()
+current_year = datetime.now().strftime('%Y')
+current_month = datetime.now().strftime('%m')
+current_day = datetime.now().strftime('%d')
 
 
 @pytest.mark.unit
 @pytest.mark.parametrize("input_date, expected_result, expected_error",
                          [('180924-00:00', '2024-09-18T00:00:00', None),
                           ('20180924T', '2018-09-24T00:00:00', None),
-                          ('mon sep 24', f'{now.year}-09-24T00:00:00', None),
-                          ('sep 24', f'{now.year}-09-24T00:00:00', None),
-                          ('24', f'{now.year}-{now.month}-24T00:00:00', None),
-                          ('00:00:00', f'{now.year}-{now.month}-{now.day}T00:00:00', None),
+                          ('mon sep 24', f'{current_year}-09-24T00:00:00', None),
+                          ('sep 24', f'{current_year}-09-24T00:00:00', None),
+                          ('24', f'{current_year}-{current_month}-24T00:00:00', None),
+                          ('00:00:00', f'{current_year}-{current_month}-{current_day}T00:00:00', None),
                           ('20180101f', None, ParserError),
                           ('2099-13-32', None, ParserError),
                           ('18-09-24:01:01', None, ParserError),
