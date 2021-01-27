@@ -8,7 +8,8 @@ from jobtech.common.customlogging import configure_logging
 from importers import settings
 from importers.platsannons import loader, converter, enricher_mt_rest_multiple as enricher
 from importers.repository import elastic
-from importers.indexmaint.main import (set_platsannons_read_alias, set_platsannons_write_alias)
+from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, \
+    check_index_size_before_switching_alias
 
 configure_logging([__name__.split('.')[0], 'importers'])
 log = logging.getLogger(__name__)
@@ -86,7 +87,9 @@ def start(es_index=None):
 
     num_doc_elastic = elastic.document_count(es_index)
     if num_doc_elastic:
-        log.info(f"All done! Index: {es_index} has: {num_doc_elastic} indexed documents.")
+        log.info(f"Index: {es_index} has: {num_doc_elastic} indexed documents.")
+    if not check_index_size_before_switching_alias(es_index):
+        sys.exit(1)
 
 
 def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
@@ -147,12 +150,12 @@ def _grouper(n, iterable):
 
 
 def start_daily_index():
-    new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX,
-                                datetime.now().strftime('%Y%m%d-%H.%M'))
+    new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX, datetime.now().strftime('%Y%m%d-%H.%M'))
     log.info(f"Start creating new daily index: {new_index_name}")
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)
+    log.info("Switching alias to new index completed successfully")
 
 
 if __name__ == '__main__':
