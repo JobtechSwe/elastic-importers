@@ -16,7 +16,6 @@ setup(
             'import-platsannonser = importers.platsannons.main:start',
             'import-platsannonser-daily = importers.platsannons.main:start_daily_index',
             'import-taxonomy = importers.taxonomy.main:start',
-            'import-scrapedannonser = importers.scrapedannons.main:start',
             'set-read-alias-platsannons = '
             'importers.indexmaint.main:set_platsannons_read_alias',
             'set-write-alias-platsannons = '

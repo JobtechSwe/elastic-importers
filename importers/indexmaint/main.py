@@ -4,7 +4,6 @@ from elasticsearch.exceptions import NotFoundError
 from importers.repository import elastic
 from importers import settings
 
-
 log = logging.getLogger(__name__)
 
 
@@ -52,6 +51,23 @@ def change_alias(idxnames, aliasname):
     except NotFoundError as e:
         log.error(f"Can't create alias: {aliasname}. Indices not found: {idxnames}. {e} Exit!")
         sys.exit(1)
+
+
+def check_index_size_before_switching_alias(new_index_name):
+    alias_name = "%s%s" % (settings.ES_ANNONS_PREFIX, settings.READ_INDEX_SUFFIX)
+    if not elastic.alias_exists(alias_name):
+        log.info(f"Alias {alias_name} does not exist, can't compare to old data, continuing")
+        return True
+    current_index = elastic.get_index_name_for_alias(alias_name)
+    current_number = elastic.document_count(current_index)
+    new_number = elastic.document_count(new_index_name)
+    if int(new_number) < int(current_number) * settings.NEW_ADS_COEFFICIENT:
+        log.error(f"Too FEW ads in latest import. Current: {current_number}, new: {new_number}, "
+                  f"coefficient: {settings.NEW_ADS_COEFFICIENT}")
+        return False
+    else:
+        log.info(f'OK number of ads in latest import. Current: {current_number}, new: {new_number}')
+        return True
 
 
 if __name__ == '__main__':
