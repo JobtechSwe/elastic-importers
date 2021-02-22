@@ -5,6 +5,8 @@ import math
 import itertools
 from datetime import datetime
 from jobtech.common.customlogging import configure_logging
+
+import importers.mappings
 from importers import settings
 from importers.platsannons import loader, converter, enricher_mt_rest_multiple as enricher
 from importers.repository import elastic
@@ -22,8 +24,8 @@ def _setup_index(es_index):
     try:
         es_index, delete_index = elastic.setup_indices(es_index,
                                                        settings.ES_ANNONS_PREFIX,
-                                                       settings.platsannons_mappings,
-                                                       settings.platsannons_deleted_mappings)
+                                                       importers.mappings.platsannons_mappings,
+                                                       importers.mappings.platsannons_deleted_mappings)
         log.info(f'Starting importer with batch: {settings.PG_BATCH_SIZE} for index: {es_index}')
         log.info(f'Index for removed items: {delete_index}')
     except Exception as e:
@@ -123,6 +125,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         log.info(f'Processed ads: {processed_ads_total}/{len_ads}')
 
     return doc_counter
+
 
 
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
