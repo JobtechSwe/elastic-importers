@@ -55,7 +55,8 @@ def convert_ad(message):
     if cleaned_description_text == '' and not message.get('avpublicerad'):
         log.warning('description.text is empty for ad id: %s' % annons['id'])
 
-    annons['remote_work'] = _is_ad_remote(cleaned_description_text, annons['headline'])
+    if not message.get('avpublicerad'):
+        annons['remote_work'] = _is_ad_remote(cleaned_description_text, annons['headline'])
 
     annons['description'] = {
         'text': cleaned_description_text,
