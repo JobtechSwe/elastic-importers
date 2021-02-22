@@ -1,6 +1,8 @@
 import sys
 import logging
 from elasticsearch.exceptions import NotFoundError
+
+import importers.mappings
 from importers.repository import elastic
 from importers import settings
 
@@ -37,7 +39,7 @@ def create_platsannons_index():
         sys.exit(1)
 
     idxname = sys.argv[1]
-    elastic.create_index(idxname, settings.platsannons_mappings)
+    elastic.create_index(idxname, importers.mappings.platsannons_mappings)
 
 
 def change_alias(idxnames, aliasname):

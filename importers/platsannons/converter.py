@@ -31,6 +31,14 @@ def _isodate(input_date):
         return None
 
 
+def _is_ad_remote(desc, title):
+    """
+    returns True if at least one of the match phrases is found in description or title of an ad, else returns False
+    """
+    text_to_check = f"{desc} {title}".lower()
+    return any(x in text_to_check for x in settings.REMOTE_MATCH_PHRASES)
+
+
 def convert_ad(message):
     annons = dict()
     start_time = int(time.time() * 1000)
@@ -46,6 +54,9 @@ def convert_ad(message):
     cleaned_description_text = clean_html(message.get('annonstextFormaterad'))
     if cleaned_description_text == '' and not message.get('avpublicerad'):
         log.warning('description.text is empty for ad id: %s' % annons['id'])
+
+    if not message.get('avpublicerad'):
+        annons['remote_work'] = _is_ad_remote(cleaned_description_text, annons['headline'])
 
     annons['description'] = {
         'text': cleaned_description_text,
