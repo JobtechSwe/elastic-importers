@@ -35,7 +35,8 @@ def _is_ad_remote(desc, title):
     """
     returns True if at least one of the match phrases is found in description or title of an ad, else returns False
     """
-    return any(x in f"{desc} {title}" for x in settings.REMOTE_MATCH_PHRASES)
+    text_to_check = f"{desc} {title}".lower()
+    return any(x in text_to_check for x in settings.REMOTE_MATCH_PHRASES)
 
 
 def convert_ad(message):

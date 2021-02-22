@@ -48,5 +48,7 @@ COMPANY_LOGO_BASE_URL = os.getenv('COMPANY_LOGO_BASE_URL',
                                   'https://www.arbetsformedlingen.se/rest/arbetsgivare/rest/af/v3/')
 COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))
 
-REMOTE_MATCH_PHRASES = ["Arbeta på distans", "Arbete på distans", "Jobba på distans", "Arbeta hemifrån",
-                        "Arbetar hemifrån", "Jobba hemifrån", "Jobb hemifrån", "remote work", "jobba tryggt hemifrån"]
+REMOTE_MATCH_PHRASES = [y.lower() for y in ["Arbeta på distans", "Arbete på distans", "Jobba på distans", "Arbeta hemifrån",
+                        "Arbetar hemifrån", "Jobba hemifrån", "Jobb hemifrån", "remote work", "jobba tryggt hemifrån"]]
+
+
