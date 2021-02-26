@@ -3,38 +3,37 @@ Changelog Application Jobsearch
 # 1.4.0
 * Check for phrases indicating remote work and set new field 'remote_work' 
 
-
 # 1.3.0
-* remove LA V1 logic in code
-* remove code for importing from scraped ads (moved to separate repo)
+* Remove LA v1 logic in code
+* Remove code for importing from scraped ads (moved to separate repo)
 
 # 1.2.2
-* Bugfix for handling 'arbetstidstyp'
+* Bugfix support both legacy ids and concept ids when handling 'arbetstidstyp'
 
 # 1.2.1
-* bugfix related to taxonomy
+* Bugfix related to taxonomy fail
 
 # 1.2.0
-* Use LA V2 default
+* Use LA v2 as default
 
 # 1.1.0
-* add concept ids for occupation and location to deleted ads
-* add import of scraped ads
+* Add ocupation and location concept id fields to deleted index. 
+* New scraped ads project preparation
 
 # 1.0.5
-* bugfix for reference field
+* Add fixed reference field type
 
 # 1.0.4
-* bugfix for concept_id
+* Bugfix for concept_id
 
 # 1.0.3
-* add logic for handling LA V2 ads
+* Preparation to LA v2 ad format
 
 # 1.0.2
-* removed unused code
+* Remove old stuff, exit while loop
 
-# 1.0.1-pr35
-* removed unused code
+# 1.0.1
+* Remove old stuff
 
 # 1.0.0
-* initial release
+* Initial release
