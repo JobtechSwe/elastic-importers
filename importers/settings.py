@@ -36,6 +36,7 @@ LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
 LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', 'false').lower() == 'true'
 LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 
+
 # For berikning (platsannonser)
 URL_ENRICH = 'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments'
 URL_ENRICH_TEXTDOCS_SERVICE = os.getenv('URL_ENRICH_TEXTDOCS_SERVICE', URL_ENRICH)
