@@ -5,13 +5,11 @@ import math
 import itertools
 from datetime import datetime
 from jobtech.common.customlogging import configure_logging
-
 import importers.mappings
 from importers import settings
 from importers.platsannons import loader, converter, enricher_mt_rest_multiple as enricher
 from importers.repository import elastic
-from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, \
-    check_index_size_before_switching_alias
+from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, check_index_size_before_switching_alias
 
 configure_logging([__name__.split('.')[0], 'importers'])
 log = logging.getLogger(__name__)
@@ -91,6 +89,7 @@ def start(es_index=None):
     if num_doc_elastic:
         log.info(f"Index: {es_index} has: {num_doc_elastic} indexed documents.")
     if not check_index_size_before_switching_alias(es_index):
+        log.error(f"Index: {es_index} has: {num_doc_elastic} indexed documents. Exit!")
         sys.exit(1)
 
 
@@ -127,7 +126,6 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
     return doc_counter
 
 
-
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
     # Loop over raw-list, convert and enrich into cooked-list
     log.info(f"Converting: {len(raw_ads)} ads to proper format ...")
@@ -158,7 +156,7 @@ def start_daily_index():
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)
-    log.info("Switching alias to new index completed successfully")
+    log.info(f"Switching alias to new index completed successfully: {new_index_name}")
 
 
 if __name__ == '__main__':

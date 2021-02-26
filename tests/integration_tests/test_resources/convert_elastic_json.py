@@ -5,6 +5,7 @@ this isn't valid JSON anymore. This scripts reads a JSON file line by line and
 outputs a valid JSON with correct quote usage.
 """
 
+
 def convert(input_filename, output_filename):
 
     multiline = False
@@ -69,11 +70,12 @@ def convert(input_filename, output_filename):
                 else:
                     buff += line
 
-    except:
+    except Exception:
         target.close()
         raise
 
     target.close()
+
 
 if __name__ == '__main__':
     # INFO: To run

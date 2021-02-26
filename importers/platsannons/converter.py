@@ -2,6 +2,7 @@ import logging
 import re
 import time
 from dateutil import parser
+
 from importers import settings
 from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
@@ -9,7 +10,6 @@ from importers.common import clean_html
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
-
 log = logging.getLogger(__name__)
 
 MUST_HAVE_WEIGHT = 10
@@ -340,8 +340,7 @@ def get_null_safe_value(element, key, replacement_val):
 
 
 def _expand_taxonomy_value(annons_key, message_key, message_dict):
-    message_value = message_dict.get(message_key, {}).get('varde') \
-        if message_dict else None
+    message_value = message_dict.get(message_key, {}).get('varde') if message_dict else None
     if message_value:
         concept = taxonomy.get_legacy_by_concept_id(annons_key, message_value)
         return {
@@ -364,8 +363,7 @@ def get_concept_as_annons_value_with_weight(taxtype, id, weight=None):
         weighted_concept['concept_id'] = concept.get('concept_id', None)
         weighted_concept['label'] = concept.get('label', None)
         weighted_concept['weight'] = weight
-        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id',
-                                                                 None)
+        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id', None)
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, id))
     except RequestError:

@@ -15,7 +15,8 @@ STREAM_INDEX_SUFFIX = '-stream'
 ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX', os.getenv('ES_ANNONS', 'platsannons'))
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 
-NEW_ADS_COEFFICIENT = 0.8  # don't switch alias to new index if number of ads in new index is too low
+# don't switch alias to new index if number of ads in new index < current index * coefficient
+NEW_ADS_COEF = 0.8
 
 # Parameter names corresponding to
 # narvaltextdocenrichments.textdocenrichments.NarvalEnricher

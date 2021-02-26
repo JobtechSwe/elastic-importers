@@ -1,21 +1,21 @@
 import os
 import sys
 import json
-
 import pytest
+
 from importers.platsannons import converter
 
-currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
+current_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 def get_source_ads_from_file():
-    with open(currentdir + 'test_resources/platsannonser_source_test_import.json', encoding='utf-8') as f:
+    with open(current_dir + 'test_resources/platsannonser_source_test_import.json', encoding='utf-8') as f:
         result = json.load(f)
         return result['testannonser']
 
 
 def get_target_ads_from_file():
-    with open(currentdir + 'test_resources/platsannonser_expected_after_conversion.json', encoding='utf-8') as f:
+    with open(current_dir + 'test_resources/platsannonser_expected_after_conversion.json', encoding='utf-8') as f:
         result = json.load(f)
         return result['hits']['hits']
 

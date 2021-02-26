@@ -63,12 +63,11 @@ def check_index_size_before_switching_alias(new_index_name):
     current_index = elastic.get_index_name_for_alias(alias_name)
     current_number = elastic.document_count(current_index)
     new_number = elastic.document_count(new_index_name)
-    if int(new_number) < int(current_number) * settings.NEW_ADS_COEFFICIENT:
-        log.error(f"Too FEW ads in latest import. Current: {current_number}, new: {new_number}, "
-                  f"coefficient: {settings.NEW_ADS_COEFFICIENT}")
+    if int(new_number) < int(current_number) * settings.NEW_ADS_COEF:
+        log.error(f"Too FEW ads in import. New: {new_number} current: {current_number}, coefficient: {settings.NEW_ADS_COEF}")
         return False
     else:
-        log.info(f'OK number of ads in latest import. Current: {current_number}, new: {new_number}')
+        log.info(f'OK number of ads in import. New: {new_number} current: {current_number}')
         return True
 
 
