@@ -2,6 +2,7 @@ Changelog Application Jobsearch
 ===============================
 # 1.4.0
 * Check for phrases indicating remote work and set new field 'remote_work' 
+* Check that new index is large enough (percentage of previous) before switching alias to new index
 
 # 1.3.0
 * Remove LA v1 logic in code
@@ -17,7 +18,7 @@ Changelog Application Jobsearch
 * Use LA v2 as default
 
 # 1.1.0
-* Add ocupation and location concept id fields to deleted index. 
+* Add occupation and location concept id fields to deleted index. 
 * New scraped ads project preparation
 
 # 1.0.5
