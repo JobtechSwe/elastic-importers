@@ -1,6 +1,7 @@
 import os
 import sys
 import pytest
+
 from importers.platsannons.loader import load_ad_details
 from importers.platsannons import converter, enricher_mt_rest_multiple as enricher
 
@@ -9,7 +10,6 @@ from importers.platsannons import converter, enricher_mt_rest_multiple as enrich
 @pytest.mark.integration
 def test_get_and_enrich_ad_details():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
-
 
     annons_id = 23888740
     ad_meta = {'annonsId': annons_id, 'avpublicerad': False, 'uppdateradTid': 1582272745821}

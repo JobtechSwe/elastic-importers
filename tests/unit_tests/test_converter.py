@@ -3,6 +3,7 @@ import sys
 import logging
 from dateutil.parser import ParserError
 from datetime import datetime
+
 from importers.platsannons import converter
 
 log = logging.getLogger(__name__)

@@ -1,10 +1,9 @@
 import concurrent.futures
-import sys
 import logging
 import time
 from multiprocessing import Value
-
 import requests
+
 from importers import settings
 from importers.repository import elastic
 
