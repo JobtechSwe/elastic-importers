@@ -72,4 +72,3 @@ This is run every night to create a fresh index and make sure no ads are missed 
 When running integration tests, the system needs access to other services so you need to specify environment variables in order for it to run properly.
 
     $ python3 -m pytest -svv -ra -m integration tests/
-

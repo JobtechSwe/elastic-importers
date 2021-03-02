@@ -34,7 +34,7 @@ WORKDIR /app
 RUN python3 -m pip install -r requirements.txt && \
     find tests -type d -name __pycache__ -prune -exec rm -rf -vf {} \; && \
     python3 setup.py install && \
-    python3 -m pytest -m unit tests/
+    python3 -m pytest -m unit tests/unit_tests
 
 
 WORKDIR /
