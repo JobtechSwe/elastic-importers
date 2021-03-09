@@ -293,3 +293,8 @@ def update_alias(indexnames, old_indexlist, aliasname):
     es.indices.update_aliases(body=actions)
     log.info(f"update_alias. Added: {indexnames}, removed: {old_indexlist}, alias name: {aliasname}")
     log.debug(f"update_alias. Actions: {actions}")
+
+
+def number_of_not_removed_ads(current_index):
+    query_not_removed = {"query": {"bool": {"must": {"term": {"removed": False}}}}}
+    return es.search(index=current_index, body=query_not_removed)['hits']['total']['value']
