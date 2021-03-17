@@ -61,7 +61,7 @@ def check_index_size_before_switching_alias(new_index_name):
         log.info(f"Alias {alias_name} does not exist, can't compare to old data, continuing")
         return True
     current_index = elastic.get_index_name_for_alias(alias_name)
-    current_number = elastic.document_count(current_index)
+    current_number = elastic.number_of_not_removed_ads(current_index)
     new_number = elastic.document_count(new_index_name)
     if int(new_number) < int(current_number) * settings.NEW_ADS_COEF:
         log.error(f"Too FEW ads in import. New: {new_number} current: {current_number}, coefficient: {settings.NEW_ADS_COEF}")
