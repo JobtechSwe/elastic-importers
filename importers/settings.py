@@ -16,7 +16,7 @@ ES_ANNONS_PREFIX = os.getenv('ES_ANNONS_INDEX', os.getenv('ES_ANNONS', 'platsann
 ES_ANNONS_INDEX = "%s%s" % (ES_ANNONS_PREFIX, WRITE_INDEX_SUFFIX)
 
 # don't switch alias to new index if number of ads in new index < current index * coefficient
-NEW_ADS_COEF = int(os.getenv('NEW_ADS_COEF', 0.8))
+NEW_ADS_COEF = float(os.getenv('NEW_ADS_COEF', 0.8))
 
 # Parameter names corresponding to
 # narvaltextdocenrichments.textdocenrichments.NarvalEnricher
