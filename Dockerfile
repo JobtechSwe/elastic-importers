@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN date && apt-get update && apt-get install -yq --no-install-recommends --fix-missing \
     apt-transport-https \
     ca-certificates \
-    python3 \
+    python3.7 \
     python3-dev \
     python3-setuptools \
     python3-pip \
