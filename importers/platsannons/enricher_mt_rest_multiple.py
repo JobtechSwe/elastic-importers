@@ -16,7 +16,7 @@ counter = None
 RETRIES = 10
 
 
-def enrich(annonser, scraped=False, typeahead=True):
+def enrich(annonser, typeahead=True):
     len_annonser = len(annonser)
     parallelism = settings.ENRICHER_PROCESSES if len_annonser > 100 else 1
     log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
@@ -29,10 +29,7 @@ def enrich(annonser, scraped=False, typeahead=True):
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
         doc_headline = get_doc_headline_input(annons)
-        if scraped:
-            doc_text = annons.get('originalJobPosting', {}).get('description', {}).get('text_formatted', '')
-        else:
-            doc_text = annons.get('description', {}).get('text_formatted', '')
+        doc_text = annons.get('description', {}).get('text_formatted', '')
 
         if not doc_text:
             log.debug(f"No enrich - empty description for id: {doc_id}, moving on to the next one.")

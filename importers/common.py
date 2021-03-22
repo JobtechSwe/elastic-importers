@@ -1,4 +1,4 @@
-import itertools as IT
+import itertools
 import logging
 from bs4 import BeautifulSoup
 
@@ -15,7 +15,7 @@ def log_import_metrics(log, importer_name, items_count):
 
 def grouper(n, iterable):
     iterable = iter(iterable)
-    return iter(lambda: list(IT.islice(iterable, n)), [])
+    return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
 tags_display_block = ['p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']

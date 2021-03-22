@@ -1,6 +1,7 @@
 import sys
 import logging
 import pytest
+
 from importers.platsannons import converter
 from importers.repository import taxonomy
 

@@ -2,6 +2,7 @@ import logging
 import re
 import time
 from dateutil import parser
+
 from importers import settings
 from importers.repository import taxonomy
 from elasticsearch.exceptions import RequestError
@@ -9,7 +10,6 @@ from importers.common import clean_html
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
-
 log = logging.getLogger(__name__)
 
 MUST_HAVE_WEIGHT = 10
@@ -31,6 +31,14 @@ def _isodate(input_date):
         return None
 
 
+def _is_ad_remote(desc, title):
+    """
+    returns True if at least one of the match phrases is found in description or title of an ad, else returns False
+    """
+    text_to_check = f"{desc} {title}".lower()
+    return any(x in text_to_check for x in settings.REMOTE_MATCH_PHRASES)
+
+
 def convert_ad(message):
     annons = dict()
     start_time = int(time.time() * 1000)
@@ -46,6 +54,9 @@ def convert_ad(message):
     cleaned_description_text = clean_html(message.get('annonstextFormaterad'))
     if cleaned_description_text == '' and not message.get('avpublicerad'):
         log.warning('description.text is empty for ad id: %s' % annons['id'])
+
+    if not message.get('avpublicerad'):
+        annons['remote_work'] = _is_ad_remote(cleaned_description_text, annons['headline'])
 
     annons['description'] = {
         'text': cleaned_description_text,
@@ -329,8 +340,7 @@ def get_null_safe_value(element, key, replacement_val):
 
 
 def _expand_taxonomy_value(annons_key, message_key, message_dict):
-    message_value = message_dict.get(message_key, {}).get('varde') \
-        if message_dict else None
+    message_value = message_dict.get(message_key, {}).get('varde') if message_dict else None
     if message_value:
         concept = taxonomy.get_legacy_by_concept_id(annons_key, message_value)
         return {
@@ -353,8 +363,7 @@ def get_concept_as_annons_value_with_weight(taxtype, id, weight=None):
         weighted_concept['concept_id'] = concept.get('concept_id', None)
         weighted_concept['label'] = concept.get('label', None)
         weighted_concept['weight'] = weight
-        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id',
-                                                                 None)
+        weighted_concept['legacy_ams_taxonomy_id'] = concept.get('legacy_ams_taxonomy_id', None)
     except AttributeError:
         log.warning('Taxonomy (3) value not found for {0} {1}'.format(taxtype, id))
     except RequestError:

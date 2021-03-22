@@ -39,7 +39,7 @@ def _bulk_generator(documents, indexname, idkey, deleted_index):
                     'publication_date': None,
                     'occupation': {
                         'concept_id': document.get('removed_ad_filter', {}).get('occupation_concept_id')
-                    } ,
+                    },
                     'occupation_group': {
                         'concept_id': document.get('removed_ad_filter', {}).get('occupation_group_concept_id')
                     },
@@ -101,6 +101,7 @@ def get_last_timestamp(indexname):
         last_timestamp = 0
     return last_timestamp
 
+
 def get_ad_by_id(id, indexname=settings.ES_ANNONS_INDEX):
     response = es.search(index=indexname,
                          body={
@@ -119,6 +120,7 @@ def get_ad_by_id(id, indexname=settings.ES_ANNONS_INDEX):
     if hits:
         ad = hits[0]['_source']
     return ad
+
 
 def get_ids_with_timestamp(ts, indexname):
     # Possible failure if there are more than "size" documents with the same timestamp
@@ -196,6 +198,11 @@ def alias_exists(aliasname):
     return es.indices.exists_alias(name=[aliasname])
 
 
+def get_index_name_for_alias(alias_name):
+    response = get_alias(alias_name)
+    return list(response.keys())[0]
+
+
 def get_alias(aliasname):
     return es.indices.get_alias(name=[aliasname])
 
@@ -214,7 +221,8 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
         write_alias = "%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)
         read_alias = "%s%s" % (es_index, settings.READ_INDEX_SUFFIX)
         stream_alias = "%s%s" % (es_index, settings.STREAM_INDEX_SUFFIX)
-        log.info(f'Setup alias based on default index: {default_index}. Write: {write_alias} Read: {read_alias} Stream: {stream_alias}')
+        log.info(
+            f'Setup alias based on default index: {default_index}. Write: {write_alias} Read: {read_alias} Stream: {stream_alias}')
     if not index_exists(deleted_index):
         log.info(f"Creating index: {deleted_index}")
         create_index(deleted_index, mappings_deleted)
@@ -285,3 +293,8 @@ def update_alias(indexnames, old_indexlist, aliasname):
     es.indices.update_aliases(body=actions)
     log.info(f"update_alias. Added: {indexnames}, removed: {old_indexlist}, alias name: {aliasname}")
     log.debug(f"update_alias. Actions: {actions}")
+
+
+def number_of_not_removed_ads(current_index):
+    query_not_removed = {"query": {"bool": {"must": {"term": {"removed": False}}}}}
+    return es.search(index=current_index, body=query_not_removed)['hits']['total']['value']

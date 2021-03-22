@@ -1,9 +1,10 @@
 import sys
 import logging
 from elasticsearch.exceptions import NotFoundError
+
+import importers.mappings
 from importers.repository import elastic
 from importers import settings
-
 
 log = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ def create_platsannons_index():
         sys.exit(1)
 
     idxname = sys.argv[1]
-    elastic.create_index(idxname, settings.platsannons_mappings)
+    elastic.create_index(idxname, importers.mappings.platsannons_mappings)
 
 
 def change_alias(idxnames, aliasname):
@@ -52,6 +53,22 @@ def change_alias(idxnames, aliasname):
     except NotFoundError as e:
         log.error(f"Can't create alias: {aliasname}. Indices not found: {idxnames}. {e} Exit!")
         sys.exit(1)
+
+
+def check_index_size_before_switching_alias(new_index_name):
+    alias_name = "%s%s" % (settings.ES_ANNONS_PREFIX, settings.READ_INDEX_SUFFIX)
+    if not elastic.alias_exists(alias_name):
+        log.info(f"Alias {alias_name} does not exist, can't compare to old data, continuing")
+        return True
+    current_index = elastic.get_index_name_for_alias(alias_name)
+    current_number = elastic.number_of_not_removed_ads(current_index)
+    new_number = elastic.document_count(new_index_name)
+    if int(new_number) < int(current_number) * settings.NEW_ADS_COEF:
+        log.error(f"Too FEW ads in import. New: {new_number} current: {current_number}, coefficient: {settings.NEW_ADS_COEF}")
+        return False
+    else:
+        log.info(f'OK number of ads in import. New: {new_number} current: {current_number}')
+        return True
 
 
 if __name__ == '__main__':

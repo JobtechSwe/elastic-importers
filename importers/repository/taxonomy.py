@@ -68,7 +68,7 @@ def get_legacy_by_concept_id(taxtype, concept_id, not_found_response=None):
             tax_value_cache[key] = value
         else:
             tax_value_cache[key] = {}
-            log.warning("(get_legacy_by_concept_id) set empty{} to tax_value_cache[key]: %s[%s]" % (tax_value_cache, key))
+            log.warning(f"(get_legacy_by_concept_id) empty value to tax_value_cache[key]: [{key}]")
     cached = dict(tax_value_cache.get(key, {}))
     log.debug(concept_id, taxtype)
     log.debug("(get_legacy_by_concept_id) returns cached: %s" % cached)

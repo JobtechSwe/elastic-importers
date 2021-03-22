@@ -25,7 +25,6 @@ The application is entirely configured using environment variables.
 | ES_TAX_INDEX_ALIAS  |  taxonomy | Alias for index that is the current version of the taxonomy |import-taxonomy|
 | ES_TAX_ARCHIVE_ALIAS  |  taxonomy-archive | Alias collecting all older versions of the taxonomy |import-taxonomy|
 | ES_ANNONS_INDEX | platsannons | Base index name for job ads |import-platsannonser, import-platsannonser-daily|
-| ES_SCRAPED_ANNONS_INDEX | scrapedannons / Base index name for scraped annons | import-scrapedannonser
 | LA_FEED_URL | http://localhost:5000/sokningar/andradeannonser/ | REST feed API for changes in job ads | import-platsannonser, import-platsannonser-daily |
 | LA_BOOTSTRAP_FEED_URL | http://localhost:5000/sokningar/publiceradeannonser| REST feed API for all currently available job ads | import-platsannonser-daily |
 | LA_DETAILS_URL | http://localhost:5000/annonser/ | REST feed API job ad details (i.e. the entire job ad) | import-platsannonser, import-platsannonser-daily |
@@ -60,19 +59,16 @@ This script is typically run every few minutes by cron.
     $ import-platsannonser-daily
     
 Creates a new index for platsannonser according to the configured ```ES_ANNONS_INDEX``` environment variable, with todays date and hour as a suffix, and starts a full load into that index.
-After successfull import, new "-read" and "-write" aliases are pointed to the new index.
+After successful import, new "-read" and "-write" aliases are pointed to the new index.
 This is run every night to create a fresh index and make sure no ads are missed by ```import-platsannonser```.
-
-### import-scrapedannonser
-Imports scraped ads from a file defined in the environment variable 'SCRAPED_FILE' default value is 'test_data.json' (scrapedannons\resources)
 
 
 ## Test
 
-## Köra unittester
+## Run unit tests
     $ python3 -m pytest -svv -ra -m unit tests/
     
-### Köra integrationstester    
+### Run integrations tests    
 When running integration tests, the system needs access to other services so you need to specify environment variables in order for it to run properly.
 
     $ python3 -m pytest -svv -ra -m integration tests/

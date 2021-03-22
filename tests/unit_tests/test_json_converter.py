@@ -1,5 +1,6 @@
 import importers.taxonomy.json_converter as json_converter
-import pytest, sys
+import pytest
+import sys
 
 test_data_for_map_functions = [{'legacy_ams_taxonomy_id': '5370',
                                 'type': 'jobterm',
