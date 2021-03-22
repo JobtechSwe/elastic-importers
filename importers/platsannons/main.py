@@ -131,9 +131,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
 
 
 def _get_taxonomy_multiple_versions():
-    headers = {
-        "api-key": settings.TAXONOMY_2_API_KEY,
-    }
+    headers = {"api-key": settings.TAXONOMY_2_API_KEY, }
     taxonomy_2 = requests.get(settings.TAXONOMY_2_URL, headers=headers)
     return taxonomy_2.json()
 

@@ -81,6 +81,7 @@ def get_doc_headline_input(annons):
     sep = ' | '
     # Add occupation from structured data in headline.
     doc_headline_occupation = ' '.join([occupation.get('label', '') for occupation in annons.get('occupation', {})])
+    log.info("enriched headline %s" % doc_headline_occupation)
     if doc_headline_occupation is None:
         doc_headline_occupation = ''
 
