@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
+from importers import settings
 
 setup(
     name='ElasticImporters',
     author='Team Narwhal',
-    version='1.4.0',
+    version=settings.VERSION,
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
