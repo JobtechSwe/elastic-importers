@@ -2,16 +2,14 @@ import logging
 import os
 import sys
 from ssl import create_default_context
-
 import certifi
 import pytest
+
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import scan
 
 log = logging.getLogger(__name__)
-
-indexname = 'platsannons-read'
-
+indexname = 'platsannons-read'  # TODO fixed or from settings?
 context = create_default_context(cafile=certifi.where())
 
 

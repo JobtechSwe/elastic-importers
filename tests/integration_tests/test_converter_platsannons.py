@@ -1,22 +1,22 @@
 import os
 import sys
 import json
-
 import pytest
 
-currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
+from importers.platsannons import converter
+
+current_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 def get_source_ads_from_file():
-    with open(currentdir + 'test_resources/platsannonser_source_test_import.json') as f:
+    with open(current_dir + 'test_resources/platsannonser_source_test_import.json', encoding='utf-8') as f:
         result = json.load(f)
         return result['testannonser']
 
 
 def get_target_ads_from_file():
-    with open(currentdir + 'test_resources/platsannonser_target_test_import.json') as f:
+    with open(current_dir + 'test_resources/platsannonser_expected_after_conversion.json', encoding='utf-8') as f:
         result = json.load(f)
-        # pprint(result)
         return result['hits']['hits']
 
 
@@ -31,14 +31,14 @@ def test_platsannons_conversion():
     source_ad = get_source_ad(annons_id, source_ads)
 
     annons_id = source_ad['annonsId']
-    assert_ad_properties(annons_id, source_ads, target_ads)
-
-
-def assert_ad_properties(annons_id, source_ads, target_ads):
-    from importers.platsannons import converter
-    print('Testing convert_message for id: %s' % annons_id)
     source_ad = get_source_ad(annons_id, source_ads)
     target_ad = get_target_ad(annons_id, target_ads)
+    assert_ad_properties(annons_id, source_ad, target_ad)
+
+
+def assert_ad_properties(annons_id, source_ad, target_ad):
+    print('Testing convert_message for id: %s' % annons_id)
+
     message_envelope = source_ad
 
     message_envelope['version'] = 1
@@ -49,7 +49,7 @@ def assert_ad_properties(annons_id, source_ads, target_ads):
         if key not in ['keywords', 'timestamp', 'employer']:
             assert key in conv_ad.keys()
             assert type(val) == type(conv_ad[key])
-            assert val == conv_ad[key]
+            assert val == conv_ad[key], f"Expected {val} but got {conv_ad[key]}"
         elif key == 'keywords':
             company_node = conv_ad['keywords']['extracted']['employer']
             assert 'fazer food services' in company_node
@@ -93,7 +93,6 @@ def assert_ad_properties(annons_id, source_ads, target_ads):
 @pytest.mark.integration
 def test_corrupt_platsannons():
     print('============================', sys._getframe().f_code.co_name, '============================ ')
-    from importers.platsannons import converter
     source_ads = get_source_ads_from_file()
 
     annons_id = '20159374'

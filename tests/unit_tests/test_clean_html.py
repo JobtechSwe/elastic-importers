@@ -3,11 +3,11 @@ import sys
 import json
 import os
 import logging
+
 from importers.common import clean_html
 
 log = logging.getLogger(__name__)
-
-currentdir = os.path.dirname(os.path.realpath(__file__)) + '/'
+current_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
 
 
 @pytest.mark.unit
@@ -135,7 +135,7 @@ def test_clean_html_double_p_tags():
 
 
 def get_source_ads_from_file():
-    with open(currentdir + 'test_resources/platsannonser_source_test_import.json', encoding='utf-8') as f:
+    with open(current_dir + 'test_resources/platsannonser_source_test_import.json', encoding='utf-8') as f:
         result = json.load(f)
         return result['testannonser']
 
