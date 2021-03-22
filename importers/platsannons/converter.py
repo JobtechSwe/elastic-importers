@@ -138,7 +138,7 @@ def convert_ad(message, taxonomy_2):
         'education_level': [],
     }
 
-    # not nice code, will change in future
+    # TODO: loop will be updated in future
     skills = annons['must_have'].get('skills', [])
     replaced_terms = []
     if skills:
@@ -177,7 +177,7 @@ def convert_ad(message, taxonomy_2):
         'education_level': [],
     }
 
-    # not nice code, will change in future
+    # TODO: loop need to be updated in nice way
     skills = annons['nice_to_have'].get('skills', [])
     replaced_terms = []
     if skills:
@@ -278,7 +278,6 @@ def _build_contacts(kontaktpersoner):
 
 def _set_occupations(annons, message, taxonomy_2):
     if 'yrkesroll' in message:
-        log.debug('NB! Env var to use la v2')
         yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll', {}).get('varde'))
 
         if yrkesroll and 'parent' in yrkesroll:
