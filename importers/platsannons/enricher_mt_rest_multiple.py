@@ -80,9 +80,10 @@ def enrich(annonser, typeahead=True):
 def get_doc_headline_input(annons):
     sep = ' | '
     # Add occupation from structured data in headline.
-    doc_headline_occupation = annons.get('occupation', {}).get('label', '')
-    if doc_headline_occupation is None:
+    doc_headline_occupation = ' '.join([occupation.get('label', '') for occupation in annons.get('occupation', {})])
+    if not doc_headline_occupation:
         doc_headline_occupation = ''
+    log.info(f"enriched headline occupation: {doc_headline_occupation}")
 
     wp_address_node = annons.get('workplace_address', {})
     wp_address_input = ''

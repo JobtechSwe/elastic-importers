@@ -4,6 +4,8 @@ import sys
 import math
 import itertools
 from datetime import datetime
+
+import requests
 from jobtech.common.customlogging import configure_logging
 import importers.mappings
 from importers import settings
@@ -105,6 +107,8 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
     # Partition list into manageable chunks
     ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
     processed_ads_total = 0
+    taxonomy_2 = _get_taxonomy_multiple_versions()
+
     for i, ad_batch in enumerate(ad_batches):
         log.info('Processing batch %s/%s' % (i + 1, nr_of_batches))
 
@@ -118,7 +122,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         log.info(f'Fetched batch of ads (id, updatedAt): '
                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
 
-        _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted)
+        _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted, taxonomy_2)
         processed_ads_total = processed_ads_total + len(ad_batch)
 
         log.info(f'Processed ads: {processed_ads_total}/{len_ads}')
@@ -126,10 +130,16 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
     return doc_counter
 
 
-def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index):
+def _get_taxonomy_multiple_versions():
+    headers = {"api-key": settings.TAXONOMY_2_API_KEY, }
+    taxonomy_2 = requests.get(settings.TAXONOMY_2_URL, headers=headers)
+    return taxonomy_2.json()
+
+
+def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index, taxonomy_2):
     # Loop over raw-list, convert and enrich into cooked-list
     log.info(f"Converting: {len(raw_ads)} ads to proper format ...")
-    converted_ads = [converter.convert_ad(raw_ad) for raw_ad in raw_ads]
+    converted_ads = [converter.convert_ad(raw_ad, taxonomy_2) for raw_ad in raw_ads]
     log.info("Enriching ads with ML ...")
     enriched_ads = enricher.enrich(converted_ads)
     log.info(f"Indexing: {len(enriched_ads)} enriched documents into: {es_index}")

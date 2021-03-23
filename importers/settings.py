@@ -54,3 +54,6 @@ COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))
 REMOTE_MATCH_PHRASES = [y.lower() for y in
                         ["Arbeta på distans", "Arbete på distans", "Jobba på distans", "Arbeta hemifrån",
                          "Arbetar hemifrån", "Jobba hemifrån", "Jobb hemifrån", "remote work", "jobba tryggt hemifrån"]]
+#taxonomy replaced terms
+TAXONOMY_2_URL = os.getenv('TAXONOMY_2_URL')
+TAXONOMY_2_API_KEY = os.getenv('TAXONOMY_2_API_KEY')
