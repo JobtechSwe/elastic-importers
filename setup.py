@@ -7,9 +7,7 @@ setup(
     version=settings.VERSION,
     packages=find_packages(),
     include_package_data=True,
-    install_requires=[
-        'valuestore', 'elasticsearch', 'zeep', 'python-dateutil', 'flashtext', 'jobtech-common'
-    ],
+    install_requires=['valuestore', 'elasticsearch', 'zeep', 'jobtech-common'],
     package_data={'': ['**/resources/*']},
     entry_points={
         'console_scripts': [

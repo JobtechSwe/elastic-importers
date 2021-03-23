@@ -314,6 +314,7 @@ def _check_and_add_replace_concept_id(old_term_concept_id, taxonomy_2):
         content = item.get("taxonomy/concept", {})
         if old_term_concept_id == content.get("taxonomy/id"):
             replaced_term = content.get("taxonomy/replaced-by")[0]
+            log.info(f"Old taxonomy term: {old_term_concept_id} is replaced by: {replaced_term}")
             return {
                 'concept_id': replaced_term.get("taxonomy/id"),
                 'label': replaced_term.get('taxonomy/preferred-label'),
