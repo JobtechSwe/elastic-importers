@@ -2,6 +2,7 @@ git+https://github.com/JobtechSwe/valuestore-module.git
 git+https://github.com/JobtechSwe/jobtech-common.git
 requests~=2.23.0
 elasticsearch~=7.6.0
+python-dateutil~=2.8.1
 pytest~=5.4.1
 beautifulsoup4~=4.9.1
 certifi~=2020.4.5.1
