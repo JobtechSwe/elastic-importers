@@ -11,10 +11,13 @@ import importers.mappings
 from importers import settings
 from importers.platsannons import loader, converter, enricher_mt_rest_multiple as enricher
 from importers.repository import elastic
-from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, check_index_size_before_switching_alias
+from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, \
+    check_index_size_before_switching_alias
+from index_from_file.file_handling import save_enriched_ads_to_file
 
 configure_logging([__name__.split('.')[0], 'importers'])
 log = logging.getLogger(__name__)
+enriched_ads_to_save = []
 
 
 def _setup_index(es_index):
@@ -126,8 +129,17 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         processed_ads_total = processed_ads_total + len(ad_batch)
 
         log.info(f'Processed ads: {processed_ads_total}/{len_ads}')
+    save_enriched_ads()
 
     return doc_counter
+
+
+def save_enriched_ads():
+    """
+    saves enriched ads to a Pickle file that can be used when creating an index from a known state
+    """
+    if settings.SAVE_ENRICHED_ADS:
+        save_enriched_ads_to_file(enriched_ads_to_save)
 
 
 def _get_taxonomy_multiple_versions():
@@ -142,6 +154,10 @@ def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index, taxonomy_2):
     converted_ads = [converter.convert_ad(raw_ad, taxonomy_2) for raw_ad in raw_ads]
     log.info("Enriching ads with ML ...")
     enriched_ads = enricher.enrich(converted_ads)
+
+    if settings.SAVE_ENRICHED_ADS:
+        enriched_ads_to_save.extend(enriched_ads)
+
     log.info(f"Indexing: {len(enriched_ads)} enriched documents into: {es_index}")
     # Bulk save cooked-list to elastic
     num_indexed = elastic.bulk_index(enriched_ads, es_index, deleted_index)

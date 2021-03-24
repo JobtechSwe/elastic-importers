@@ -8,5 +8,5 @@ def save_enriched_ads_to_file(list_of_enriched_ads):
 
 
 def unpickle_ads():
-    with open(settings.PATH / settings.FILE_NAME, 'rb') as f:
+    with open(settings.FILE_TO_UNPICKLE, 'rb') as f:
         return pickle.load(f)

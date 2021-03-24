@@ -1,7 +1,10 @@
 import pathlib
-
-FILE_NAME = "enriched_ads_json_20210324_0745.pickle"
+from datetime import datetime
+PATH = pathlib.Path.cwd()
+FILE_NAME = f"enriched_ads_{datetime.now().strftime('%Y%m%d-%H%M')}.pickle"
 INDEX_NAME = "platsannons-import-from-file-0850"
 deleted_index = f"{INDEX_NAME}-deleted"
 
-PATH = pathlib.Path.cwd()
+
+FILE_TO_UNPICKLE = ''
+
