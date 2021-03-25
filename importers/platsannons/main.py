@@ -156,6 +156,7 @@ def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index, taxonomy_2):
     enriched_ads = enricher.enrich(converted_ads)
 
     if settings.SAVE_ENRICHED_ADS:
+        global enriched_ads_to_save
         enriched_ads_to_save.extend(enriched_ads)
 
     log.info(f"Indexing: {len(enriched_ads)} enriched documents into: {es_index}")
