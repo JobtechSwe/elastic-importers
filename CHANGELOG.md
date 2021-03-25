@@ -1,5 +1,8 @@
 Changelog Application Jobsearch
 ===============================
+# 1.4.1
+* Option to save enriched ads to a file (for development & testing)
+
 # 1.4.0
 * Check for phrases indicating remote work and set new field 'remote_work' 
 * Check that new index is large enough (percentage of previous) before switching alias to new index

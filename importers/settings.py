@@ -57,3 +57,5 @@ REMOTE_MATCH_PHRASES = [y.lower() for y in
 #taxonomy replaced terms
 TAXONOMY_2_URL = os.getenv('TAXONOMY_2_URL')
 TAXONOMY_2_API_KEY = os.getenv('TAXONOMY_2_API_KEY')
+
+SAVE_ENRICHED_ADS = os.getenv('SAVE_ENRICHED_ADS', False)
