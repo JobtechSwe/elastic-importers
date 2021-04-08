@@ -52,24 +52,24 @@ def load_ad_to_remove(unpublished_ad_meta):
     log.info(f"Ad is avpublicerad, preparing to remove it: {ad_id}")
     removed_date = unpublished_ad_meta.get('avpubliceringsdatum') or \
                    time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(unpublished_ad_meta.get('uppdateradTid') / 1000))
-    occupation_concept_id = None
-    occupation_group_concept_id = None
-    occupation_field_concept_id = None
+    occupation_concept_ids = None
+    occupation_group_concept_ids = None
+    occupation_field_concept_ids = None
     municipality_concept_id = None
     region_concept_id = None
     country_concept_id = None
     # Fetch filtering details for unpublished ad from Elastic Search...
     ad_from_elastic = elastic.get_ad_by_id(ad_id)
     if ad_from_elastic:
-        occupation = ad_from_elastic.get('occupation')
-        if occupation:
-            occupation_concept_id = occupation.get('concept_id')
-        occupation_field = ad_from_elastic.get('occupation_field')
-        if occupation_field:
-            occupation_field_concept_id = occupation_field.get('concept_id')
-        occupation_group = ad_from_elastic.get('occupation_group')
-        if occupation_group:
-            occupation_group_concept_id = occupation_group.get('concept_id')
+        occupations = ad_from_elastic.get('occupation')
+        if occupations:
+            occupation_concept_ids = [occupation.get('concept_id') for occupation in occupations]
+        occupation_fields = ad_from_elastic.get('occupation_field')
+        if occupation_fields:
+            occupation_field_concept_ids = [occupation_field.get('concept_id') for occupation_field in occupation_fields]
+        occupation_groups = ad_from_elastic.get('occupation_group')
+        if occupation_groups:
+            occupation_group_concept_ids = [occupation_group.get('concept_id') for occupation_group in occupation_groups]
         workplace_address = ad_from_elastic.get('workplace_address')
         if workplace_address:
             municipality_concept_id = workplace_address.get('municipality_concept_id')
@@ -88,9 +88,9 @@ def load_ad_to_remove(unpublished_ad_meta):
             'updatedAt': unpublished_ad_meta.get('uppdateradTid'),
             'timestamp': unpublished_ad_meta.get('uppdateradTid'),
             'removed_ad_filter': {
-                'occupation_concept_id': occupation_concept_id,
-                'occupation_field_concept_id': occupation_field_concept_id,
-                'occupation_group_concept_id': occupation_group_concept_id,
+                'occupation_concept_id': occupation_concept_ids,
+                'occupation_field_concept_id': occupation_field_concept_ids,
+                'occupation_group_concept_id': occupation_group_concept_ids,
                 'municipality_concept_id': municipality_concept_id,
                 'region_concept_id': region_concept_id,
                 'country_concept_id': country_concept_id}
