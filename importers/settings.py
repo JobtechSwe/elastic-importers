@@ -1,6 +1,6 @@
 import os
 
-VERSION = '1.4.0'
+VERSION = '1.5.0'
 
 ES_HOST = os.getenv("ES_HOST", "127.0.0.1")
 ES_PORT = os.getenv("ES_PORT", 9200)
