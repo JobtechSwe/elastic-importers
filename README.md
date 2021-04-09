@@ -2,6 +2,9 @@
 Imports job ads and taxonomy values into elasticsearch. 
 Creates console script entry points to run with different intervals, usually via cron to load data into elastic.
 
+## Python version
+    Python 3.8.8 
+
 ## Installation
 
     $ python setup.py 

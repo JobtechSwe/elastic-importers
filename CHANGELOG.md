@@ -1,5 +1,10 @@
 Changelog Application Jobsearch
 ===============================
+# 1.5.0
+* Changes for new taxonomy version
+* update of third-party libraries
+
+
 # 1.4.1
 * Option to save enriched ads to a file (for development & testing)
 
