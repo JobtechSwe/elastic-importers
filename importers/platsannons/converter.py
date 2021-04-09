@@ -53,7 +53,7 @@ def convert_ad(message, taxonomy_2):
 
     cleaned_description_text = clean_html(message.get('annonstextFormaterad'))
     if cleaned_description_text == '' and not message.get('avpublicerad'):
-        log.warning('description.text is empty for ad id: %s' % annons['id'])
+        log.warning(f"description.text is empty for ad id: {annons['id']}")
 
     if not message.get('avpublicerad'):
         annons['remote_work'] = _is_ad_remote(cleaned_description_text, annons['headline'])
@@ -144,7 +144,7 @@ def convert_ad(message, taxonomy_2):
     if skills:
         for skill in skills:
             concept_id = skill.get('concept_id')
-            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_2)
+            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_2, annons['id'])
             for replaced_term in replaced_terms:
                 terms.append(replaced_term)
     annons['must_have']['skills'] += terms
@@ -183,7 +183,7 @@ def convert_ad(message, taxonomy_2):
     if skills:
         for skill in skills:
             concept_id = skill.get('concept_id')
-            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_2)
+            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_2, annons['id'])
             for replaced_term in replaced_terms:
                 terms.append(replaced_term)
     annons['nice_to_have']['skills'] += terms
@@ -193,8 +193,8 @@ def convert_ad(message, taxonomy_2):
     if message.get('utbildningsinriktning'):
         try:
             _set_education(annons, message)
-        except TypeError:
-            log.warning(f"Skipping education on ad {annons['id']} due to TypeError")
+        except TypeError as e:
+            log.warning(f"Skipping education on ad: {annons['id']} due to TypeError: {e}")
 
     annons['publication_date'] = _isodate(message.get('publiceringsdatum'))
     annons['last_publication_date'] = _isodate(message.get('sistaPubliceringsdatum'))
@@ -287,7 +287,7 @@ def _set_occupations(annons, message, taxonomy_2):
                                     'label': yrkesroll['label'],
                                      'legacy_ams_taxonomy_id':
                                          yrkesroll['legacy_ams_taxonomy_id']}]
-            replaced_terms = _check_and_add_replace_concept_id(yrkesroll['concept_id'], taxonomy_2)
+            replaced_terms = _check_and_add_replace_concept_id(yrkesroll['concept_id'], taxonomy_2, annons['id'])
             if replaced_terms:
                 for replaced_term in replaced_terms:
                     if replaced_term.get('new_version', False):
@@ -316,14 +316,14 @@ def _set_occupations(annons, message, taxonomy_2):
             log.warning(f"Parent not found for yrkesroll: {message['yrkesroll']} ({yrkesroll})")
 
 
-def _check_and_add_replace_concept_id(old_term_concept_id, taxonomy_2):
+def _check_and_add_replace_concept_id(old_term_concept_id, taxonomy_2, annons_id):
     taxonomy_values = []
     for item in taxonomy_2:
         content = item.get("taxonomy/concept", {})
         internal_content = content.get("taxonomy/replaced-by", {})[0]
         if old_term_concept_id == content.get("taxonomy/id"):
             replaced_term = content.get("taxonomy/replaced-by")[0]
-            log.info(f"Old taxonomy term: {old_term_concept_id} is replaced by: {replaced_term}")
+            log.info(f"Old taxonomy term: {old_term_concept_id} is replaced by: {replaced_term} in id: {annons_id}")
             taxonomy_values.append({
                 'concept_id': replaced_term.get("taxonomy/id"),
                 'label': replaced_term.get('taxonomy/preferred-label'),
