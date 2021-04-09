@@ -297,7 +297,7 @@ def _set_occupations(annons, message, taxonomy_2):
                             'legacy_ams_taxonomy_id': replaced_term['legacy_ams_taxonomy_id']})
                         replaced_yrkesroll = taxonomy.get_concept_by_legacy_id('yrkesroll', replaced_term.get('concept_id'))
                         if replaced_yrkesroll and 'parent' in replaced_yrkesroll:
-                            yrkesgrupp = yrkesroll.get('parent')
+                            yrkesgrupp = replaced_yrkesroll.get('parent', {})
                             yrkesomrade = yrkesgrupp.get('parent')
                     else:
                         annons['occupation'].append(replaced_term)
