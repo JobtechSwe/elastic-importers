@@ -144,9 +144,9 @@ def save_enriched_ads():
 
 def _get_taxonomy_multiple_versions():
     headers = {"api-key": settings.TAXONOMY_2_API_KEY, }
-    taxonomy_2 = requests.get(settings.TAXONOMY_2_URL, headers=headers)
-    taxonomy_2.raise_for_status()
-    return taxonomy_2.json()
+    taxonomy_2_response = requests.get(settings.TAXONOMY_2_URL, headers=headers)
+    taxonomy_2_response.raise_for_status()
+    return taxonomy_2_response.json()
 
 
 def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index, taxonomy_2):
