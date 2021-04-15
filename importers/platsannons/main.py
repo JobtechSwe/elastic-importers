@@ -122,7 +122,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
                    if not raw_ad.get('removed', False)]
         doc_counter += len(raw_ads)
         log.info(f'doc_counter=len(raw_ads): {doc_counter}')
-        log.info(f'Fetched batch of ads (id, updatedAt): '
+        log.debug(f'Fetched batch of ads (id, updatedAt): '
                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
 
         _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted, taxonomy_2)
@@ -145,6 +145,7 @@ def save_enriched_ads():
 def _get_taxonomy_multiple_versions():
     headers = {"api-key": settings.TAXONOMY_2_API_KEY, }
     taxonomy_2 = requests.get(settings.TAXONOMY_2_URL, headers=headers)
+    taxonomy_2.raise_for_status()
     return taxonomy_2.json()
 
 
