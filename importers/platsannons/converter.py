@@ -281,12 +281,12 @@ def _set_occupations(annons, message, taxonomy_2):
         yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll', {}).get('varde'))
 
         if yrkesroll and 'parent' in yrkesroll:
-            yrkesgrupp = yrkesroll.get('parent')
-            yrkesomrade = yrkesgrupp.get('parent')
-            annons['occupation'] = [{'concept_id': yrkesroll['concept_id'],
-                                    'label': yrkesroll['label'],
+            yrkesgrupp = yrkesroll.get('parent', {})
+            yrkesomrade = yrkesgrupp.get('parent', {})
+            annons['occupation'] = [{'concept_id': yrkesroll.get('concept_id', None),
+                                    'label': yrkesroll.get('label', None),
                                      'legacy_ams_taxonomy_id':
-                                         yrkesroll['legacy_ams_taxonomy_id']}]
+                                         yrkesroll.get('legacy_ams_taxonomy_id', None)}]
             replaced_terms = _check_and_add_replace_concept_id(yrkesroll['concept_id'], taxonomy_2, annons['id'])
             if replaced_terms:
                 for replaced_term in replaced_terms:
@@ -300,14 +300,14 @@ def _set_occupations(annons, message, taxonomy_2):
                             yrkesgrupp = replaced_yrkesroll.get('parent', {})
                             yrkesomrade = yrkesgrupp.get('parent')
 
-            annons['occupation_group'] = [{'concept_id': yrkesgrupp['concept_id'],
-                                          'label': yrkesgrupp['label'],
+            annons['occupation_group'] = [{'concept_id': yrkesgrupp.get('concept_id', None),
+                                          'label': yrkesgrupp.get('label', None),
                                            'legacy_ams_taxonomy_id':
-                                               yrkesgrupp['legacy_ams_taxonomy_id']}]
-            annons['occupation_field'] = [{'concept_id': yrkesomrade['concept_id'],
-                                          'label': yrkesomrade['label'],
+                                               yrkesgrupp.get('legacy_ams_taxonomy_id', None)}]
+            annons['occupation_field'] = [{'concept_id': yrkesomrade.get('concept_id', None),
+                                          'label': yrkesomrade.get('label', None),
                                            'legacy_ams_taxonomy_id':
-                                               yrkesomrade['legacy_ams_taxonomy_id']}]
+                                               yrkesomrade.get('legacy_ams_taxonomy_id', None)}]
         elif not yrkesroll:
             log.warning(f"Taxonomy value not found for: {message['yrkesroll']}")
         else:  # yrkesroll is not None and 'parent' not in yrkesroll
