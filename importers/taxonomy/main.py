@@ -1,22 +1,16 @@
 import logging
 from jobtech.common.customlogging import configure_logging
-from importers.taxonomy import settings, taxonomy_service
+from importers.taxonomy import settings
 from importers.repository import elastic
-import pickle
 
+from importers.taxonomy.fetch_values_from_taxonomy import fetch_and_convert_values
 
 configure_logging([__name__.split('.')[0], 'jobtech'])
 log = logging.getLogger(__name__)
 
 
 def check_if_taxonomyversion_already_exists():
-    try:
-        tax_versions = taxonomy_service.get_taxonomy_version()
-    except Exception as e:
-        log.error('Failed to get taxonomy version from taxonomy service', e)
-        raise
-    highest_version = max([v['BastaxonomiId'] for v in tax_versions])
-    expected_index_name = settings.ES_TAX_INDEX_BASE + str(highest_version)
+    expected_index_name = settings.ES_TAX_INDEX_BASE + '2'
     log.info('Expected index based on taxonomy version: %s' % expected_index_name)
     try:
         index_exists = elastic.index_exists(expected_index_name)
@@ -24,13 +18,6 @@ def check_if_taxonomyversion_already_exists():
         log.error('Failed to check index existence on elastic', e)
         raise
     return expected_index_name, index_exists
-
-
-def unpickle_values():
-    with open(settings.resources_folder + "values.pickle", "rb") as fin:
-        data = pickle.load(fin)
-        log.info("File values.pickle loaded from folder: %s" % settings.resources_folder)
-        return data
 
 
 def update_search_engine_valuestore(indexname, indexexists, values):
@@ -69,9 +56,9 @@ def update_search_engine_valuestore(indexname, indexexists, values):
 
 def start():
     (indexname, indexexist) = check_if_taxonomyversion_already_exists()
-    values = unpickle_values()
+    values = fetch_and_convert_values()
     update_search_engine_valuestore(indexname, indexexist, values)
-    log.info("Import-taxonomy from pickles finished")
+    log.info("Import-taxonomy finished")
 
 
 if __name__ == '__main__':

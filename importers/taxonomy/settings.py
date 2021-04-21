@@ -1,10 +1,16 @@
 import os
 
 # Taxonomyservice settings
-TAXONOMY_SERVICE_URL = os.getenv("TAXONOMY_SERVICE_URL",
-                                 "http://api.arbetsformedlingen.se/taxonomi/v0/TaxonomiService.asmx")
-LANGUAGE_CODE_SE = 502
-COUNTRY_CODE_SE = 199
+TAXONOMY_VERSION_2_URL = os.getenv("TAXONOMY_VERSION_2_URL",
+                                   "https://taxonomy.api.jobtechdev.se/v1/taxonomy/graphql?")
+TAXONOMY_VERSION_2_API_KEY = os.getenv("API_KEY")
+
+GENERAL_VALUES = ['region', 'municipality', 'country', 'worktime-extent', 'language', 'driving-licence', 'wage-type',
+                'sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3', 'sun-education-level-1',
+                'sun-education-level-2', 'sun-education-level-3', 'employment-duration']
+
+REPLECED_VALUES = ['skill', 'employment-type']
+
 
 # Elasticsearch settings
 ES_TAX_INDEX_BASE = os.getenv("ES_TAX_INDEX_BASE", "taxonomy-")
