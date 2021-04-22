@@ -144,7 +144,7 @@ def save_enriched_ads():
 
 def _get_taxonomy_multiple_versions():
     headers = {"api-key": settings.TAXONOMY_API_KEY, }
-    url = f"{settings.TAXONOMY_URL}/v1/taxonomy/main/replaced-by-changes?after-version=1&to-version-inclusive=2"
+    url = f"{settings.TAXONOMY_URL}/main/replaced-by-changes?after-version=1&to-version-inclusive=2"
     taxonomy_2_response = requests.get(url, headers=headers)
     taxonomy_2_response.raise_for_status()
     return taxonomy_2_response.json()

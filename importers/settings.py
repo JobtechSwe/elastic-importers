@@ -56,7 +56,7 @@ REMOTE_MATCH_PHRASES = [y.lower() for y in
 
 SAVE_ENRICHED_ADS = os.getenv('SAVE_ENRICHED_ADS', False)
 
-TAXONOMY_URL = os.getenv('TAXONOMY_URL', "https://taxonomy.api.jobtechdev.se")
+TAXONOMY_URL = os.getenv('TAXONOMY_URL', "https://taxonomy.api.jobtechdev.se/v1/taxonomy")
 TAXONOMY_API_KEY = os.getenv('TAXONOMY_API_KEY')
 
 ES_TAX_INDEX_BASE = os.getenv("ES_TAX_INDEX_BASE", "taxonomy-")

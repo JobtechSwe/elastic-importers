@@ -9,7 +9,7 @@ from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_W
 
 def _fetch_taxonomy_values(params):
     headers = {"api-key": importers.settings.TAXONOMY_API_KEY, }
-    url = f"{settings.TAXONOMY_URL}/v1/taxonomy/graphql?"
+    url = f"{settings.TAXONOMY_URL}/graphql?"
     taxonomy_2_response = requests.get(url, headers=headers, params=params)
     taxonomy_2_response.raise_for_status()
     return taxonomy_2_response.json()
