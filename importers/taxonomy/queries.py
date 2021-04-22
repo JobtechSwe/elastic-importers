@@ -1,5 +1,5 @@
 OCCUPATIONS_QUERY = """
-query MyQuery {
+query OccupationsQuery {
   concepts(type: "occupation-name", include_deprecated: true) {
     type
     id
@@ -46,7 +46,7 @@ query MyQuery {
 """
 
 GENERAL_QUERY = """
-query MyQuery {
+query GeneralQuery {
   concepts(type: %s) {
     type
     id
@@ -57,7 +57,7 @@ query MyQuery {
 """
 
 QUERY_WITH_REPLACED = """
-query MyQuery {
+query ReplacedQuery {
   concepts(type: %s){
     type
     id

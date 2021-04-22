@@ -9,9 +9,9 @@ from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_W
 
 def _fetch_taxonomy_values(params):
     headers = {"api-key": importers.settings.TAXONOMY_API_KEY, }
-    taxonomy_2_response = requests.get(url=settings.TAXONOMY_GRAPHQL_URL, headers=headers, params=params)
-    taxonomy_2_response.raise_for_status()
-    return taxonomy_2_response.json()
+    taxonomy_response = requests.get(url=settings.TAXONOMY_GRAPHQL_URL, headers=headers, params=params)
+    taxonomy_response.raise_for_status()
+    return taxonomy_response.json()
 
 
 def _fetch_value(query):
