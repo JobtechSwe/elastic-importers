@@ -14,6 +14,7 @@ from importers.repository import elastic
 from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, \
     check_index_size_before_switching_alias
 from index_from_file.file_handling import save_enriched_ads_to_file
+from importers.common import grouper
 
 configure_logging([__name__.split('.')[0], 'importers'])
 log = logging.getLogger(__name__)
@@ -108,7 +109,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         sys.exit(1)
     nr_of_batches = math.ceil(len_ads / nr_of_items_per_batch)
     # Partition list into manageable chunks
-    ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
+    ad_batches = grouper(nr_of_items_per_batch, ad_ids)
     processed_ads_total = 0
     taxonomy_data = _get_taxonomy_multiple_versions()
 
@@ -123,7 +124,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         doc_counter += len(raw_ads)
         log.info(f'doc_counter=len(raw_ads): {doc_counter}')
         log.debug(f'Fetched batch of ads (id, updatedAt): '
-                 f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
+                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
 
         _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted, taxonomy_data)
         processed_ads_total = processed_ads_total + len(ad_batch)
@@ -171,11 +172,6 @@ def _find_missing_ids_and_create_loadinglist(ad_ids, es_index):
     loaded_ids = [str(a['annonsId']) for a in ad_ids if not a['avpublicerad']]
     missing_ids = elastic.find_missing_ad_ids(loaded_ids, es_index)
     return [id_lookup[missing_id] for missing_id in missing_ids]
-
-
-def _grouper(n, iterable):
-    iterable = iter(iterable)
-    return iter(lambda: list(itertools.islice(iterable, n)), [])
 
 
 def start_daily_index():
