@@ -56,11 +56,11 @@ def convert_occupation_value(value):
             convert_values.append(occupation_field)
             occupation_group['parent'] = occupation_field
         else:
-            log.error('There is not occupation field for %s' % parent_value.get('id', None))
+            log.error('There is no occupation field for %s' % parent_value.get('id', None))
         convert_values.append(occupation_group)
         occupation_name['parent'] = occupation_group
     else:
-        log.error('There is not occupation group for %s' % value.get('id', None))
+        log.error('There is no occupation group for %s' % value.get('id', None))
 
     if collection_value:  # Add collection field
         collection_value = collection_value[0]
