@@ -8,6 +8,23 @@ from importers.taxonomy.converter import convert_occupation_value, convert_gener
 from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_WITH_REPLACED, REGION_QUERY
 
 
+def _fetch_taxonomy_version():
+    try:
+        headers = {"api-key": importers.settings.TAXONOMY_API_KEY, }
+        taxonomy_response = requests.get(url=settings.TAXONOMY_VERSION_URL, headers=headers)
+        taxonomy_response.raise_for_status()
+        versions = taxonomy_response.json()
+        new_version = 0
+        timestamp = None
+        for version in versions:
+            if version.get("taxonomy/version") > new_version:
+                new_version = version.get("taxonomy/version")
+                timestamp = version.get("taxonomy/timestamp")
+        return timestamp
+    except Exception as e:
+        log.error('Failed to fetch taxonomy version', e)
+
+
 def _fetch_taxonomy_values(params):
     headers = {"api-key": importers.settings.TAXONOMY_API_KEY, }
     taxonomy_response = requests.get(url=settings.TAXONOMY_GRAPHQL_URL, headers=headers, params=params)

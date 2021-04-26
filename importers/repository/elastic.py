@@ -199,12 +199,18 @@ def alias_exists(aliasname):
 
 
 def get_index_name_for_alias(alias_name):
-    response = get_alias(alias_name)
-    return list(response.keys())[0]
+    try:
+        response = get_alias(alias_name)
+        return list(response.keys())[0]
+    except:
+        log.error("No index found for %s" % alias_name)
 
 
 def get_alias(aliasname):
-    return es.indices.get_alias(name=[aliasname])
+    try:
+        return es.indices.get_alias(name=[aliasname])
+    except:
+        log.error("No alias %s" % aliasname)
 
 
 def put_alias(indexlist, aliasname):

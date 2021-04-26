@@ -59,9 +59,10 @@ SAVE_ENRICHED_ADS = os.getenv('SAVE_ENRICHED_ADS', False)
 TAXONOMY_URL = os.getenv('TAXONOMY_URL', "https://taxonomy.api.jobtechdev.se/v1/taxonomy")
 TAXONOMY_CHANGES_URL = f"{TAXONOMY_URL}/main/replaced-by-changes?after-version=1&to-version-inclusive=2"
 TAXONOMY_GRAPHQL_URL = f"{TAXONOMY_URL}/graphql?"
+TAXONOMY_VERSION_URL = f"{TAXONOMY_URL}/main/versions"
 
 TAXONOMY_API_KEY = os.getenv('TAXONOMY_API_KEY')
 
-ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy-index")
+ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy")
 ES_TAX_INDEX_ALIAS = os.getenv("ES_TAX_INDEX_ALIAS", "taxonomy")
 ES_TAX_ARCHIVE_ALIAS = os.getenv("ES_TAX_ARCHIVE_ALIAS", "taxonomy-archive")
