@@ -11,8 +11,8 @@ configure_logging([__name__.split('.')[0], 'jobtech'])
 log = logging.getLogger(__name__)
 
 
-def check_if_taxonomyversion_already_exists():
-    expected_index_name = importers.settings.ES_TAX_INDEX_BASE + '2'
+def check_if_taxonomy_index_exists():
+    expected_index_name = importers.settings.ES_TAX_INDEX
     log.info('Expected index based on taxonomy version: %s' % expected_index_name)
     try:
         index_exists = elastic.index_exists(expected_index_name)
@@ -59,7 +59,7 @@ def update_search_engine_valuestore(indexname, indexexists, values):
 
 
 def start():
-    (indexname, indexexist) = check_if_taxonomyversion_already_exists()
+    (indexname, indexexist) = check_if_taxonomy_index_exists()
     values = fetch_and_convert_values()
     update_search_engine_valuestore(indexname, indexexist, values)
     log.info("Import-taxonomy finished")

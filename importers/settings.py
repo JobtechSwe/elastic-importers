@@ -62,6 +62,6 @@ TAXONOMY_GRAPHQL_URL = f"{TAXONOMY_URL}/graphql?"
 
 TAXONOMY_API_KEY = os.getenv('TAXONOMY_API_KEY')
 
-ES_TAX_INDEX_BASE = os.getenv("ES_TAX_INDEX_BASE", "taxonomy-")
+ES_TAX_INDEX = os.getenv("ES_TAX_INDEX", "taxonomy-index")
 ES_TAX_INDEX_ALIAS = os.getenv("ES_TAX_INDEX_ALIAS", "taxonomy")
 ES_TAX_ARCHIVE_ALIAS = os.getenv("ES_TAX_ARCHIVE_ALIAS", "taxonomy-archive")
