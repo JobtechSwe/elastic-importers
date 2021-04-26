@@ -45,6 +45,19 @@ query MyQuery {
 }
 """
 
+REGION_QUERY = """
+query MyQuery {
+  concepts(type: "country", id: "i46j_HmG_v64") {
+    narrower {
+      type
+      id
+      national_nuts_level_3_code_2019
+      preferred_label
+    }
+  }
+}
+"""
+
 GENERAL_QUERY = """
 query MyQuery {
   concepts(type: %s) {

@@ -78,6 +78,11 @@ def convert_occupation_value(value):
     return convert_values
 
 
+def convert_region_value(value):
+    return _standard_format(value.get('national_nuts_level_3_code_2019', None), 'region',
+                            value.get("preferred_label", None), value.get('id'))
+
+
 def convert_general_value(value, type):
     return _standard_format(value.get('deprecated_legacy_id', None), type,
                             value.get("preferred_label", None), value.get('id'))

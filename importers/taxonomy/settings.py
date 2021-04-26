@@ -5,7 +5,7 @@ TAXONOMY_VERSION_2_URL = os.getenv("TAXONOMY_VERSION_2_URL",
                                    "https://taxonomy.api.jobtechdev.se/v1/taxonomy/graphql?")
 TAXONOMY_VERSION_2_API_KEY = os.getenv("API_KEY")
 
-GENERAL_VALUES = ['region', 'municipality', 'country', 'worktime-extent', 'language', 'driving-licence', 'wage-type',
+GENERAL_VALUES = ['municipality', 'country', 'worktime-extent', 'language', 'driving-licence', 'wage-type',
                 'sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3', 'sun-education-level-1',
                 'sun-education-level-2', 'sun-education-level-3', 'employment-duration']
 
