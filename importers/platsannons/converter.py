@@ -39,7 +39,7 @@ def _is_ad_remote(desc, title):
     return any(x in text_to_check for x in settings.REMOTE_MATCH_PHRASES)
 
 
-def convert_ad(message, taxonomy_2):
+def convert_ad(message, taxonomy_data):
     annons = dict()
     start_time = int(time.time() * 1000)
     if 'removed_ad_filter' in message:
@@ -109,7 +109,7 @@ def convert_ad(message, taxonomy_2):
     else:
         annons['driving_license_required'] = False
 
-    _set_occupations(annons, message, taxonomy_2)
+    _set_occupations(annons, message, taxonomy_data)
 
     annons['workplace_address'] = _build_wp_address(message.get('arbetsplatsadress', {}))
 
@@ -144,7 +144,7 @@ def convert_ad(message, taxonomy_2):
     if skills:
         for skill in skills:
             concept_id = skill.get('concept_id')
-            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_2, annons['id'])
+            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_data, annons['id'])
             for replaced_term in replaced_terms:
                 terms.append(replaced_term)
     annons['must_have']['skills'] += terms
@@ -183,7 +183,7 @@ def convert_ad(message, taxonomy_2):
     if skills:
         for skill in skills:
             concept_id = skill.get('concept_id')
-            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_2, annons['id'])
+            replaced_terms = _check_and_add_replace_concept_id(concept_id, taxonomy_data, annons['id'])
             for replaced_term in replaced_terms:
                 terms.append(replaced_term)
     annons['nice_to_have']['skills'] += terms
@@ -276,7 +276,7 @@ def _build_contacts(kontaktpersoner):
     return appl_contact_list
 
 
-def _set_occupations(annons, message, taxonomy_2):
+def _set_occupations(annons, message, taxonomy_data):
     if 'yrkesroll' in message:
         yrkesroll = taxonomy.get_legacy_by_concept_id('yrkesroll', message.get('yrkesroll', {}).get('varde'))
 
@@ -287,7 +287,7 @@ def _set_occupations(annons, message, taxonomy_2):
                                     'label': yrkesroll.get('label', None),
                                      'legacy_ams_taxonomy_id':
                                          yrkesroll.get('legacy_ams_taxonomy_id', None)}]
-            replaced_terms = _check_and_add_replace_concept_id(yrkesroll['concept_id'], taxonomy_2, annons['id'])
+            replaced_terms = _check_and_add_replace_concept_id(yrkesroll['concept_id'], taxonomy_data, annons['id'])
             if replaced_terms:
                 for replaced_term in replaced_terms:
                     annons['occupation'].append({
@@ -314,9 +314,9 @@ def _set_occupations(annons, message, taxonomy_2):
             log.warning(f"Parent not found for yrkesroll: {message['yrkesroll']} ({yrkesroll})")
 
 
-def _check_and_add_replace_concept_id(old_term_concept_id, taxonomy_2, annons_id):
+def _check_and_add_replace_concept_id(old_term_concept_id, taxonomy_data, annons_id):
     taxonomy_values = []
-    for item in taxonomy_2:
+    for item in taxonomy_data:
         content = item.get("taxonomy/concept", {})
         internal_content = content.get("taxonomy/replaced-by", {})[0]
         if old_term_concept_id == content.get("taxonomy/id"):

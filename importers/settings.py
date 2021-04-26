@@ -37,7 +37,6 @@ LA_ANNONS_TIMEOUT = int(os.getenv('LA_ANNONS_TIMEOUT', 10))
 LA_LAST_TIMESTAMP_MANUAL = os.getenv('LA_LAST_TIMESTAMP_MANUAL', 'false').lower() == 'true'
 LA_LAST_TIMESTAMP = int(os.getenv('LA_LAST_TIMESTAMP', 0))
 
-
 # For berikning (platsannonser)
 URL_ENRICH = 'https://textdoc-enrichments.dev.services.jtech.se/enrichtextdocuments'
 URL_ENRICH_TEXTDOCS_SERVICE = os.getenv('URL_ENRICH_TEXTDOCS_SERVICE', URL_ENRICH)
@@ -54,8 +53,15 @@ COMPANY_LOGO_TIMEOUT = int(os.getenv('COMPANY_LOGO_TIMEOUT', 10))
 REMOTE_MATCH_PHRASES = [y.lower() for y in
                         ["Arbeta på distans", "Arbete på distans", "Jobba på distans", "Arbeta hemifrån",
                          "Arbetar hemifrån", "Jobba hemifrån", "Jobb hemifrån", "remote work", "jobba tryggt hemifrån"]]
-#taxonomy replaced terms
-TAXONOMY_2_URL = os.getenv('TAXONOMY_2_URL')
-TAXONOMY_2_API_KEY = os.getenv('TAXONOMY_2_API_KEY')
 
 SAVE_ENRICHED_ADS = os.getenv('SAVE_ENRICHED_ADS', False)
+
+TAXONOMY_URL = os.getenv('TAXONOMY_URL', "https://taxonomy.api.jobtechdev.se/v1/taxonomy")
+TAXONOMY_CHANGES_URL = f"{TAXONOMY_URL}/main/replaced-by-changes?after-version=1&to-version-inclusive=2"
+TAXONOMY_GRAPHQL_URL = f"{TAXONOMY_URL}/graphql?"
+
+TAXONOMY_API_KEY = os.getenv('TAXONOMY_API_KEY')
+
+ES_TAX_INDEX_BASE = os.getenv("ES_TAX_INDEX_BASE", "taxonomy-")
+ES_TAX_INDEX_ALIAS = os.getenv("ES_TAX_INDEX_ALIAS", "taxonomy")
+ES_TAX_ARCHIVE_ALIAS = os.getenv("ES_TAX_ARCHIVE_ALIAS", "taxonomy-archive")

@@ -1,4 +1,6 @@
-from importers.taxonomy import settings
+import importers.settings
+from importers.taxonomy import taxonomy_settings
+from importers import settings
 import requests
 
 from importers.taxonomy.converter import convert_occupation_value, convert_general_value, convert_value_with_replaced, \
@@ -7,10 +9,10 @@ from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_W
 
 
 def _fetch_taxonomy_values(params):
-    headers = {"api-key": settings.TAXONOMY_VERSION_2_API_KEY, }
-    taxonomy_2_response = requests.get(settings.TAXONOMY_VERSION_2_URL, headers=headers, params=params)
-    taxonomy_2_response.raise_for_status()
-    return taxonomy_2_response.json()
+    headers = {"api-key": importers.settings.TAXONOMY_API_KEY, }
+    taxonomy_response = requests.get(url=settings.TAXONOMY_GRAPHQL_URL, headers=headers, params=params)
+    taxonomy_response.raise_for_status()
+    return taxonomy_response.json()
 
 
 def _fetch_value(query):
@@ -26,8 +28,8 @@ def fetch_and_convert_values():
     converted_values += [item for value in occupations for item in convert_occupation_value(value)]
     regions = _fetch_value(REGION_QUERY)
     converted_values += [convert_region_value(region) for region in regions.get('narrower')]
-    general_types = settings.GENERAL_VALUES
-    types_with_replaced = settings.REPLECED_VALUES
+    general_types = taxonomy_settings.GENERAL_VALUES
+    types_with_replaced = taxonomy_settings.REPLACED_VALUES
 
     for type in general_types:
         field = '"' + type + '"'

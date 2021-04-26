@@ -1,6 +1,8 @@
 import logging
 from jobtech.common.customlogging import configure_logging
-from importers.taxonomy import settings
+
+import importers.settings
+from importers.taxonomy import taxonomy_settings
 from importers.repository import elastic
 
 from importers.taxonomy.fetch_values_from_taxonomy import fetch_and_convert_values
@@ -10,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 def check_if_taxonomyversion_already_exists():
-    expected_index_name = settings.ES_TAX_INDEX_BASE + '2'
+    expected_index_name = importers.settings.ES_TAX_INDEX_BASE + '2'
     log.info('Expected index based on taxonomy version: %s' % expected_index_name)
     try:
         index_exists = elastic.index_exists(expected_index_name)
@@ -24,7 +26,7 @@ def update_search_engine_valuestore(indexname, indexexists, values):
     # Create and/or update valuestore index
     try:
         log.info("Creating index: %s and loading taxonomy" % indexname)
-        elastic.create_index(indexname, settings.TAXONOMY_INDEX_CONFIGURATION)
+        elastic.create_index(indexname, taxonomy_settings.TAXONOMY_INDEX_CONFIGURATION)
         elastic.bulk_index(values, indexname, ['type', 'concept_id'])
     except Exception as e:
         log.error('Failed to load values into search engine', e)
@@ -32,23 +34,25 @@ def update_search_engine_valuestore(indexname, indexexists, values):
     # Create and/or assign index to taxonomy alias and
     # assign old index to archive alias
     try:
-        if elastic.alias_exists(settings.ES_TAX_INDEX_ALIAS):
-            log.info("Updating alias: %s" % settings.ES_TAX_INDEX_ALIAS)
-            alias = elastic.get_alias(settings.ES_TAX_INDEX_ALIAS)
+        if elastic.alias_exists(importers.settings.ES_TAX_INDEX_ALIAS):
+            log.info("Updating alias: %s" % importers.settings.ES_TAX_INDEX_ALIAS)
+            alias = elastic.get_alias(importers.settings.ES_TAX_INDEX_ALIAS)
             elastic.update_alias(
-                [indexname], list(alias.keys()), settings.ES_TAX_INDEX_ALIAS)
+                [indexname], list(alias.keys()), importers.settings.ES_TAX_INDEX_ALIAS)
             if not indexexists:
-                if elastic.alias_exists(settings.ES_TAX_ARCHIVE_ALIAS):
-                    log.info("Adding index: %s to archive alias: %s" % (indexname, settings.ES_TAX_ARCHIVE_ALIAS))
+                if elastic.alias_exists(importers.settings.ES_TAX_ARCHIVE_ALIAS):
+                    log.info("Adding index: %s to archive alias: %s" % (indexname,
+                                                                        importers.settings.ES_TAX_ARCHIVE_ALIAS))
                     elastic.add_indices_to_alias(list(alias.keys()),
-                                                 settings.ES_TAX_ARCHIVE_ALIAS)
+                                                 importers.settings.ES_TAX_ARCHIVE_ALIAS)
                 else:
-                    log.info("Creating alias: %s and adding index: %s" % (settings.ES_TAX_ARCHIVE_ALIAS, indexname))
+                    log.info("Creating alias: %s and adding index: %s" % (
+                    importers.settings.ES_TAX_ARCHIVE_ALIAS, indexname))
                     elastic.put_alias(
-                        list(alias.keys()), settings.ES_TAX_ARCHIVE_ALIAS)
+                        list(alias.keys()), importers.settings.ES_TAX_ARCHIVE_ALIAS)
         else:
-            log.info("Creating alias: %s and inserting index: %s" % (settings.ES_TAX_INDEX_ALIAS, indexname))
-            elastic.put_alias([indexname], settings.ES_TAX_INDEX_ALIAS)
+            log.info("Creating alias: %s and inserting index: %s" % (importers.settings.ES_TAX_INDEX_ALIAS, indexname))
+            elastic.put_alias([indexname], importers.settings.ES_TAX_INDEX_ALIAS)
     except Exception as e:
         log.error('Failed to update aliases', e)
         raise

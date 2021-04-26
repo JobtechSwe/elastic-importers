@@ -18,7 +18,7 @@ def _standard_format(legacy_id, type, label, concept_id):
         'legacy_ams_taxonomy_num_id': legacy_num_id}
 
 
-def _add_repleced_format(legacy_id, type, label, concept_id, replaced_by):
+def _add_replaced_format(legacy_id, type, label, concept_id, replaced_by):
     result = _standard_format(legacy_id, type, label, concept_id)
     result['replaced_by'] = []
     if replaced_by:
@@ -40,7 +40,7 @@ def convert_occupation_value(value):
     replaced_values = value.get("replaced_by", [])
     parent_value = value.get('broader', {})
 
-    if not parent_value and replaced_values:   # If Occupation name is decrecated, we will you replaced value
+    if not parent_value and replaced_values:   # If Occupation name is deprecated, replaced value is used
         parent_value = replaced_values[0].get('broader', {})
 
     if parent_value:
@@ -56,11 +56,11 @@ def convert_occupation_value(value):
             convert_values.append(occupation_field)
             occupation_group['parent'] = occupation_field
         else:
-            log.error('There is not occupation field for %s' % parent_value.get('id', None))
+            log.error('There is no occupation field for %s' % parent_value.get('id', None))
         convert_values.append(occupation_group)
         occupation_name['parent'] = occupation_group
     else:
-        log.error('There is not occupation group for %s' % value.get('id', None))
+        log.error('There is no occupation group for %s' % value.get('id', None))
 
     if collection_value:  # Add collection field
         collection_value = collection_value[0]
@@ -89,6 +89,6 @@ def convert_general_value(value, type):
 
 
 def convert_value_with_replaced(value, type):
-    return _add_repleced_format(value.get('deprecated_legacy_id', None), type,
-                            value.get("preferred_label", None), value.get('id'),
-                            value.get("replaced_by", []))
+    return _add_replaced_format(value.get('deprecated_legacy_id', None), type,
+                                value.get("preferred_label", None), value.get('id'),
+                                value.get("replaced_by", []))
