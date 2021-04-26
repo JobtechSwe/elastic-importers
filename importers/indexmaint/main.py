@@ -67,7 +67,7 @@ def check_index_size_before_switching_alias(new_index_name):
         log.error(f"Too FEW ads in import. New: {new_number} current: {current_number}, coefficient: {settings.NEW_ADS_COEF}")
         return False
     else:
-        log.info(f'OK number of ads in import. New: {new_number} current: {current_number}')
+        log.info(f'OK number of ads in import. New: {new_number} current: {current_number}, coefficient: {settings.NEW_ADS_COEF}')
         return True
 
 
