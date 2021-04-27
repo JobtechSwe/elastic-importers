@@ -7,14 +7,14 @@ import importers.settings
 from importers.taxonomy import taxonomy_settings
 from importers.repository import elastic
 
-from importers.taxonomy.fetch_values_from_taxonomy import fetch_and_convert_values, _fetch_taxonomy_version
+from importers.taxonomy.fetch_values_from_taxonomy import fetch_and_convert_values, fetch_taxonomy_version
 
 configure_logging([__name__.split('.')[0], 'jobtech'])
 log = logging.getLogger(__name__)
 
 
 def check_if_taxonomy_update():
-    version_timestamp = _fetch_taxonomy_version()
+    version_timestamp = fetch_taxonomy_version()
     if version_timestamp:
         version_time = ''.join(version_timestamp[:10].split('-'))
     else:
@@ -58,7 +58,7 @@ def update_search_engine_valuestore(indexname, values):
 
 def start():
     if check_if_taxonomy_update():
-        new_index_name = "%s-%s" % (importers.settings.ES_TAX_INDEX, datetime.now().strftime('%Y%m%d'))
+        new_index_name = "%s-%s" % (importers.settings.ES_TAX_INDEX, datetime.now().strftime('%Y%m%d-%H.%M'))
         log.info(f"Start creating new taxonomy index: {new_index_name}")
         values = fetch_and_convert_values()
         update_search_engine_valuestore(new_index_name, values)

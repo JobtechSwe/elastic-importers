@@ -8,7 +8,7 @@ from importers.taxonomy.converter import convert_occupation_value, convert_gener
 from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_WITH_REPLACED, REGION_QUERY
 
 
-def _fetch_taxonomy_version():
+def fetch_taxonomy_version():
     try:
         headers = {"api-key": importers.settings.TAXONOMY_API_KEY, }
         taxonomy_response = requests.get(url=settings.TAXONOMY_VERSION_URL, headers=headers)
@@ -20,6 +20,7 @@ def _fetch_taxonomy_version():
             if version.get("taxonomy/version") > new_version:
                 new_version = version.get("taxonomy/version")
                 timestamp = version.get("taxonomy/timestamp")
+                log.info(f"Tax version: {new_version}, timestamp: {timestamp}")
         return timestamp
     except Exception as e:
         log.error('Failed to fetch taxonomy version', e)
