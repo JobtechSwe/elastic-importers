@@ -10,7 +10,7 @@ from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_W
 
 def fetch_taxonomy_version():
     try:
-        headers = {"api-key": importers.settings.TAXONOMY_API_KEY, }
+        headers = {"api-key": importers.settings.TAXONOMY_API_KEY}
         taxonomy_response = requests.get(url=settings.TAXONOMY_VERSION_URL, headers=headers)
         taxonomy_response.raise_for_status()
         versions = taxonomy_response.json()
@@ -20,7 +20,7 @@ def fetch_taxonomy_version():
             if version.get("taxonomy/version") > new_version:
                 new_version = version.get("taxonomy/version")
                 timestamp = version.get("taxonomy/timestamp")
-                log.info(f"Tax version: {new_version}, timestamp: {timestamp}")
+                log.info(f"Taxonomy version: {new_version}, timestamp: {timestamp}")
         return timestamp
     except Exception as e:
         log.error('Failed to fetch taxonomy version', e)
