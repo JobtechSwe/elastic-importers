@@ -2,7 +2,6 @@ import time
 import logging
 import sys
 import math
-import itertools
 from datetime import datetime
 
 import requests
@@ -13,7 +12,6 @@ from importers.platsannons import loader, converter, enricher_mt_rest_multiple a
 from importers.repository import elastic
 from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, \
     check_index_size_before_switching_alias
-from index_from_file.file_handling import save_enriched_ads_to_file
 from importers.common import grouper
 
 configure_logging([__name__.split('.')[0], 'importers'])
@@ -130,18 +128,8 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         processed_ads_total = processed_ads_total + len(ad_batch)
 
         log.info(f'Processed ads: {processed_ads_total}/{len_ads}')
-    save_enriched_ads()
 
     return doc_counter
-
-
-def save_enriched_ads():
-    """
-    saves enriched ads to a Pickle file that can be used when creating an index from a known state
-    """
-    if settings.SAVE_ENRICHED_ADS:
-        save_enriched_ads_to_file(enriched_ads_to_save)
-
 
 def _get_taxonomy_multiple_versions():
     headers = {"api-key": settings.TAXONOMY_API_KEY, }
