@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 def check_if_taxonomy_update():
     version_timestamp = fetch_taxonomy_version()
     if version_timestamp:
-        version_time = ''.join(version_timestamp[:10].split('-'))
+        version_date = ''.join(version_timestamp[:10].split('-'))
     else:
         version_date = 0
     index_name = elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)
