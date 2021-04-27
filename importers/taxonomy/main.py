@@ -58,7 +58,7 @@ def update_search_engine_valuestore(indexname, values):
 
 def start():
     if check_if_taxonomy_update():
-        new_index_name = "%s-%s" % (importers.settings.ES_TAX_INDEX, datetime.now().strftime('%Y%m%d-%H.%M'))
+        new_index_name = "%s-%s" % (importers.settings.ES_TAX_INDEX, datetime.now().strftime('%Y%m%d-%H%M'))
         log.info(f"Start creating new taxonomy index: {new_index_name}")
         values = fetch_and_convert_values()
         update_search_engine_valuestore(new_index_name, values)
