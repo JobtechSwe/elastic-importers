@@ -43,12 +43,14 @@ def _fetch_value(query):
 def fetch_and_convert_values():
     converted_values = []
     occupations = _fetch_value(OCCUPATIONS_QUERY)
+    log.info(f"Occupations: {occupations}")
     converted_values += [item for value in occupations for item in convert_occupation_value(value)]
     regions = _fetch_value(REGION_QUERY)
+    log.info(f"Regions: {regions}")
     if regions:
         converted_values += [convert_region_value(region) for region in regions[0].get('narrower', [])]
     else:
-        log.warning("Not fetch regions")
+        log.warning("Could not fetch regions")
     general_types = taxonomy_settings.GENERAL_VALUES
     types_with_replaced = taxonomy_settings.REPLACED_VALUES
 

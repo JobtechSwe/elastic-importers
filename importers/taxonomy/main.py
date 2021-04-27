@@ -1,12 +1,10 @@
 import logging
 from datetime import datetime
 
-from jobtech.common.customlogging import configure_logging
-
 import importers.settings
-from importers.taxonomy import taxonomy_settings
+from jobtech.common.customlogging import configure_logging
 from importers.repository import elastic
-
+from importers.taxonomy import taxonomy_settings
 from importers.taxonomy.fetch_values_from_taxonomy import fetch_and_convert_values, fetch_taxonomy_version
 
 configure_logging([__name__.split('.')[0], 'jobtech'])
@@ -26,9 +24,12 @@ def check_if_taxonomy_update():
         index_timestamp = 0
 
     if version_date and int(version_date) > int(index_timestamp):
+        log.info(f"Updating. Tax version_time: {int(version_date)} > index_timestamp: {int(index_timestamp)}")
         return True
     else:
+        log.info(f"No update. Tax version_time: {int(version_date)} <= index_timestamp: {int(index_timestamp)}")
         return False
+
 
 def update_taxonomy_index(indexname, values):
     try:
