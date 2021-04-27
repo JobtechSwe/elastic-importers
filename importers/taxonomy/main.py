@@ -21,7 +21,8 @@ def check_if_taxonomy_update():
         version_date = 0
     index_name = elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)
     if index_name:
-        index_timestamp = index_name.split('-')[-1]
+        index_timestamp = index_name.split('-')[1]
+        print()
     else:
         index_timestamp = 0
 
