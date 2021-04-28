@@ -14,14 +14,14 @@ def fetch_taxonomy_version():
         taxonomy_response = requests.get(url=settings.TAXONOMY_VERSION_URL, headers=headers)
         taxonomy_response.raise_for_status()
         versions = taxonomy_response.json()
-        new_version = 0
+        latest_version = 0
         timestamp = None
         for version in versions:
-            if version.get("taxonomy/version") > new_version:
-                new_version = version.get("taxonomy/version")
+            if version.get("taxonomy/version") > latest_version:
+                latest_version = version.get("taxonomy/version")
                 timestamp = version.get("taxonomy/timestamp")
-                log.info(f"Taxonomy version: {new_version}, timestamp: {timestamp}")
-        return timestamp
+                log.info(f"Taxonomy version: {latest_version}, timestamp: {timestamp}")
+        return latest_version, timestamp
     except Exception as e:
         log.error('Failed to fetch taxonomy version', e)
 
