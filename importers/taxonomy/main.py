@@ -23,11 +23,11 @@ def check_if_taxonomy_update():
     else:
         index_timestamp = 0
 
-    if version_date and int(version_date) > int(index_timestamp):
-        log.info(f"Updating. Tax version_time: {int(version_date)} > index_timestamp: {int(index_timestamp)}")
+    if version_date and int(version_date) >= int(index_timestamp):
+        log.info(f"Updating. Tax version_time: {int(version_date)} >= index_timestamp: {int(index_timestamp)}")
         return True
     else:
-        log.info(f"No update. Tax version_time: {int(version_date)} <= index_timestamp: {int(index_timestamp)}")
+        log.info(f"No update. Tax version_time: {int(version_date)} < index_timestamp: {int(index_timestamp)}")
         return False
 
 

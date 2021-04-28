@@ -194,27 +194,27 @@ def index_exists(indexname):
             time.sleep(1)
 
 
-def alias_exists(aliasname):
-    return es.indices.exists_alias(name=[aliasname])
+def alias_exists(alias_name):
+    return es.indices.exists_alias(name=[alias_name])
 
 
 def get_index_name_for_alias(alias_name):
     try:
         response = get_alias(alias_name)
         return list(response.keys())[0]
-    except:
-        log.error("No index found for %s" % alias_name)
+    except Exception as e:
+        log.error(f"No index found for: {alias_name}, {e}")
 
 
-def get_alias(aliasname):
+def get_alias(alias_name):
     try:
-        return es.indices.get_alias(name=[aliasname])
-    except:
-        log.error("No alias %s" % aliasname)
+        return es.indices.get_alias(name=[alias_name])
+    except Exception as e:
+        log.error(f"No alias: {alias_name}, {e}")
 
 
-def put_alias(indexlist, aliasname):
-    return es.indices.put_alias(index=indexlist, name=aliasname)
+def put_alias(indexlist, alias_name):
+    return es.indices.put_alias(index=indexlist, name=alias_name)
 
 
 def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
