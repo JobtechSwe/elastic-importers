@@ -302,5 +302,5 @@ def update_alias(indexnames, old_indexlist, aliasname):
 
 
 def number_of_not_removed_ads(current_index):
-    query_not_removed = {"query": {"bool": {"must": {"term": {"removed": False}}}}}
+    query_not_removed = {"query": {"bool": {"must": {"term": {"removed": False}}}}, "track_total_hits": True}
     return es.search(index=current_index, body=query_not_removed)['hits']['total']['value']
