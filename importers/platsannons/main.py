@@ -131,6 +131,7 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
 
     return doc_counter
 
+
 def _get_taxonomy_multiple_versions():
     headers = {"api-key": settings.TAXONOMY_API_KEY, }
     taxonomy_response = requests.get(url=settings.TAXONOMY_CHANGES_URL, headers=headers)
