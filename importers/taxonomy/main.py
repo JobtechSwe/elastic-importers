@@ -24,10 +24,10 @@ def check_if_taxonomy_update():
         index_timestamp = 0
 
     if version_date and int(version_date) >= int(index_timestamp):
-        log.info(f"Updating. Tax version_time: {int(version_date)} >= index_timestamp: {int(index_timestamp)}")
+        log.info(f"Updating taxonomy. Taxonomy date: {int(version_date)} is newer that index date: {int(index_timestamp)}")
         return True
     else:
-        log.info(f"No update. Tax version_time: {int(version_date)} < index_timestamp: {int(index_timestamp)}")
+        log.info(f"No update of taxonomy. Current version ({int(index_timestamp)}) is created from latest taxonomy version: ({int(version_date)})")
         return False
 
 
@@ -63,7 +63,7 @@ def start():
         update_taxonomy_index(new_index_name, values)
         log.info("Import-taxonomy finished")
     else:
-        log.info("No taxonomy update, No need to update")
+        log.info("No taxonomy update, current index is up to date")
 
 
 if __name__ == '__main__':
