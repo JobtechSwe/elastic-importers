@@ -51,15 +51,13 @@ def fetch_and_convert_values():
         converted_values += [convert_region_value(region) for region in regions[0].get('narrower', [])]
     else:
         log.warning("Could not fetch regions")
-    general_types = taxonomy_settings.GENERAL_VALUES
-    types_with_replaced = taxonomy_settings.REPLACED_VALUES
 
-    for type in general_types:
+    for type in taxonomy_settings.GENERAL_VALUES:
         field = '"' + type + '"'
         values = _fetch_value(GENERAL_QUERY % field)
         converted_values += [convert_general_value(value, type) for value in values]
 
-    for type in types_with_replaced:
+    for type in taxonomy_settings.REPLACED_VALUES:
         field = '"' + type + '"'
         values = _fetch_value(QUERY_WITH_REPLACED % field)
         converted_values += [convert_value_with_replaced(value, type) for value in values]
