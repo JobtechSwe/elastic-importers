@@ -14,14 +14,14 @@ def fetch_taxonomy_version():
         taxonomy_response = requests.get(url=settings.TAXONOMY_VERSION_URL, headers=headers)
         taxonomy_response.raise_for_status()
         versions = taxonomy_response.json()
-        new_version = 0
+        latest_version = 0
         timestamp = None
         for version in versions:
-            if version.get("taxonomy/version") > new_version:
-                new_version = version.get("taxonomy/version")
+            if version.get("taxonomy/version") > latest_version:
+                latest_version = version.get("taxonomy/version")
                 timestamp = version.get("taxonomy/timestamp")
-                log.info(f"Taxonomy version: {new_version}, timestamp: {timestamp}")
-        return timestamp
+                log.info(f"Taxonomy version: {latest_version}, timestamp: {timestamp}")
+        return latest_version, timestamp
     except Exception as e:
         log.error('Failed to fetch taxonomy version', e)
 
@@ -51,15 +51,13 @@ def fetch_and_convert_values():
         converted_values += [convert_region_value(region) for region in regions[0].get('narrower', [])]
     else:
         log.warning("Could not fetch regions")
-    general_types = taxonomy_settings.GENERAL_VALUES
-    types_with_replaced = taxonomy_settings.REPLACED_VALUES
 
-    for type in general_types:
+    for type in taxonomy_settings.GENERAL_VALUES:
         field = '"' + type + '"'
         values = _fetch_value(GENERAL_QUERY % field)
         converted_values += [convert_general_value(value, type) for value in values]
 
-    for type in types_with_replaced:
+    for type in taxonomy_settings.REPLACED_VALUES:
         field = '"' + type + '"'
         values = _fetch_value(QUERY_WITH_REPLACED % field)
         converted_values += [convert_value_with_replaced(value, type) for value in values]

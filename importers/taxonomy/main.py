@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 def check_if_taxonomy_update():
-    version_timestamp = fetch_taxonomy_version()
+    version, version_timestamp = fetch_taxonomy_version()
     if version_timestamp:
         version_date = ''.join(version_timestamp[:10].split('-'))
     else:
@@ -23,11 +23,11 @@ def check_if_taxonomy_update():
     else:
         index_timestamp = 0
 
-    if version_date and int(version_date) > int(index_timestamp):
-        log.info(f"Updating. Tax version_time: {int(version_date)} > index_timestamp: {int(index_timestamp)}")
+    if version_date and int(version_date) >= int(index_timestamp):
+        log.info(f"Updating taxonomy. Taxonomy timestamp: {version_timestamp} is newer than index: {index_name}")
         return True
     else:
-        log.info(f"No update. Tax version_time: {int(version_date)} <= index_timestamp: {int(index_timestamp)}")
+        log.info(f"No taxonomy update. Current index: {index_name} is created from latest taxonomy version: {version}, {version_timestamp}")
         return False
 
 
@@ -63,7 +63,7 @@ def start():
         update_taxonomy_index(new_index_name, values)
         log.info("Import-taxonomy finished")
     else:
-        log.info("No taxonomy update, No need to update")
+        log.info("No taxonomy update, current index is up to date")
 
 
 if __name__ == '__main__':
