@@ -71,7 +71,7 @@ query GeneralQuery {
 
 QUERY_WITH_REPLACED = """
 query ReplacedQuery {
-  concepts(type: %s){
+  concepts(type: %s, include_deprecated: true){
     type
     id
     preferred_label
