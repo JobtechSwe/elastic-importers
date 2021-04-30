@@ -1,4 +1,4 @@
-GENERAL_VALUES = ['municipality', 'country', 'worktime-extent', 'language', 'driving-licence', 'wage-type',
+GENERAL_VALUES = ['country', 'worktime-extent', 'language', 'driving-licence', 'wage-type',
                   'sun-education-field-1', 'sun-education-field-2', 'sun-education-field-3', 'sun-education-level-1',
                   'sun-education-level-2', 'sun-education-level-3', 'employment-duration']
 

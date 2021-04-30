@@ -4,8 +4,9 @@ from importers import settings
 import requests
 
 from importers.taxonomy.converter import convert_occupation_value, convert_general_value, convert_value_with_replaced, \
-    convert_region_value
-from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_WITH_REPLACED, REGION_QUERY
+    convert_region_value, convert_municipality_value
+from importers.taxonomy.queries import OCCUPATIONS_QUERY, GENERAL_QUERY, QUERY_WITH_REPLACED, REGION_QUERY, \
+    MUNICIPALITY_QUERY
 
 
 def fetch_taxonomy_version():
@@ -51,6 +52,8 @@ def fetch_and_convert_values():
         converted_values += [convert_region_value(region) for region in regions[0].get('narrower', [])]
     else:
         log.warning("Could not fetch regions")
+    municipalities = _fetch_value(MUNICIPALITY_QUERY)
+    converted_values += [convert_municipality_value(municipality) for municipality in municipalities]
 
     for type in taxonomy_settings.GENERAL_VALUES:
         field = '"' + type + '"'

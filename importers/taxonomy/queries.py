@@ -58,6 +58,17 @@ query MyQuery {
 }
 """
 
+MUNICIPALITY_QUERY = """
+query municipality {
+  concepts(type: "municipality" ) {
+    id
+    preferred_label
+    deprecated_legacy_id
+    lau_2_code_2015
+  }
+}
+"""
+
 GENERAL_QUERY = """
 query GeneralQuery {
   concepts(type: %s) {
