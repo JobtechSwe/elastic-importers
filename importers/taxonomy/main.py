@@ -57,7 +57,7 @@ def update_taxonomy_index(indexname, values):
 
 def start():
     if check_if_taxonomy_update():
-        new_index_name = "%s-%s" % (importers.settings.ES_TAX_INDEX, datetime.now().strftime('%Y%m%d-%H%M'))
+        new_index_name = f"{importers.settings.ES_TAX_INDEX}-{datetime.now().strftime('%Y%m%d-%H%M')}"
         log.info(f"Start creating new taxonomy index: {new_index_name}")
         values = fetch_and_convert_values()
         update_taxonomy_index(new_index_name, values)
