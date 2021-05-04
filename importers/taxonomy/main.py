@@ -11,15 +11,14 @@ configure_logging([__name__.split('.')[0], 'jobtech'])
 log = logging.getLogger(__name__)
 
 
-def check_if_taxonomy_update():
-    version, version_timestamp = fetch_taxonomy_version()
+def check_if_taxonomy_update(version, version_timestamp):
     if version_timestamp:
         version_date = ''.join(version_timestamp[:10].split('-'))
     else:
         version_date = 0
     index_name = elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)
     if index_name:
-        index_timestamp = index_name.split('-')[1]
+        index_timestamp = index_name.split('-')[2]
     else:
         index_timestamp = 0
 
@@ -56,8 +55,9 @@ def update_taxonomy_index(indexname, values):
 
 
 def start():
-    if check_if_taxonomy_update():
-        new_index_name = f"{importers.settings.ES_TAX_INDEX}-{datetime.now().strftime('%Y%m%d-%H%M')}"
+    version, version_timestamp = fetch_taxonomy_version()
+    if check_if_taxonomy_update(version, version_timestamp):
+        new_index_name = f"{importers.settings.ES_TAX_INDEX}-{version}-{datetime.now().strftime('%Y%m%d-%H%M')}"
         log.info(f"Start creating new taxonomy index: {new_index_name}")
         values = fetch_and_convert_values()
         update_taxonomy_index(new_index_name, values)
