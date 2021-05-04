@@ -9,7 +9,7 @@ query OccupationsQuery {
       type
       id
       preferred_label
-      deprecated_legacy_id
+      ssyk_code_2012
       broader(type: "occupation-field") {
         type
         id
@@ -26,7 +26,7 @@ query OccupationsQuery {
         id
         type
         preferred_label
-        deprecated_legacy_id
+        ssyk_code_2012
         broader(type: "occupation-field") {
           type
           id

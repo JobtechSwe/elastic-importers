@@ -45,7 +45,7 @@ def convert_occupation_value(value):
 
     if parent_value:
         parent_value = parent_value[0]
-        occupation_group = _standard_format(parent_value.get('deprecated_legacy_id', None), 'occupation-group',
+        occupation_group = _standard_format(parent_value.get('ssyk_code_2012', None), 'occupation-group',
                                             parent_value.get("preferred_label", None),  parent_value.get('id'))
         occupation_group['parent'] = {}
         grandparent_value = parent_value.get('broader', {})
@@ -62,7 +62,6 @@ def convert_occupation_value(value):
         occupation_name['parent'] = occupation_group
     else:
         log.warning(f"There is no occupation group for {value.get('id', None)} - {value.get('preferred_label', None)}")
-
 
     if collection_value:  # Add collection field
         collection_value = collection_value[0]
