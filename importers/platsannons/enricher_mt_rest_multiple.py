@@ -80,9 +80,10 @@ def enrich(annonser, typeahead=True):
 def get_doc_headline_input(annons):
     sep = ' | '
     # Add occupation from structured data in headline.
-    occupation = ' | '.join([occupation.get('label', '') for occupation in annons.get('occupation', {})])
-    occupation_group = ' | '.join([occupation_group.get('label', '') for occupation_group in annons.get('occupation_group', {})])
-    doc_headline_occupation = occupation + sep + occupation_group
+    doc_headline_occupation = ' | '.join([occupation.get('label', '') for occupation in annons.get('occupation', {})])
+    occupation_group_label = annons.get('occupation_group', {})[0].get('label', None)
+    if occupation_group_label:
+        doc_headline_occupation += sep + occupation_group_label
     if not doc_headline_occupation:
         doc_headline_occupation = ''
     log.debug(f"enriched headline occupation: {doc_headline_occupation}")
