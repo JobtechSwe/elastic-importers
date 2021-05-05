@@ -52,9 +52,9 @@ def start(es_index=None):
     start_time = time.time()
     # Get, set and create elastic index
     es_index, es_index_deleted = _setup_index(es_index)
-    log.info("Starting ad import into index: %s" % es_index)
+    log.info(f"Starting ad import into index: {es_index}")
     last_timestamp = _check_last_timestamp(es_index)
-    log.info("Timestamp to load from: %d" % last_timestamp)
+    log.info(f"Timestamp to load from: {last_timestamp}")
 
     if not settings.LA_FEED_URL:
         log.error("LA_FEED_URL is not set. Exit!")

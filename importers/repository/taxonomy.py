@@ -32,17 +32,17 @@ def get_entity(taxtype, taxid, not_found_response=None):
             tax_value_cache[key] = {}
             log.warning(f"(get_entity) set empty to tax_value_cache[key]: [{key}]")
     cached = dict(tax_value_cache.get(key, {}))
-    log.debug("(get_entity) returns cached: %s" % cached)
+    log.debug(f"(get_entity) returns cached: {cached}")
     return cached
 
 
-def get_concept_by_legacy_id(taxtype, legacy_id, not_found_response=None):
-    key = "concept-%s-%s-%s" % (str(taxtype), legacy_id, str(not_found_response))
+def get_concept_by_legacy_id(tax_type, legacy_id, not_found_response=None):
+    key = "concept-%s-%s-%s" % (str(tax_type), legacy_id, str(not_found_response))
     if key not in tax_value_cache:
         try:
-            value = fcbla(elastic.es, taxtype, legacy_id, not_found_response)
+            value = fcbla(elastic.es, tax_type, legacy_id, not_found_response)
         except RequestError:
-            log.warning(f'Taxonomy RequestError for request with arguments type: {taxtype} and id: {legacy_id}')
+            log.warning(f'Taxonomy RequestError for request with arguments type: {tax_type} and id: {legacy_id}')
             value = not_found_response
             log.info(f"(get_concept_by_legacy_id) set value: {value}")
         if value:
@@ -51,27 +51,27 @@ def get_concept_by_legacy_id(taxtype, legacy_id, not_found_response=None):
             tax_value_cache[key] = {}
             log.warning(f"(get_concept_by_legacy_id)  set empty value to tax_value_cache[key]: [{key}]")
     cached = dict(tax_value_cache.get(key, {}))
-    log.debug("(get_concept_by_legacy_id) returns cached: %s" % cached)
+    log.debug(f"(get_concept_by_legacy_id) returns cached: {cached}")
     return cached
 
 
-def get_legacy_by_concept_id(taxtype, concept_id, not_found_response=None):
-    key = "concept-%s-%s-%s" % (str(taxtype), concept_id, str(not_found_response))
+def get_legacy_by_concept_id(tax_type, concept_id, not_found_response=None):
+    key = "concept-%s-%s-%s" % (str(tax_type), concept_id, str(not_found_response))
     if key not in tax_value_cache:
         try:
-            value = flatc(elastic.es, taxtype, concept_id, not_found_response)
+            value = flatc(elastic.es, tax_type, concept_id, not_found_response)
         except RequestError as e:
-            log.warning(f'Taxonomy RequestError for request with arguments type: {taxtype} and id: {concept_id}. {e}')
+            log.warning(f'Taxonomy RequestError for request with arguments type: {tax_type} and id: {concept_id}. {e}')
             value = not_found_response
-            log.info("(get_legacy_by_concept_id) set value: %s" % str(not_found_response))
+            log.info(f"(get_legacy_by_concept_id) set value: {not_found_response}")
         if value:
             tax_value_cache[key] = value
         else:
             tax_value_cache[key] = {}
             log.warning(f"(get_legacy_by_concept_id) set empty value to tax_value_cache[key]: [{key}]")
     cached = dict(tax_value_cache.get(key, {}))
-    log.debug(concept_id, taxtype)
-    log.debug("(get_legacy_by_concept_id) returns cached: %s" % cached)
+    log.debug(concept_id, tax_type)
+    log.debug(f"(get_legacy_by_concept_id) returns cached: {cached}")
     return cached
 
 
@@ -84,7 +84,7 @@ def get_info_by_label_name_and_type(name, info_type, not_found_response=None):
         except RequestError as e:
             log.warning(f'Taxonomy RequestError for request with city name: {name}. {e}')
             value = not_found_response
-            log.info(f"(find_info_by_city_name) set value: %s" % str(not_found_response))
+            log.info(f"(find_info_by_city_name) set value: {not_found_response}")
     return value
 
 

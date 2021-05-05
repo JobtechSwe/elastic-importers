@@ -27,7 +27,7 @@ def _isodate(input_date):
     try:
         return _date_parser(input_date)
     except ValueError as e:
-        log.error('Failed to parse %s as a valid date' % input_date, e)
+        log.error(f'Failed to parse as a valid date: {input_date}. {e}')
         return None
 
 
@@ -566,5 +566,5 @@ def _extract_taxonomy_label(label):
         else:
             return [word.lower().strip() for word in re.split(r'/|, | och ', label)]
     except AttributeError:
-        log.warning('(extract_taxonomy_label) extract fail for: %s' % label)
+        log.warning(f'(extract_taxonomy_label) extract fail for: {label}')
     return []
