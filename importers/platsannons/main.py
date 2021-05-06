@@ -53,6 +53,7 @@ def start(es_index=None):
     # Get, set and create elastic index
     es_index, es_index_deleted = _setup_index(es_index)
     log.info(f"Starting ad import into index: {es_index}")
+    log.info(f"Using taxonomy alias: {elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)}")
     last_timestamp = _check_last_timestamp(es_index)
     log.info(f"Timestamp to load from: {last_timestamp}")
 
@@ -166,7 +167,7 @@ def _find_missing_ids_and_create_loadinglist(ad_ids, es_index):
 def start_daily_index():
     new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX, datetime.now().strftime('%Y%m%d-%H%M'))
     log.info(f"Start creating new daily index: {new_index_name}")
-    log.info(f"Using taxonomy index {elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)}")
+    log.info(f"Using taxonomy alias: {elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)}")
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)
