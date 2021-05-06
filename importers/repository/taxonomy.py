@@ -15,7 +15,7 @@ def get_term(tax_type, tax_id):
 
 
 def get_entity(tax_type, tax_id, not_found_response=None):
-    key = "entity-%s-%s-%s" % (tax_type, tax_id, str(not_found_response))
+    key = f"entity-{tax_type}-{tax_id}-{not_found_response}"
     if key not in tax_value_cache:
         try:
             value = ge(elastic.es, tax_type, tax_id, not_found_response)
@@ -34,7 +34,7 @@ def get_entity(tax_type, tax_id, not_found_response=None):
 
 
 def get_legacy_by_concept_id(tax_type, concept_id, not_found_response=None):
-    key = "concept-%s-%s-%s" % (str(tax_type), concept_id, str(not_found_response))
+    key = f"concept-{tax_type}-{concept_id}-{not_found_response}"
     if key not in tax_value_cache:
         try:
             value = flatc(elastic.es, tax_type, concept_id, not_found_response)
