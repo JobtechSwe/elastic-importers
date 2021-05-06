@@ -17,13 +17,13 @@ def get_term(taxtype, taxid):
     return gt(elastic.es, taxtype, taxid)
 
 
-def get_entity(taxtype, taxid, not_found_response=None):
-    key = "entity-%s-%s-%s" % (taxtype, taxid, str(not_found_response))
+def get_entity(tax_type, taxid, not_found_response=None):
+    key = f"entity-{tax_type}-{taxid}-{not_found_response}"
     if key not in tax_value_cache:
         try:
-            value = ge(elastic.es, taxtype, taxid, not_found_response)
+            value = ge(elastic.es, tax_type, taxid, not_found_response)
         except RequestError:
-            log.warning(f'Taxonomy RequestError for request with arguments type: {taxtype} and id: {taxid}')
+            log.warning(f'Taxonomy RequestError for request with arguments type: {tax_type} and id: {taxid}')
             value = not_found_response
             log.info(f"(get_entity) set value: {value}")
         if value:
@@ -37,7 +37,7 @@ def get_entity(taxtype, taxid, not_found_response=None):
 
 
 def get_concept_by_legacy_id(tax_type, legacy_id, not_found_response=None):
-    key = "concept-%s-%s-%s" % (str(tax_type), legacy_id, str(not_found_response))
+    key = f"concept-{tax_type}-{legacy_id}-{not_found_response}"
     if key not in tax_value_cache:
         try:
             value = fcbla(elastic.es, tax_type, legacy_id, not_found_response)
@@ -56,7 +56,7 @@ def get_concept_by_legacy_id(tax_type, legacy_id, not_found_response=None):
 
 
 def get_legacy_by_concept_id(tax_type, concept_id, not_found_response=None):
-    key = "concept-%s-%s-%s" % (str(tax_type), concept_id, str(not_found_response))
+    key = f"concept-{tax_type}-{concept_id}-{not_found_response}"
     if key not in tax_value_cache:
         try:
             value = flatc(elastic.es, tax_type, concept_id, not_found_response)
