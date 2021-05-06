@@ -82,9 +82,7 @@ def get_doc_headline_input(annons):
     # Add occupation from structured data in headline.
     doc_headline_occupation = sep.join([occupation.get('label', '') for occupation in annons.get('occupation', {})])
     occupation_group = annons.get('occupation_group', {})
-    if occupation_group and occupation_group[0].get('label', {}):
-        doc_headline_occupation += sep + occupation_group[0].get('label', {})
-    else:
+    if not occupation_group:
         log.error(f"No occupation group: {occupation_group} for ad: {annons.get('id')}")
 
     if not doc_headline_occupation:
@@ -134,8 +132,8 @@ def execute_calls(batch_indatas, parallelism):
         for future in concurrent.futures.as_completed(future_to_enrich_result):
             try:
                 enriched_result = future.result()
-                for resultrow in enriched_result:
-                    enriched_output[resultrow[settings.ENRICHER_PARAM_DOC_ID]] = resultrow
+                for result_row in enriched_result:
+                    enriched_output[result_row[settings.ENRICHER_PARAM_DOC_ID]] = result_row
                     # += operation is not atomic, so we need to get a lock:
                     with counter.get_lock():
                         counter.value += 1
@@ -207,12 +205,12 @@ def process_enriched_candidates(annons, enriched_output):
 
 def process_enriched_candidates_typeahead_terms(annons, enriched_output):
     enriched_candidates = enriched_output['enriched_candidates']
-    fieldname = 'enriched_typeahead_terms'
+    field_name = 'enriched_typeahead_terms'
 
-    if fieldname not in annons['keywords']:
-        annons['keywords'][fieldname] = {}
+    if field_name not in annons['keywords']:
+        annons['keywords'][field_name] = {}
 
-    enriched_typeahead_node = annons['keywords'][fieldname]
+    enriched_typeahead_node = annons['keywords'][field_name]
 
     enriched_typeahead_node[TARGET_TYPE_OCCUPATION] = filter_valid_typeahead_terms(
         filter_candidates(enriched_candidates, SOURCE_TYPE_OCCUPATION, settings.ENRICH_THRESHOLD_OCCUPATION))
@@ -233,10 +231,10 @@ def process_enriched_candidates_typeahead_terms(annons, enriched_output):
 
 def filter_valid_typeahead_terms(candidates):
     typeahead_for_type = set()
-    for cand in candidates:
-        typeahead_for_type.add(cand['concept_label'].lower())
-        if not cand['term_misspelled']:
-            typeahead_for_type.add(cand['term'].lower())
+    for candidate in candidates:
+        typeahead_for_type.add(candidate['concept_label'].lower())
+        if not candidate['term_misspelled']:
+            typeahead_for_type.add(candidate['term'].lower())
     return list(typeahead_for_type)
 
 

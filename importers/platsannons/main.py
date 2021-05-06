@@ -164,7 +164,7 @@ def _find_missing_ids_and_create_loadinglist(ad_ids, es_index):
 
 
 def start_daily_index():
-    new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX, datetime.now().strftime('%Y%m%d-%H.%M'))
+    new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX, datetime.now().strftime('%Y%m%d-%H%M'))
     log.info(f"Start creating new daily index: {new_index_name}")
     log.info(f"Using taxonomy index {elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)}")
     start(new_index_name)

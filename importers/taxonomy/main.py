@@ -35,11 +35,11 @@ def check_if_taxonomy_update(version, version_timestamp):
         return False
 
 
-def update_taxonomy_index(indexname, values):
+def update_taxonomy_index(index_name, values):
     try:
-        log.info(f"Creating index: {indexname} and loading taxonomy")
-        elastic.create_index(indexname, taxonomy_settings.TAXONOMY_INDEX_CONFIGURATION)
-        elastic.bulk_index(values, indexname, ['type', 'concept_id'])
+        log.info(f"Creating index: {index_name} and loading taxonomy")
+        elastic.create_index(index_name, taxonomy_settings.TAXONOMY_INDEX_CONFIGURATION)
+        elastic.bulk_index(values, index_name, ['type', 'concept_id'])
     except Exception as e:
         log.error('Failed to create index', e)
         raise
@@ -50,10 +50,10 @@ def update_taxonomy_index(indexname, values):
             log.info(f"Updating alias: {importers.settings.ES_TAX_INDEX_ALIAS}")
             alias = elastic.get_alias(importers.settings.ES_TAX_INDEX_ALIAS)
             elastic.update_alias(
-                [indexname], list(alias.keys()), importers.settings.ES_TAX_INDEX_ALIAS)
+                [index_name], list(alias.keys()), importers.settings.ES_TAX_INDEX_ALIAS)
         else:
-            log.info(f"Creating alias: {importers.settings.ES_TAX_INDEX_ALIAS} and inserting index: {indexname}")
-            elastic.put_alias([indexname], importers.settings.ES_TAX_INDEX_ALIAS)
+            log.info(f"Creating alias: {importers.settings.ES_TAX_INDEX_ALIAS} and inserting index: {index_name}")
+            elastic.put_alias([index_name], importers.settings.ES_TAX_INDEX_ALIAS)
     except Exception as e:
         log.error(f'Failed to update aliases. {e}')
         raise

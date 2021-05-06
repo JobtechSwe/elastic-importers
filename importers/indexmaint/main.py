@@ -2,56 +2,46 @@ import sys
 import logging
 from elasticsearch.exceptions import NotFoundError
 
-import importers.mappings
 from importers.repository import elastic
 from importers import settings
 
 log = logging.getLogger(__name__)
 
 
-def set_platsannons_read_alias(idxname=None):
-    if not idxname and len(sys.argv) > 1:
-        idxname = sys.argv[1]
-    if not idxname:
+def set_platsannons_read_alias(idx_name=None):
+    if not idx_name and len(sys.argv) > 1:
+        idx_name = sys.argv[1]
+    if not idx_name:
         log.error("Must provide name of read index to alias against. Exit!")
         sys.exit(1)
 
     aliasname = "%s%s" % (settings.ES_ANNONS_PREFIX, settings.READ_INDEX_SUFFIX)
-    change_alias([idxname], aliasname)
+    change_alias([idx_name], aliasname)
     deleted_index = "%s%s" % (settings.ES_ANNONS_PREFIX, settings.DELETED_INDEX_SUFFIX)
     stream_alias = "%s%s" % (settings.ES_ANNONS_PREFIX, settings.STREAM_INDEX_SUFFIX)
-    change_alias([idxname, deleted_index], stream_alias)
+    change_alias([idx_name, deleted_index], stream_alias)
 
 
-def set_platsannons_write_alias(idxname=None):
+def set_platsannons_write_alias(idx_name=None):
     if len(sys.argv) > 1:
-        idxname = sys.argv[1]
-    if not idxname:
+        idx_name = sys.argv[1]
+    if not idx_name:
         log.error("Must provide name of write index to alias against. Exit!")
         sys.exit(1)
 
-    change_alias([idxname], settings.ES_ANNONS_INDEX)
+    change_alias([idx_name], settings.ES_ANNONS_INDEX)
 
 
-def create_platsannons_index():
-    if len(sys.argv) < 1:
-        log.error("Must provide name of index to alias against. Exit!")
-        sys.exit(1)
-
-    idxname = sys.argv[1]
-    elastic.create_index(idxname, importers.mappings.platsannons_mappings)
-
-
-def change_alias(idxnames, aliasname):
-    log.info(f"Setting alias: {aliasname} to point to: {idxnames}")
+def change_alias(idx_names, alias_name):
+    log.info(f"Setting alias: {alias_name} to point to: {idx_names}")
     try:
-        if elastic.alias_exists(aliasname):
-            oldindices = list(elastic.get_alias(aliasname).keys())
-            elastic.update_alias(idxnames, oldindices, aliasname)
+        if elastic.alias_exists(alias_name):
+            oldindices = list(elastic.get_alias(alias_name).keys())
+            elastic.update_alias(idx_names, oldindices, alias_name)
         else:
-            elastic.add_indices_to_alias(idxnames, aliasname)
+            elastic.add_indices_to_alias(idx_names, alias_name)
     except NotFoundError as e:
-        log.error(f"Can't create alias: {aliasname}. Indices not found: {idxnames}. {e} Exit!")
+        log.error(f"Can't create alias: {alias_name}. Indices not found: {idx_names}. {e} Exit!")
         sys.exit(1)
 
 

@@ -18,14 +18,14 @@ else:
 log.info(f"Elastic object set using host: {settings.ES_HOST}:{settings.ES_PORT}")
 
 
-def _bulk_generator(documents, indexname, idkey, deleted_index):
-    log.debug(f"(_bulk_generator) index: {indexname}, idkey: {idkey}, deleted_index: {deleted_index}")
+def _bulk_generator(documents, indexname, id_key, deleted_index):
+    log.debug(f"(_bulk_generator) index: {indexname}, id_key: {id_key}, deleted_index: {deleted_index}")
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
         else:
-            doc_id = '-'.join([document[key] for key in idkey]) \
-                if isinstance(idkey, list) else document[idkey]
+            doc_id = '-'.join([document[key] for key in id_key]) \
+                if isinstance(id_key, list) else document[id_key]
 
         if document.get('removed', False):
             if deleted_index:
@@ -122,22 +122,6 @@ def get_ad_by_id(id, indexname=settings.ES_ANNONS_INDEX):
     return ad
 
 
-def get_ids_with_timestamp(ts, indexname):
-    # Possible failure if there are more than "size" documents with the same timestamp
-    max_size = 1000
-    response = es.search(index=indexname,
-                         body={
-                             "from": 0, "size": max_size,
-                             "sort": {"timestamp": "desc"},
-                             "_source": "id",
-                             "query": {
-                                 "term": {"timestamp": ts}
-                             }
-                         })
-    hits = response['hits']['hits']
-    return [hit['_source']['id'] for hit in hits]
-
-
 def find_missing_ad_ids(ad_ids, es_index):
     # Check if the index has the ad ids. If refresh fails, still scan and log but return 0.
     try:
@@ -213,8 +197,8 @@ def get_alias(alias_name):
         log.error(f"No alias: {alias_name}, {e}")
 
 
-def put_alias(indexlist, alias_name):
-    return es.indices.put_alias(index=indexlist, name=alias_name)
+def put_alias(index_list, alias_name):
+    return es.indices.put_alias(index=index_list, name=alias_name)
 
 
 def setup_indices(es_index, default_index, mappings, mappings_deleted=None):

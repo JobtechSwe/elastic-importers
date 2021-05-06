@@ -55,13 +55,13 @@ def fetch_and_convert_values():
     municipalities = _fetch_value(MUNICIPALITY_QUERY)
     converted_values += [convert_municipality_value(municipality) for municipality in municipalities]
 
-    for type in taxonomy_settings.GENERAL_VALUES:
-        field = '"' + type + '"'
+    for type_general in taxonomy_settings.GENERAL_VALUES:
+        field = '"' + type_general + '"'
         values = _fetch_value(GENERAL_QUERY % field)
-        converted_values += [convert_general_value(value, type) for value in values]
+        converted_values += [convert_general_value(value, type_general) for value in values]
 
-    for type in taxonomy_settings.REPLACED_VALUES:
-        field = '"' + type + '"'
+    for type_replaced in taxonomy_settings.REPLACED_VALUES:
+        field = '"' + type_replaced + '"'
         values = _fetch_value(QUERY_WITH_REPLACED % field)
-        converted_values += [convert_value_with_replaced(value, type) for value in values]
+        converted_values += [convert_value_with_replaced(value, type_replaced) for value in values]
     return converted_values

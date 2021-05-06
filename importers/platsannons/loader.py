@@ -118,7 +118,7 @@ def load_ad_details(ad_meta):
                 ad['logo_url'] = find_correct_logo_url(ad.get('arbetsplatsId'),
                                                        ad.get('organisationsnummer'))
                 desensitized_ad = _clean_sensitive_data(ad, detail_url_la)
-                clean_ad = _cleanup_stringvalues(desensitized_ad)
+                clean_ad = _cleanup_string_values(desensitized_ad)
                 return clean_ad
         # On fail, try again 10 times with 0.3 second delay
         except requests.exceptions.RequestException as e:
@@ -203,12 +203,12 @@ def find_correct_logo_url(workplace_id, org_number):
     return logo_url
 
 
-def _cleanup_stringvalues(value):
+def _cleanup_string_values(value):
     if isinstance(value, dict):
-        value = {_cleanup_stringvalues(k): _cleanup_stringvalues(v)
+        value = {_cleanup_string_values(k): _cleanup_string_values(v)
                  for k, v in value.items()}
     elif isinstance(value, list):
-        value = [_cleanup_stringvalues(v) for v in value]
+        value = [_cleanup_string_values(v) for v in value]
     elif isinstance(value, str):
         value = ''.join([i if ord(i) > 0 else '' for i in value])
     return value
