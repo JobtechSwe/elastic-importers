@@ -19,7 +19,8 @@ RETRIES = 10
 def enrich(annonser, typeahead=True):
     len_annonser = len(annonser)
     parallelism = settings.ENRICHER_PROCESSES if len_annonser > 100 else 1
-    log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
+    log.info(
+        f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
 
     global counter
     counter = Value('i', 0)
@@ -66,7 +67,7 @@ def enrich(annonser, typeahead=True):
         batch_indatas.append(batch_indata)
 
     enrich_results_data = execute_calls(batch_indatas, parallelism)
-    log.info('Enriched %s/%s documents' % (len(enrich_results_data), len_annonser))
+    log.info(f"Enriched {len(enrich_results_data)} / {len_annonser} documents")
     log.info('Typeahead terms will be not enriched!') if not typeahead else None
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
@@ -111,7 +112,8 @@ def get_enrich_result(batch_indata, timeout):
     headers = {'Content-Type': 'application/json', 'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
     for retry in range(RETRIES):
         try:
-            r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE, headers=headers, json=batch_indata, timeout=timeout)
+            r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE, headers=headers, json=batch_indata,
+                              timeout=timeout)
             r.raise_for_status()
         except requests.HTTPError as e:
             log.warning(f"get_enrich_result() retrying after error: {e}")
