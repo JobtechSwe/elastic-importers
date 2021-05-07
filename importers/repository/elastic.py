@@ -172,7 +172,7 @@ def index_exists(indexname):
             if fail_count > 1:
                 # Elastic has its own failure management, so > 1 is enough.
                 log.error(f"Elastic not available after try: {fail_count}. Stop trying. {e}")
-                raise e
+                return False
             fail_count += 1
             log.warning(f"Connection fail: {fail_count} for index: {indexname} with {e}")
             time.sleep(1)
