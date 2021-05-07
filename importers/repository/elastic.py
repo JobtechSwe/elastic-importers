@@ -216,7 +216,7 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
     if not index_exists(deleted_index):
         log.info(f"Creating index: {deleted_index}")
         create_index(deleted_index, mappings_deleted)
-    if not index_exists(es_index):
+    if not index_exists(write_alias):
         log.info(f"Creating index: {es_index}")
         create_index(es_index, mappings)
     if write_alias and not alias_exists(write_alias):
