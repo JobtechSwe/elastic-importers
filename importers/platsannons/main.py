@@ -2,7 +2,6 @@ import time
 import logging
 import sys
 import math
-import itertools
 from datetime import datetime
 
 import requests
@@ -13,7 +12,7 @@ from importers.platsannons import loader, converter, enricher_mt_rest_multiple a
 from importers.repository import elastic
 from importers.indexmaint.main import set_platsannons_read_alias, set_platsannons_write_alias, \
     check_index_size_before_switching_alias
-from index_from_file.file_handling import save_enriched_ads_to_file
+from importers.common import grouper
 
 configure_logging([__name__.split('.')[0], 'importers'])
 log = logging.getLogger(__name__)
@@ -53,9 +52,10 @@ def start(es_index=None):
     start_time = time.time()
     # Get, set and create elastic index
     es_index, es_index_deleted = _setup_index(es_index)
-    log.info("Starting ad import into index: %s" % es_index)
+    log.info(f"Starting ad import into index: {es_index}")
+    log.info(f"Using taxonomy index: {elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)}")
     last_timestamp = _check_last_timestamp(es_index)
-    log.info("Timestamp to load from: %d" % last_timestamp)
+    log.info(f"Timestamp to load from: {last_timestamp}")
 
     if not settings.LA_FEED_URL:
         log.error("LA_FEED_URL is not set. Exit!")
@@ -108,9 +108,9 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         sys.exit(1)
     nr_of_batches = math.ceil(len_ads / nr_of_items_per_batch)
     # Partition list into manageable chunks
-    ad_batches = _grouper(nr_of_items_per_batch, ad_ids)
+    ad_batches = grouper(nr_of_items_per_batch, ad_ids)
     processed_ads_total = 0
-    taxonomy_2 = _get_taxonomy_multiple_versions()
+    taxonomy_data = _get_taxonomy_multiple_versions()
 
     for i, ad_batch in enumerate(ad_batches):
         log.info('Processing batch %s/%s' % (i + 1, nr_of_batches))
@@ -123,36 +123,27 @@ def _load_and_process_ads(ad_ids, es_index, es_index_deleted):
         doc_counter += len(raw_ads)
         log.info(f'doc_counter=len(raw_ads): {doc_counter}')
         log.debug(f'Fetched batch of ads (id, updatedAt): '
-                 f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
+                  f'{", ".join(("(" + str(ad["annonsId"]) + ", " + str(ad["updatedAt"])) + ")" for ad in raw_ads)}')
 
-        _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted, taxonomy_2)
+        _convert_and_save_to_elastic(ad_details.values(), es_index, es_index_deleted, taxonomy_data)
         processed_ads_total = processed_ads_total + len(ad_batch)
 
         log.info(f'Processed ads: {processed_ads_total}/{len_ads}')
-    save_enriched_ads()
 
     return doc_counter
 
 
-def save_enriched_ads():
-    """
-    saves enriched ads to a Pickle file that can be used when creating an index from a known state
-    """
-    if settings.SAVE_ENRICHED_ADS:
-        save_enriched_ads_to_file(enriched_ads_to_save)
-
-
 def _get_taxonomy_multiple_versions():
-    headers = {"api-key": settings.TAXONOMY_2_API_KEY, }
-    taxonomy_2_response = requests.get(settings.TAXONOMY_2_URL, headers=headers)
-    taxonomy_2_response.raise_for_status()
-    return taxonomy_2_response.json()
+    headers = {"api-key": settings.TAXONOMY_API_KEY, }
+    taxonomy_response = requests.get(url=settings.TAXONOMY_CHANGES_URL, headers=headers)
+    taxonomy_response.raise_for_status()
+    return taxonomy_response.json()
 
 
-def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index, taxonomy_2):
+def _convert_and_save_to_elastic(raw_ads, es_index, deleted_index, taxonomy_data):
     # Loop over raw-list, convert and enrich into cooked-list
     log.info(f"Converting: {len(raw_ads)} ads to proper format ...")
-    converted_ads = [converter.convert_ad(raw_ad, taxonomy_2) for raw_ad in raw_ads]
+    converted_ads = [converter.convert_ad(raw_ad, taxonomy_data) for raw_ad in raw_ads]
     log.info("Enriching ads with ML ...")
     enriched_ads = enricher.enrich(converted_ads)
 
@@ -173,14 +164,10 @@ def _find_missing_ids_and_create_loadinglist(ad_ids, es_index):
     return [id_lookup[missing_id] for missing_id in missing_ids]
 
 
-def _grouper(n, iterable):
-    iterable = iter(iterable)
-    return iter(lambda: list(itertools.islice(iterable, n)), [])
-
-
 def start_daily_index():
-    new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX, datetime.now().strftime('%Y%m%d-%H.%M'))
+    new_index_name = "%s-%s" % (settings.ES_ANNONS_PREFIX, datetime.now().strftime('%Y%m%d-%H%M'))
     log.info(f"Start creating new daily index: {new_index_name}")
+    log.info(f"Using taxonomy index: {elastic.get_index_name_for_alias(importers.settings.ES_TAX_INDEX_ALIAS)}")
     start(new_index_name)
     set_platsannons_read_alias(new_index_name)
     set_platsannons_write_alias(new_index_name)

@@ -19,7 +19,8 @@ RETRIES = 10
 def enrich(annonser, typeahead=True):
     len_annonser = len(annonser)
     parallelism = settings.ENRICHER_PROCESSES if len_annonser > 100 else 1
-    log.info(f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
+    log.info(
+        f'Enriching docs: {len_annonser} processes: {parallelism} calling: {settings.URL_ENRICH_TEXTDOCS_SERVICE} ')
 
     global counter
     counter = Value('i', 0)
@@ -66,7 +67,7 @@ def enrich(annonser, typeahead=True):
         batch_indatas.append(batch_indata)
 
     enrich_results_data = execute_calls(batch_indatas, parallelism)
-    log.info('Enriched %s/%s documents' % (len(enrich_results_data), len_annonser))
+    log.info(f"Enriched docs: {len(enrich_results_data)} / {len_annonser}")
     log.info('Typeahead terms will be not enriched!') if not typeahead else None
     for annons in annonser:
         doc_id = str(annons.get('id', ''))
@@ -80,7 +81,11 @@ def enrich(annonser, typeahead=True):
 def get_doc_headline_input(annons):
     sep = ' | '
     # Add occupation from structured data in headline.
-    doc_headline_occupation = ' '.join([occupation.get('label', '') for occupation in annons.get('occupation', {})])
+    doc_headline_occupation = sep.join([occupation.get('label', '') for occupation in annons.get('occupation', {})])
+    occupation_group = annons.get('occupation_group', {})
+    if not occupation_group:
+        log.error(f"No occupation group: {occupation_group} for ad: {annons.get('id')}")
+
     if not doc_headline_occupation:
         doc_headline_occupation = ''
     log.debug(f"enriched headline occupation: {doc_headline_occupation}")
@@ -105,7 +110,8 @@ def get_enrich_result(batch_indata, timeout):
     headers = {'Content-Type': 'application/json', 'api-key': settings.API_KEY_ENRICH_TEXTDOCS}
     for retry in range(RETRIES):
         try:
-            r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE, headers=headers, json=batch_indata, timeout=timeout)
+            r = requests.post(url=settings.URL_ENRICH_TEXTDOCS_SERVICE, headers=headers, json=batch_indata,
+                              timeout=timeout)
             r.raise_for_status()
         except requests.HTTPError as e:
             log.warning(f"get_enrich_result() retrying after error: {e}")
@@ -128,8 +134,8 @@ def execute_calls(batch_indatas, parallelism):
         for future in concurrent.futures.as_completed(future_to_enrich_result):
             try:
                 enriched_result = future.result()
-                for resultrow in enriched_result:
-                    enriched_output[resultrow[settings.ENRICHER_PARAM_DOC_ID]] = resultrow
+                for result_row in enriched_result:
+                    enriched_output[result_row[settings.ENRICHER_PARAM_DOC_ID]] = result_row
                     # += operation is not atomic, so we need to get a lock:
                     with counter.get_lock():
                         counter.value += 1
@@ -201,12 +207,12 @@ def process_enriched_candidates(annons, enriched_output):
 
 def process_enriched_candidates_typeahead_terms(annons, enriched_output):
     enriched_candidates = enriched_output['enriched_candidates']
-    fieldname = 'enriched_typeahead_terms'
+    field_name = 'enriched_typeahead_terms'
 
-    if fieldname not in annons['keywords']:
-        annons['keywords'][fieldname] = {}
+    if field_name not in annons['keywords']:
+        annons['keywords'][field_name] = {}
 
-    enriched_typeahead_node = annons['keywords'][fieldname]
+    enriched_typeahead_node = annons['keywords'][field_name]
 
     enriched_typeahead_node[TARGET_TYPE_OCCUPATION] = filter_valid_typeahead_terms(
         filter_candidates(enriched_candidates, SOURCE_TYPE_OCCUPATION, settings.ENRICH_THRESHOLD_OCCUPATION))
@@ -227,10 +233,10 @@ def process_enriched_candidates_typeahead_terms(annons, enriched_output):
 
 def filter_valid_typeahead_terms(candidates):
     typeahead_for_type = set()
-    for cand in candidates:
-        typeahead_for_type.add(cand['concept_label'].lower())
-        if not cand['term_misspelled']:
-            typeahead_for_type.add(cand['term'].lower())
+    for candidate in candidates:
+        typeahead_for_type.add(candidate['concept_label'].lower())
+        if not candidate['term_misspelled']:
+            typeahead_for_type.add(candidate['term'].lower())
     return list(typeahead_for_type)
 
 

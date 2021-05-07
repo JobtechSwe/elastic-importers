@@ -18,14 +18,14 @@ else:
 log.info(f"Elastic object set using host: {settings.ES_HOST}:{settings.ES_PORT}")
 
 
-def _bulk_generator(documents, indexname, idkey, deleted_index):
-    log.debug(f"(_bulk_generator) index: {indexname}, idkey: {idkey}, deleted_index: {deleted_index}")
+def _bulk_generator(documents, indexname, id_key, deleted_index):
+    log.debug(f"(_bulk_generator) index: {indexname}, id_key: {id_key}, deleted_index: {deleted_index}")
     for document in documents:
         if "concept_id" in document:
             doc_id = document["concept_id"]
         else:
-            doc_id = '-'.join([document[key] for key in idkey]) \
-                if isinstance(idkey, list) else document[idkey]
+            doc_id = '-'.join([document[key] for key in id_key]) \
+                if isinstance(id_key, list) else document[id_key]
 
         if document.get('removed', False):
             if deleted_index:
@@ -122,22 +122,6 @@ def get_ad_by_id(id, indexname=settings.ES_ANNONS_INDEX):
     return ad
 
 
-def get_ids_with_timestamp(ts, indexname):
-    # Possible failure if there are more than "size" documents with the same timestamp
-    max_size = 1000
-    response = es.search(index=indexname,
-                         body={
-                             "from": 0, "size": max_size,
-                             "sort": {"timestamp": "desc"},
-                             "_source": "id",
-                             "query": {
-                                 "term": {"timestamp": ts}
-                             }
-                         })
-    hits = response['hits']['hits']
-    return [hit['_source']['id'] for hit in hits]
-
-
 def find_missing_ad_ids(ad_ids, es_index):
     # Check if the index has the ad ids. If refresh fails, still scan and log but return 0.
     try:
@@ -188,27 +172,33 @@ def index_exists(indexname):
             if fail_count > 1:
                 # Elastic has its own failure management, so > 1 is enough.
                 log.error(f"Elastic not available after try: {fail_count}. Stop trying. {e}")
-                raise e
+                return False
             fail_count += 1
             log.warning(f"Connection fail: {fail_count} for index: {indexname} with {e}")
             time.sleep(1)
 
 
-def alias_exists(aliasname):
-    return es.indices.exists_alias(name=[aliasname])
+def alias_exists(alias_name):
+    return es.indices.exists_alias(name=[alias_name])
 
 
 def get_index_name_for_alias(alias_name):
-    response = get_alias(alias_name)
-    return list(response.keys())[0]
+    try:
+        response = get_alias(alias_name)
+        return list(response.keys())[0]
+    except Exception as e:
+        log.error(f"No index found for: {alias_name}, {e}")
 
 
-def get_alias(aliasname):
-    return es.indices.get_alias(name=[aliasname])
+def get_alias(alias_name):
+    try:
+        return es.indices.get_alias(name=[alias_name])
+    except Exception as e:
+        log.error(f"No alias: {alias_name}, {e}")
 
 
-def put_alias(indexlist, aliasname):
-    return es.indices.put_alias(index=indexlist, name=aliasname)
+def put_alias(index_list, alias_name):
+    return es.indices.put_alias(index=index_list, name=alias_name)
 
 
 def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
@@ -226,7 +216,7 @@ def setup_indices(es_index, default_index, mappings, mappings_deleted=None):
     if not index_exists(deleted_index):
         log.info(f"Creating index: {deleted_index}")
         create_index(deleted_index, mappings_deleted)
-    if not index_exists(es_index):
+    if not index_exists("%s%s" % (es_index, settings.WRITE_INDEX_SUFFIX)):
         log.info(f"Creating index: {es_index}")
         create_index(es_index, mappings)
     if write_alias and not alias_exists(write_alias):
@@ -296,5 +286,5 @@ def update_alias(indexnames, old_indexlist, aliasname):
 
 
 def number_of_not_removed_ads(current_index):
-    query_not_removed = {"query": {"bool": {"must": {"term": {"removed": False}}}}}
+    query_not_removed = {"query": {"bool": {"must": {"term": {"removed": False}}}}, "track_total_hits": True}
     return es.search(index=current_index, body=query_not_removed)['hits']['total']['value']

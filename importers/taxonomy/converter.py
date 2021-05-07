@@ -1,299 +1,100 @@
 import logging
-from collections import OrderedDict
-from valuestore.taxonomy import JobtechTaxonomy as jt
-
 
 logging.basicConfig()
 logging.getLogger(__name__).setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 
 
-def create_valuestore_jobs(taxonomy_jobterms, taxonomy_jobgroups,
-                           taxonomy_jobfields):
-    jobfields = {
-        field['LocaleFieldID']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['LocaleFieldID'])),
-             ('type', jt.OCCUPATION_FIELD),
-             ('label', field['Term']),
-             ('concept_id', str(field['uuid_id'])),
-             ('description', field['Description']),
-             ('legacy_ams_taxonomy_num_id', int(field['LocaleFieldID']))])
-        for field in taxonomy_jobfields
-    }
-    jobgroups = {
-        field['LocaleCode']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['LocaleCode'])),
-             ('type', jt.OCCUPATION_GROUP),
-             ('label', field['Term']),
-             ('concept_id', str(field['uuid_id'])),
-             ('description', field['Description']),
-             ('legacy_ams_taxonomy_num_id', int(field['LocaleCode'])),
-             ('parent', jobfields[field['LocaleFieldID']])])
-        for field in taxonomy_jobgroups
-    }
-    jobterms = {
-        field['OccupationNameID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['OccupationNameID'])),
-                     ('type', jt.OCCUPATION_NAME),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['OccupationNameID'])),
-                     ('parent', jobgroups[field['LocaleCode']])])
-        for field in taxonomy_jobterms
-    }
-    return jobterms, jobgroups, jobfields
+def _standard_format(legacy_id, type, label, concept_id):
+    if legacy_id:
+        legacy_num_id = int(legacy_id)
+    else:
+        legacy_num_id = None
+    return {
+        'legacy_ams_taxonomy_id': legacy_id,
+        'type': type,
+        'label': label,
+        'concept_id': concept_id,
+        'legacy_ams_taxonomy_num_id': legacy_num_id}
 
 
-def create_valuestore_geo(file_places, taxonomy_municipalities, taxonomy_regions,
-                          taxonomy_countries):
-    countries = {
-        field['CountryID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['CountryID'])),
-                     ('type', jt.COUNTRY),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['CountryID'])),
-                     ('country_code', field['CountryCode'])])
-        for field in taxonomy_countries
-    }
-    regions = {
-        field['NationalNUTSLevel3Code']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['NationalNUTSLevel3Code'])),
-             ('type', jt.REGION),
-             ('label', field['Term']),
-             ('concept_id', str(field['uuid_id'])),
-             ('legacy_ams_taxonomy_num_id', int(field['NationalNUTSLevel3Code']))])
-        for field in taxonomy_regions
-    }
-    municipalities = {
-        field['NationalNUTSLAU2Code']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['NationalNUTSLAU2Code'])),
-             ('type', jt.MUNICIPALITY),
-             ('concept_id', str(field['uuid_id'])),
-             ('label', field['Term']),
-             ('parent', regions[field['NationalNUTSLevel3Code']]),
-             ('legacy_ams_taxonomy_num_id', int(field['NationalNUTSLAU2Code']))])
-        for field in taxonomy_municipalities
-    }
-
-    places = {}
-    for place in file_places:
-        identifier = "%s-%s" % (place['kommunkod'], _slugify(place['label']))
-        #concept_id = str(place["concept_id"])
-        municipality = municipalities[place['kommunkod']]
-        places[identifier] = dict({'legacy_ams_taxonomy_id': identifier,
-                                   'concept_id': place["uuid_id"]}, **place)
-        #del places[identifier]['concept_id']
-        places[identifier]['parent'] = municipality
-    #print(places)
-    return places, municipalities, regions, countries
+def _add_replaced_format(legacy_id, type, label, concept_id, replaced_by):
+    result = _standard_format(legacy_id, type, label, concept_id)
+    result['replaced_by'] = []
+    if replaced_by:
+        for replaced in replaced_by:
+            result['replaced_by'].append(_standard_format(replaced.get('deprecated_legacy_id', None), type,
+                                                          replaced.get('preferred_label', None), replaced.get('id')))
+    return result
 
 
-def _slugify(string):
-    return string.lower().replace('å', 'a') \
-            .replace('ä', 'a').replace('ö', 'o').replace(' ', '_') if string else None
+def convert_occupation_value(value):
+    convert_values = []
+    occupation_name = _standard_format(value.get('deprecated_legacy_id', None), 'occupation-name',
+                                       value.get('preferred_label', None), value.get('id'))
+    occupation_name['collection'] = {}
+    occupation_name['replaced_by'] = []
+    occupation_name['parent'] = {}
+
+    collection_value = value.get('related', [])
+    replaced_values = value.get("replaced_by", [])
+    parent_value = value.get('broader', {})
+
+    if not parent_value and replaced_values:   # If Occupation name is deprecated, replaced value is used
+        parent_value = replaced_values[0].get('broader', {})
+
+    if parent_value:
+        parent_value = parent_value[0]
+        occupation_group = _standard_format(parent_value.get('ssyk_code_2012', None), 'occupation-group',
+                                            parent_value.get("preferred_label", None),  parent_value.get('id'))
+        occupation_group['parent'] = {}
+        grandparent_value = parent_value.get('broader', {})
+        if grandparent_value:
+            grandparent_value = grandparent_value[0]
+            occupation_field = _standard_format(grandparent_value.get('deprecated_legacy_id', None), 'occupation-field',
+                                                grandparent_value.get("preferred_label", None),  grandparent_value.get('id'))
+            convert_values.append(occupation_field)
+            occupation_group['parent'] = occupation_field
+        else:
+            log.warning(
+                f"There is no occupation field for {parent_value.get('id', None)} - {parent_value.get('preferred_label', None)}")
+        convert_values.append(occupation_group)
+        occupation_name['parent'] = occupation_group
+    else:
+        log.warning(f"There is no occupation group for {value.get('id', None)} - {value.get('preferred_label', None)}")
+
+    if collection_value:  # Add collection field
+        collection_value = collection_value[0]
+        collection = _standard_format(collection_value.get('deprecated_legacy_id', None), 'collection_value',
+                                      collection_value.get("preferred_label", None), collection_value.get('id'))
+        occupation_name['collection'] = collection
+
+    if replaced_values:  # Add replaced value
+        replaced = []
+        for replaced_value in replaced_values:
+            replaced.append(_standard_format(replaced_value.get('deprecated_legacy_id', None), 'collection_value',
+                                             replaced_value.get("preferred_label", None), replaced_value.get('id')))
+        occupation_name['replaced_by'] = replaced
+    convert_values.append(occupation_name)
+    return convert_values
 
 
-def create_valuestore_skills(taxonomy_skills):
-    skills = {
-        field['SkillID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['SkillID'])),
-                     ('type', jt.SKILL),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('description', field['Term'])])
-        for field in taxonomy_skills
-    }
-    return skills
+def convert_region_value(value):
+    return _standard_format(value.get('national_nuts_level_3_code_2019', None), 'region',
+                            value.get("preferred_label", None), value.get('id'))
 
 
-def create_valuestore_work_time_extent(taxonomy_work_time_extent):
-    wte = {
-        field['WorkTimeExtentID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['WorkTimeExtentID'])),
-                     ('type', jt.WORKTIME_EXTENT),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id']))])
-        for field in taxonomy_work_time_extent
-    }
-    return wte
+def convert_municipality_value(value):
+    return _standard_format(value.get('lau_2_code_2015', None), 'municipality',
+                            value.get("preferred_label", None), value.get('id'))
 
 
-def create_valuestore_languages(taxonomy_languages):
-    languages = {
-        field['LanguageID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['LanguageID'])),
-                     ('type', jt.LANGUAGE),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['LanguageID']))])
-        for field in taxonomy_languages
-    }
-    return languages
+def convert_general_value(value, type):
+    return _standard_format(value.get('deprecated_legacy_id', None), type,
+                            value.get("preferred_label", None), value.get('id'))
 
 
-def create_valuestore_employment_types(taxonomy_employmenttypes):
-    employment_types = {
-        field['EmploymentTypeID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['EmploymentTypeID'])),
-                     ('type', jt.EMPLOYMENT_TYPE),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['EmploymentTypeID']))])
-        for field in taxonomy_employmenttypes
-    }
-    return employment_types
-
-
-def create_valuestore_driving_licence(taxonomy_drivinglicence):
-    driving_licence = {
-        field['DrivingLicenceID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['DrivingLicenceID'])),
-                     ('type', jt.DRIVING_LICENCE),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('description', field['Description']),
-                     ('legacy_ams_taxonomy_num_id', int(field['DrivingLicenceID']))])
-        for field in taxonomy_drivinglicence
-    }
-    return driving_licence
-
-
-def create_valuestore_wagetype(taxonomy_wagetype):
-    wage_type = {
-        field['WageTypeID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['WageTypeID'])),
-                     ('type', jt.WAGE_TYPE),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['WageTypeID']))])
-        for field in taxonomy_wagetype
-    }
-    return wage_type
-
-
-def create_valuestore_education_fields(taxonomy_education_field_SUN1, taxonomy_education_field_SUN2, taxonomy_education_field_SUN3):
-    education_field_SUN1 = {
-        field['SUNField1ID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['SUNField1Code'])),
-                     ('type', jt.SUN_EDUCATION_FIELD_1),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['SUNField1Code']))])
-        for field in taxonomy_education_field_SUN1
-    }
-
-    education_field_SUN2 = {
-        field['SUNField2ID']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['SUNField2Code'])),
-             ('type',  jt.SUN_EDUCATION_FIELD_2),
-             ('label', field['Term']),
-             ('concept_id', str(field['uuid_id'])),
-             ('legacy_ams_taxonomy_num_id', int(field['SUNField2Code'])),
-             ('parent', education_field_SUN1[field['SUNField1ID']])])
-        for field in taxonomy_education_field_SUN2
-    }
-
-    education_field_SUN3 = {
-        field['SUNField3ID']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['SUNField3Code'])),
-             ('type',  jt.SUN_EDUCATION_FIELD_3),
-             ('label', field['Term']),
-             ('concept_id', str(field['uuid_id'])),
-             ('legacy_ams_taxonomy_num_id', int(field['SUNField3ID'])),
-             ('parent', education_field_SUN2[field['SUNField2ID']])])
-        for field in taxonomy_education_field_SUN3
-    }
-
-    return education_field_SUN1, education_field_SUN2, education_field_SUN3
-
-
-def create_valuestore_education_levels(taxonomy_education_levels_SUN1, taxonomy_education_levels_SUN2,
-                                       taxonomy_education_levels_SUN3):
-    education_levels_SUN1 = {
-        field['SUNLevel1ID']:
-            OrderedDict([('legacy_ams_taxonomy_id', str(field['SUNLevel1Code'])),
-                         ('type', jt.SUN_EDUCATION_LEVEL_1),
-                         ('label', field['Term']),
-                         ('concept_id', str(field['uuid_id'])),
-                         ('legacy_ams_taxonomy_num_id', int(field['SUNLevel1Code']))])
-        for field in taxonomy_education_levels_SUN1
-    }
-
-    education_levels_SUN2 = {
-        field['SUNLevel2ID']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['SUNLevel2Code'])),
-             ('type',  jt.SUN_EDUCATION_LEVEL_2),
-             ('label', field['Term']),
-             ('concept_id', str(field['uuid_id'])),
-             ('legacy_ams_taxonomy_num_id', int(field['SUNLevel2Code'])),
-             ('parent', education_levels_SUN1[field['SUNLevel1ID']])])
-        for field in taxonomy_education_levels_SUN2
-    }
-
-    education_levels_SUN3 = {
-        field['SUNLevel3ID']: OrderedDict(
-            [('legacy_ams_taxonomy_id', str(field['SUNLevel3Code'])),
-             ('type',  jt.SUN_EDUCATION_LEVEL_3),
-             ('label', field['Term']),
-             ('concept_id', str(field['uuid_id'])),
-             ('legacy_ams_taxonomy_num_id', int(field['SUNLevel3Code'])),
-             ('parent', education_levels_SUN2[field['SUNLevel2ID']])])
-        for field in taxonomy_education_levels_SUN3
-    }
-
-    return education_levels_SUN1, education_levels_SUN2, education_levels_SUN3
-
-
-def create_valuestore_deprecated_education_level(taxonomy_education_level):
-    education_level = {
-        field['EducationLevelID']:
-            OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationLevelID'])),
-                         ('type', jt.DEPRECATED_EDUCATION_LEVEL),
-                         ('label', field['Term']),
-                         ('concept_id', str(field['uuid_id'])),
-                         ('legacy_ams_taxonomy_num_id', int(field['EducationLevelID']))])
-        for field in taxonomy_education_level
-    }
-    return education_level
-
-
-def create_valuestore_deprecated_education_field(taxonomy_education_field):
-    education_field = {
-        field['EducationFieldID']:
-            OrderedDict([('legacy_ams_taxonomy_id', str(field['EducationFieldID'])),
-                         ('type', jt.DEPRECATED_EDUCATION_FIELD),
-                         ('label', field['Term']),
-                         ('concept_id', str(field['uuid_id'])),
-                         ('description', field['Description']),
-                         ('legacy_ams_taxonomy_num_id', int(field['EducationFieldID']))])
-        for field in taxonomy_education_field
-    }
-    return education_field
-
-
-def create_valuestore_duration(taxonomy_duration):
-    duration = {
-        field['EmploymentDurationID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['EmploymentDurationID'])),
-                     ('type', jt.EMPLOYMENT_DURATION),
-                     ('label', field['Term']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('EURESCode', field['EURESCode']),
-                     ('legacy_ams_taxonomy_num_id', int(field['EmploymentDurationID']))])
-        for field in taxonomy_duration
-    }
-    return duration
-
-
-def create_valuestore_occupation_experience(taxonomy_occupation_experience):
-    occupation_experience = {
-        field['OccupationExperienceYearID']:
-        OrderedDict([('legacy_ams_taxonomy_id', str(field['OccupationExperienceYearID'])),
-                     ('type', jt.OCCUPATION_EXPERIENCE_YEARS),
-                     ('label', field['ExperienceYearCandidate']),
-                     ('concept_id', str(field['uuid_id'])),
-                     ('legacy_ams_taxonomy_num_id', int(field['OccupationExperienceYearID']))])
-        for field in taxonomy_occupation_experience
-    }
-    return occupation_experience
+def convert_value_with_replaced(value, type):
+    return _add_replaced_format(value.get('deprecated_legacy_id', None), type,
+                                value.get("preferred_label", None), value.get('id'),
+                                value.get("replaced_by", []))
